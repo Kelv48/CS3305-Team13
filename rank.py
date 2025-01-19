@@ -15,9 +15,11 @@ class Rank(Enum):
     THREE = 3
     TWO = 2
     
+    #This is for the message headers between client and server 
 class Protocols:
     class Response:
-        NICKNAME = "protocol.request_nickname"
+        AUTHENTICATION_VALID = "protocol.valid_authentication"     #Used to responded with authentication credentials 
+        AUTHENTICATION_INVALID = "protocol.invalid_authentication" #Used to reject client login
         QUESTIONS = "protocol.questions"
         START = "protocol.start"
         OPPONENT = "protocol.opponent"
@@ -28,6 +30,6 @@ class Protocols:
         OPPONENT_LEFT = "protocol.opponent_left"
 
     class Request:
-        ANSWER = "protocol.answer"
-        NICKNAME = "protocol.send_nickname"
-        LEAVE = "protocol.leave"
+        RAISE = "protocol.raise"                                #Used by client to send request to raise the pot
+        AUTHENTICATION = "protocol.request_authentication"     #Used to request of auth when client logs in 
+        LEAVE = "protocol.leave"                                #Used to send request to leave game 
