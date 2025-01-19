@@ -1,4 +1,7 @@
 
+"""
+This module contains configuration settings
+"""
 
 TITLE = 'Poker :)'
 FPS = 60

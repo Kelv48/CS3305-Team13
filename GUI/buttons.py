@@ -1,47 +1,36 @@
+
+""" This module provides button related functionality """
+
 import pygame
 
-class Button():
-    def __init__(self, x, y, width, height, text, onclickFunction, font=None, fontSize=50, image=None):
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-        self.text = text
-        self.onclick = onclickFunction
-        self.image = image  # Image for the button background
+class Button:
+    def __init__(self, x, y, width, height, text, callback, image=None):
         
-        self.font = pygame.font.Font(font, fontSize)
-        self.buttonSurface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)  # Supports transparency
-        self.buttonRect = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.buttonSurf = self.font.render(self.text, True, (0, 0, 0))
+        self.image = image  
+        self.rect = pygame.Rect(x, y, width, height)  
+        self.text = text  
+        self.callback = callback  
+        self.font = pygame.font.Font('graphics/fonts/PixelatedDisplay.ttf', 50) 
 
-    # Draw the button to the window
-    def draw(self, win):
-        # If there's an image, use it; otherwise, draw a plain rectangle
+
+    """ Draws the button on the given surface """
+    def draw(self, surface):
         if self.image:
-            scaled_image = pygame.transform.scale(self.image, (self.width, self.height))
-            self.buttonSurface.blit(scaled_image, (0, 0))
+            surface.blit(self.image, self.rect.topleft) # Draw image
         else:
-            self.buttonSurface.fill((255, 255, 255))  # Fill with a default color
+            pygame.draw.rect(surface, (0, 255, 0), self.rect) # If no image then draw green rectangle
 
-        # Draw the text on the button
-        text_x = self.buttonRect.width / 2 - self.buttonSurf.get_width() / 2
-        text_y = self.buttonRect.height / 2 - self.buttonSurf.get_height() / 2
-        self.buttonSurface.blit(self.buttonSurf, (text_x, text_y))
-        
-        # Draw the button onto the screen
-        win.blit(self.buttonSurface, self.buttonRect)
+        # Draw text on the button
+        text_surf = self.font.render(self.text, True, (0, 0, 0))
+        surface.blit(text_surf, self.rect.topleft)
 
-    # Check if the button has been clicked
-    def clicked(self, pos):
-        if self.buttonRect.collidepoint(pos):
-            print("I've been clicked")
-            self.onclick()  # Call the button's associated function
-        else:
-            return False
 
+    """ Checks if the button is clicked and calls the callback function if it is """
+    def clicked(self, mouse_pos):
+        if self.rect.collidepoint(mouse_pos):
+            self.callback()
+
+
+    """ Sets the position of the button """
     def set_position(self, x, y):
-        """Set the button's position to new coordinates."""
-        self.x = x
-        self.y = y
-        self.buttonRect.topleft = (x, y)
+        self.rect.topleft = (x, y)  # Update top left position of rectangle
