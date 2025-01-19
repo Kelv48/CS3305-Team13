@@ -27,7 +27,7 @@ class GameState:
         self.fullscreen = False
         self.win = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
         self.clock = pygame.time.Clock()
-        self.font = pygame.font.Font('graphics/fonts/PixelatedDisplay.ttf', 20)
+        self.font = pygame.font.Font('graphics/fonts/Pixel.ttf', 20)
         self.background_image = pygame.image.load('graphics/images/background.png')
         self.music = pygame.mixer.music.load('./audio/poker_face.wav')  
         pygame.mixer.music.play(-1)  # Loops music continuously
