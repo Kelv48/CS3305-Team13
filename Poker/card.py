@@ -41,9 +41,9 @@ if __name__ == "__main__":
 
 
 
-def load_card_image(card: Card):
-    # 263 × 376
-    return pygame.transform.scale(
-        pygame.image.load("./assets/" + str(card) + ".png"),
-        scale_tuple((263 / 3, 376 / 3), scale_factor),
-    )
+# def load_card_image(card: Card):
+#     
+#     return pygame.transform.scale(
+#         pygame.image.load("./assets/" + str(card) + ".png"),
+#         scale_tuple((263 / 3, 376 / 3), scale_factor),
+#     )
