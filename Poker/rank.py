@@ -14,7 +14,3 @@ class Rank(Enum):
     FOUR = 4
     THREE = 3
     TWO = 2
-    
-#    def __str__(self):
-#        return str(self.value)
-    
