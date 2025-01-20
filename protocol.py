@@ -6,7 +6,7 @@ class Protocols:
         AUTHENTICATION_INVALID = "protocol.invalid_authentication" #Used to reject client login
         PLAYER_CARDS = "protocol.player_card"                      #Used to assign players hand 
         START = "protocol.start"                                   #Used to tell client that its there turn 
-        OPPONENT = "protocol.opponent"
+        OPPONENT = "protocol.opponent"                             #Used to update other clients of an opponents move
         WINNER = "protocol.winner"                                 #Used to reveal the winner of the round 
         OPPONENT_LEFT = "protocol.opponent_left"                   #Used to tell client that another player has left the game
 

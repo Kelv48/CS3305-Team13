@@ -21,9 +21,9 @@ class Client(object):
         #m_type tells the server what kind of message it is and what actions its should except to do
         #signature is there for validation to ensure that no bad actors manipulate messages
         message = {
-            "m_type":m_type, 
-            "data": data, 
-            "signature": self.id
+            'm_type':m_type, 
+            'data': data, 
+            'signature': self.id
         }
         self.client.send(json.dumps(message).encode())
     
@@ -43,13 +43,13 @@ class Client(object):
     def setHand(self, hand):
         self.clientHand = hand
 
-if __name__ == "__main__":
-    der = Client("localhost", 80)
-    der.send("test", "How are we")
+if __name__ == '__main__':
+    der = Client('localhost', 80)
+    der.send('test', 'How are we')
     while True:
         try:
-            message = input("Type a message: ")
-            der.send("test", message)
+            message = input('Type a message: ')
+            der.send('test', message)
             print(der.receive())
         except KeyboardInterrupt:
             break
