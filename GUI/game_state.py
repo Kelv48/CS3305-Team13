@@ -23,7 +23,6 @@ class GameState:
         - Background image
         - Music and starts playing Also starts playing
         """
-    
         self.fullscreen = False
         self.win = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
         self.clock = pygame.time.Clock()
@@ -32,6 +31,13 @@ class GameState:
         self.music = pygame.mixer.music.load('./audio/poker_face.wav')  
         pygame.mixer.music.play(-1)  # Loops music continuously
         self.current_screen = None
+        self.sfx_sounds = [
+        pygame.mixer.Sound('audio/chips.mp3'),
+        # pygame.mixer.Sound("")
+        ]
+
+
+    
 
 
     """ Draws the background image then scaled to fit the current window size """
@@ -64,6 +70,32 @@ class GameState:
                 self.toggle_fullscreen()
 
 
+    
+
+
+
+    
+
+
+    # def set_custom_cursor(self, cursor_image_path):
+    #     """
+    #     Sets a custom cursor image from the given file path.
+    #     """
+    #     try:
+    #         cursor_img = pygame.image.load('graphics/images/cursor.png')
+    #         cursor_size = cursor_img.get_size()
+    #         cursor_surface = pygame.Surface(cursor_size, pygame.SRCALPHA)
+    #         cursor_surface.blit(cursor_img, (0, 0))
+
+    #         # Convert image to a Pygame cursor format (mask, width, height, hotspot)
+    #         pygame.mouse.set_cursor(pygame.cursors.Cursor(*pygame.cursors.compile(
+    #             cursor_surface.get_at((x, y)) for y in range(cursor_size[1])
+    #             for x in range(cursor_size[0])
+    #         )))
+    #     except pygame.error:
+    #         print("Failed to load custom cursor image, using default.")
+
+
 
 # Load resources
 # card_img = pygame.image.load('./graphics/images/cards.png').convert()
@@ -73,11 +105,7 @@ class GameState:
 # )
 # # Mouse click sound effects
 # card_img.set_colorkey((0, 0, 0))
-# chips_sound = pygame.mixer.Sound('./audio/chips.mp3')
 
-# Initialize and play background music
-# pygame.mixer.music.load('./audio/poker_face.wav')  # Replace with your music file path
-# pygame.mixer.music.play(-1)  # Loop the music indefinitely
 
 # Game state
 # mouse_down = False

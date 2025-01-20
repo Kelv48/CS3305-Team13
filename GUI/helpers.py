@@ -31,7 +31,7 @@ def draw_text(surface, text, font, color, position):
 
 
 """ Centers buttons on the window """
-def center_buttons(win, btns, btn_width=200, btn_height=75, btn_spacing=20):
+def center_buttons(win, btns, btn_width=256, btn_height=72, btn_spacing=90):
     # Calculate center position of the screen
     screen_center_x = win.get_width() // 2
     screen_center_y = win.get_height() // 2
