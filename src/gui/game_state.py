@@ -10,7 +10,7 @@ This module handles the game state which includes:
 
 import pygame
 import sys
-from settings import *
+from src.utils.settings import *
 
 class GameState:
     def __init__(self):
@@ -26,13 +26,13 @@ class GameState:
         self.fullscreen = False
         self.win = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
         self.clock = pygame.time.Clock()
-        self.font = pygame.font.Font('graphics/fonts/Pixel.ttf', 20)
-        self.background_image = pygame.image.load('graphics/images/background.png')
-        self.music = pygame.mixer.music.load('./audio/poker_face.wav')  
+        self.font = pygame.font.Font('assets/fonts/Pixel.ttf', 20)
+        self.background_image = pygame.image.load('assets/images/extra/background.png')
+        self.music = pygame.mixer.music.load('assets/audio/music/poker_face.wav')  
         pygame.mixer.music.play(-1)  # Loops music continuously
         self.current_screen = None
         self.sfx_sounds = [
-        pygame.mixer.Sound('audio/chips.mp3'),
+        pygame.mixer.Sound('assets/audio/sfx/chips.mp3'),
         # pygame.mixer.Sound("")
         ]
 
@@ -82,7 +82,7 @@ class GameState:
     #     Sets a custom cursor image from the given file path.
     #     """
     #     try:
-    #         cursor_img = pygame.image.load('graphics/images/cursor.png')
+    #         cursor_img = pygame.image.load('assets/images/cursor.png')
     #         cursor_size = cursor_img.get_size()
     #         cursor_surface = pygame.Surface(cursor_size, pygame.SRCALPHA)
     #         cursor_surface.blit(cursor_img, (0, 0))
@@ -98,7 +98,7 @@ class GameState:
 
 
 # Load resources
-# card_img = pygame.image.load('./graphics/images/cards.png').convert()
+# card_img = pygame.image.load('./assets/images/cards.png').convert()
 # card_img = pygame.transform.scale(
 #     card_img,
 #     (card_img.get_width() * 2, card_img.get_height() * 2)
@@ -109,3 +109,14 @@ class GameState:
 
 # Game state
 # mouse_down = False
+
+
+
+
+
+
+
+
+
+
+

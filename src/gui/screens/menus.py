@@ -17,19 +17,17 @@ and transitioning between screens.
 
 
 import pygame
-from buttons import Button
-from settings import *
-import helpers
-
+from src.gui.components.buttons import Button, back_button
+from src.utils.settings import *
+import src.utils.helpers as helpers 
 
 
 def back_button(game_state, previous_screen):
     """
     Creates a back button to return to the previous screen.
     """
-    button_image = helpers.load_image('graphics/buttons/greenButton.png')
+    button_image = helpers.load_image('assets/images/buttons/greenButton.png')
     return Button(10, 10, 150, 50, "Back", lambda: previous_screen(game_state), image=button_image)
-
 
 
 
@@ -42,11 +40,11 @@ def start_menu(game_state):
     Handles button clicks and toggles fullscreen mode when ESC is pressed.
     """
     menu_text = game_state.font.render("Poker Showdown!", False, (0, 0, 0), None)
-    button_image = helpers.load_image('graphics/buttons/greenButton.png')
+    button_image = helpers.load_image('assets/images/buttons/greenButton.png')
     pygame.display.set_caption("Poker Showdown!") 
 
     # Define the buttons and their functionality
-    btns = [Button(0, 0, 200, 75, "Play", lambda: play_menu(game_state), image=button_image),
+    buttons = [Button(0, 0, 200, 75, "Play", lambda: play_menu(game_state), image=button_image),
             Button(0, 0, 200, 75, "Settings", lambda: settings_menu(game_state), image=button_image),
             Button(0, 0, 200, 75, "Guide", lambda: guide_menu(game_state), image=button_image),]
 
@@ -54,26 +52,26 @@ def start_menu(game_state):
     screen_width, screen_height = game_state.win.get_size()
 
     # Here is where the button will be centered
-    for btn in btns:
+    for button in buttons:
         # Center each button horizontally and vertically
-        btn.set_position((screen_width * 0.4), (screen_height * 0.4))
+        button.set_position((screen_width * 0.4), (screen_height * 0.4))
 
     while True:
         game_state.clock.tick(60)
         game_state.draw_background()
         
-        helpers.center_buttons(game_state.win, btns)  # Center buttons if required
+        helpers.center_buttons(game_state.win, buttons)  # Center buttons if required
 
         for event in pygame.event.get():
             helpers.handle_quit_event(event)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 game_state.toggle_fullscreen()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                for btn in btns:
-                    btn.is_clicked(pygame.mouse.get_pos())  # Use updated is_clicked()
+                for button in buttons:
+                    button.is_clicked(pygame.mouse.get_pos())  # Use updated is_clicked()
 
-        for btn in btns:
-            btn.draw(game_state.win)  # Draw the buttons
+        for button in buttons:
+            button.draw(game_state.win)  # Draw the buttons
         helpers.draw_centered_text(game_state.win, menu_text, 20)
         pygame.display.update()
 
@@ -90,37 +88,30 @@ def play_menu(game_state):
         - Bots
     """
     menu_text = game_state.font.render("Play Menu", False, (0, 0, 0), None)
-    button_image = helpers.load_image('graphics/buttons/greenButton.png')
+    button_image = helpers.load_image('assets/images/buttons/greenButton.png')
     pygame.display.set_caption("Play menu") 
 
-    btns = [Button(165, 125, 200, 75, "Normal Poker", lambda: poker_options(game_state), image=button_image),
-            Button(165, 225, 200, 75, "Unfair Poker", lambda: unfair_poker_options(game_state), image=button_image),
-            Button(165, 325, 200, 75, "Bots", lambda: bot_options(game_state), image=button_image),
-            back_button(game_state, start_menu)]
+    buttons =  [Button(165, 125, 200, 75, "Normal Poker", lambda: poker_options(game_state), image=button_image),
+                Button(165, 225, 200, 75, "Unfair Poker", lambda: unfair_poker_options(game_state), image=button_image),
+                Button(165, 325, 200, 75, "Bots", lambda: bot_options(game_state), image=button_image),
+                back_button(game_state, start_menu)]
 
     
     while True:
         game_state.clock.tick(60)
         game_state.draw_background()
-        helpers.center_buttons(game_state.win, btns)
+        helpers.center_buttons(game_state.win, buttons)
 
         for event in pygame.event.get():
             helpers.handle_quit_event(event)
             if event.type == pygame.MOUSEBUTTONDOWN:
-                for btn in btns:
-                    btn.is_clicked(pygame.mouse.get_pos())  
+                for button in buttons:
+                    button.is_clicked(pygame.mouse.get_pos())  
 
-        for btn in btns:
-            btn.draw(game_state.win)
+        for button in buttons:
+            button.draw(game_state.win)
         helpers.draw_centered_text(game_state.win, menu_text, 20)
         pygame.display.update()
-
-
-   
-
-    
-    
-    
 
 
 
@@ -131,28 +122,27 @@ def poker_options(game_state):
         - Join game
     """
     menu_text = game_state.font.render("Game Menu", False, (0, 0, 0), None)
-    button_image = helpers.load_image('graphics/buttons/greenButton.png')
+    button_image = helpers.load_image('assets/images/buttons/greenButton.png')
     pygame.display.set_caption("Game Options") 
 
-    btns = [
-        Button(165, 125, 200, 75, "Create Game", lambda: main_game(game_state), image=button_image),
-        Button(165, 225, 200, 75, "Join Game", lambda: main_game(game_state), image=button_image),
-        back_button(game_state, start_menu)
-    ]
+    buttons =  [Button(165, 125, 200, 75, "Create Game", lambda: main_game(game_state), image=button_image),
+                Button(165, 225, 200, 75, "Join Game", lambda: main_game(game_state), image=button_image),
+                back_button(game_state, play_menu)]
+                
     
     while True:
         game_state.clock.tick(60)
         game_state.draw_background()
-        helpers.center_buttons(game_state.win, btns)
+        helpers.center_buttons(game_state.win, buttons)
 
         for event in pygame.event.get():
             helpers.handle_quit_event(event)
             if event.type == pygame.MOUSEBUTTONDOWN:
-                for btn in btns:
-                    btn.is_clicked(pygame.mouse.get_pos())  
+                for button in buttons:
+                    button.is_clicked(pygame.mouse.get_pos())  
 
-        for btn in btns:
-            btn.draw(game_state.win)
+        for button in buttons:
+            button.draw(game_state.win)
         helpers.draw_centered_text(game_state.win, menu_text, 20)
         pygame.display.update()
 
@@ -167,28 +157,26 @@ def unfair_poker_options(game_state):
         - Join game
     """
     menu_text = game_state.font.render("Start Menu", False, (0, 0, 0), None)
-    button_image = helpers.load_image('graphics/buttons/greenButton.png')
+    button_image = helpers.load_image('assets/images/buttons/greenButton.png')
     pygame.display.set_caption("Game Options") 
 
-    btns = [
-        Button(165, 125, 200, 75, "Create Game", lambda: main_game(game_state), image=button_image),
-        Button(165, 225, 200, 75, "Join Game", lambda: main_game(game_state), image=button_image),
-        back_button(game_state, start_menu)
-    ]
+    buttons =  [Button(165, 125, 200, 75, "Create Game", lambda: main_game(game_state), image=button_image),
+                Button(165, 225, 200, 75, "Join Game", lambda: main_game(game_state), image=button_image),
+                back_button(game_state, play_menu)]
 
     while True:
         game_state.clock.tick(60)
         game_state.draw_background()
-        helpers.center_buttons(game_state.win, btns)
+        helpers.center_buttons(game_state.win, buttons)
 
         for event in pygame.event.get():
             helpers.handle_quit_event(event)
             if event.type == pygame.MOUSEBUTTONDOWN:
-                for btn in btns:
-                    btn.is_clicked(pygame.mouse.get_pos())  
+                for button in buttons:
+                    button.is_clicked(pygame.mouse.get_pos())  
 
-        for btn in btns:
-            btn.draw(game_state.win)
+        for button in buttons:
+            button.draw(game_state.win)
         helpers.draw_centered_text(game_state.win, menu_text, 20)
         pygame.display.update()
 
@@ -203,42 +191,30 @@ def bot_options(game_state):
         - Advanced
     """
     menu_text = game_state.font.render("Start Menu", False, (0, 0, 0), None)
-    button_image = helpers.load_image('graphics/buttons/greenButton.png')
+    button_image = helpers.load_image('assets/images/buttons/greenButton.png')
     pygame.display.set_caption("Game Options") 
 
-    btns = [
-        Button(165, 125, 200, 75, "Easy", lambda: main_game(game_state), image=button_image),
-        Button(165, 225, 200, 75, "Advanced", lambda: main_game(game_state), image=button_image),
-        back_button(game_state, start_menu)
-    ]
+    buttons =  [Button(165, 125, 200, 75, "Easy", lambda: main_game(game_state), image=button_image),
+                Button(165, 225, 200, 75, "Advanced", lambda: main_game(game_state), image=button_image),
+                back_button(game_state, play_menu)]
 
     while True:
         game_state.clock.tick(60)
         game_state.draw_background()
-        helpers.center_buttons(game_state.win, btns)
+        helpers.center_buttons(game_state.win, buttons)
 
         for event in pygame.event.get():
             helpers.handle_quit_event(event)
             if event.type == pygame.MOUSEBUTTONDOWN:
-                for btn in btns:
-                    btn.is_clicked(pygame.mouse.get_pos())  
+                for button in buttons:
+                    button.is_clicked(pygame.mouse.get_pos())  
 
-        for btn in btns:
-            btn.draw(game_state.win)
+        for button in buttons:
+            button.draw(game_state.win)
         helpers.draw_centered_text(game_state.win, menu_text, 20)
         pygame.display.update()
 
 
-
-# development credits
-def credits():
-    pass
-
-
-
-
-def chatbox():
-    pass
 
 
 
@@ -253,31 +229,29 @@ def main_game(game_state):
     """
 
     menu_text = game_state.font.render("Start Menu", False, (0, 0, 0), None)
-    button_image = helpers.load_image('graphics/buttons/greenButton.png')
+    button_image = helpers.load_image('assets/images/buttons/greenButton.png')
     pygame.display.set_caption("Game Options") 
 
-    btns = [
-        Button(165, 125, 200, 75, "2 Players", lambda: poker_game(game_state), image=button_image),
-        Button(165, 225, 200, 75, "3 Players", lambda: poker_game(game_state), image=button_image),
-        Button(165, 325, 200, 75, "4 Players", lambda: poker_game(game_state), image=button_image),
-        Button(165, 425, 200, 75, "5 Players", lambda: poker_game(game_state), image=button_image),
-        Button(165, 525, 200, 75, "6 Players", lambda: poker_game(game_state), image=button_image),
-        back_button(game_state, start_menu)
-    ]
+    buttons =  [Button(165, 125, 200, 75, "2 Players", lambda: poker_game(game_state), image=button_image),
+                Button(165, 225, 200, 75, "3 Players", lambda: poker_game(game_state), image=button_image),
+                Button(165, 325, 200, 75, "4 Players", lambda: poker_game(game_state), image=button_image),
+                Button(165, 425, 200, 75, "5 Players", lambda: poker_game(game_state), image=button_image),
+                Button(165, 525, 200, 75, "6 Players", lambda: poker_game(game_state), image=button_image),
+                back_button(game_state, play_menu)]
 
     while True:
         game_state.clock.tick(60)
         game_state.draw_background()
-        helpers.center_buttons(game_state.win, btns)
+        helpers.center_buttons(game_state.win, buttons)
 
         for event in pygame.event.get():
             helpers.handle_quit_event(event)
             if event.type == pygame.MOUSEBUTTONDOWN:
-                for btn in btns:
-                    btn.is_clicked(pygame.mouse.get_pos())  
+                for button in buttons:
+                    button.is_clicked(pygame.mouse.get_pos())  
 
-        for btn in btns:
-            btn.draw(game_state.win)
+        for button in buttons:
+            button.draw(game_state.win)
         helpers.draw_centered_text(game_state.win, menu_text, 20)
         pygame.display.update()
 
@@ -290,7 +264,14 @@ def poker_game(game_state):
     Displays the poker game screen with resized card images.
     """
 
+
+
+
+    menu_text = game_state.font.render("Poker Game", False, (0, 0, 0), None)
+    button_image = helpers.load_image('assets/images/buttons/greenButton.png')
+    buttons = [back_button(game_state, play_menu)]
     pygame.display.set_caption("Poker Game")
+
 
     # Card dimensions (width, height) after resizing
     card_width, card_height = 60, 90
@@ -298,7 +279,7 @@ def poker_game(game_state):
     # Load and resize card images
     card_images = {
         f"{rank}{suit}": pygame.transform.scale(
-            helpers.load_image(f"graphics/cards/{rank}{suit}.png"),
+            helpers.load_image(f"assets/images/cards/{rank}{suit}.png"),
             (card_width, card_height)
         )
         for rank in ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
@@ -312,10 +293,20 @@ def poker_game(game_state):
     while True:
         game_state.clock.tick(60)
         game_state.draw_background()
+        helpers.center_buttons(game_state.win, buttons)
 
         # Handle events
         for event in pygame.event.get():
             helpers.handle_quit_event(event)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for button in buttons:
+                    button.is_clicked(pygame.mouse.get_pos())  
+
+        for button in buttons:
+            button.draw(game_state.win)
+        helpers.draw_centered_text(game_state.win, menu_text, 20)
+        pygame.display.update()
+
 
         # Draw user cards
         user_card_x = 50  # Starting x-position for user cards
@@ -333,33 +324,6 @@ def poker_game(game_state):
 
         # Update the screen
         pygame.display.update()
-
-
-
-
-
-
-
-
-# from PIL import Image
-# import os
-
-# input_folder = "graphics/cards/"
-# output_folder = "graphics/cards_resized/"
-
-# # Resize dimensions
-# card_width, card_height = 60, 90
-
-# # Resize all images in the folder
-# if not os.path.exists(output_folder):
-#     os.makedirs(output_folder)
-
-# for filename in os.listdir(input_folder):
-#     if filename.endswith(".png"):
-#         img = Image.open(os.path.join(input_folder, filename))
-#         img = img.resize((card_width, card_height))
-#         img.save(os.path.join(output_folder, filename))
-
 
 
 
@@ -387,12 +351,10 @@ def settings_menu(game_state):
         - Button to return to the main menu
     """
     menu_text = game_state.font.render("Settings Menu", True, (255, 255, 255))#
-    button_image = helpers.load_image('graphics/buttons/greenButton.png')
+    button_image = helpers.load_image('assets/images/buttons/greenButton.png')
     pygame.display.set_caption("Settings Menu")
 
-    btns = [
-        back_button(game_state, start_menu)
-    ]
+    buttons = [back_button(game_state, start_menu)]
 
     # Default volume (50%)
     default_volume = 50
@@ -426,7 +388,7 @@ def settings_menu(game_state):
     while True:
         game_state.clock.tick(60)
         game_state.draw_background()
-        helpers.center_buttons(game_state.win, btns)
+        helpers.center_buttons(game_state.win, buttons)
 
 
     
@@ -472,8 +434,8 @@ def settings_menu(game_state):
                    sfx_slider_y - (handle_height // 2) <= event.pos[1] <= sfx_slider_y + (handle_height // 2):
                     sfx_dragging = True
 
-                for btn in btns:
-                    btn.is_clicked(pygame.mouse.get_pos())  
+                for button in buttons:
+                    button.is_clicked(pygame.mouse.get_pos())  
 
             if event.type == pygame.MOUSEBUTTONUP:
                 music_dragging = False
@@ -498,19 +460,13 @@ def settings_menu(game_state):
                 sfx.set_volume(sfx_volume / 100)
 
         # Draw buttons
-        for btn in btns:
-            btn.draw(game_state.win)
+        for button in buttons:
+            button.draw(game_state.win)
 
         helpers.draw_centered_text(game_state.win, menu_text, 20)
 
         pygame.display.update()
 
-
-
-
-
-# Hand rankings
-# How to play
 
 
 def guide_menu(game_state):
@@ -521,27 +477,33 @@ def guide_menu(game_state):
         - Maybe buttons to go to play section
     """
     menu_text = game_state.font.render("Guide Menu", False, (0, 0, 0), None)
-    button_image = helpers.load_image('graphics/buttons/greenButton.png')
+    button_image = helpers.load_image('assets/images/buttons/greenButton.png')
     pygame.display.set_caption("Guide Menu") 
-    btns = [
-        back_button(game_state, start_menu)
-    ]
+    buttons = [back_button(game_state, start_menu)]
 
     while True:
         game_state.clock.tick(60)
         game_state.draw_background()
-        helpers.center_buttons(game_state.win, btns)
+        helpers.center_buttons(game_state.win, buttons)
 
         for event in pygame.event.get():
             helpers.handle_quit_event(event)
             if event.type == pygame.MOUSEBUTTONDOWN:
-                for btn in btns:
-                    btn.is_clicked(pygame.mouse.get_pos())  
+                for button in buttons:
+                    button.is_clicked(pygame.mouse.get_pos())  
 
-        for btn in btns:
-            btn.draw(game_state.win)
+        for button in buttons:
+            button.draw(game_state.win)
         helpers.draw_centered_text(game_state.win, menu_text, 20)
         pygame.display.update()
+
+
+
+# Hand rankings
+# How to play
+
+
+
 
 
 
@@ -582,3 +544,16 @@ def guide_menu(game_state):
 
 def table():
     pass
+
+
+
+# development credits
+def credits():
+    pass
+
+
+
+
+def chatbox():
+    pass
+

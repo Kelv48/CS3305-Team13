@@ -2,8 +2,9 @@
 """ This module provides button related functionality """
 
 import pygame
+import src.utils.helpers as helpers 
 
-# ...existing code...
+
 
 class Button:
     def __init__(self, x, y, width, height, text, callback, image=None, scale=1):
@@ -11,7 +12,7 @@ class Button:
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.callback = callback
-        self.font = pygame.font.Font('graphics/fonts/PixelatedDisplay.ttf', 50)
+        self.font = pygame.font.Font('assets/fonts/PixelatedDisplay.ttf', 50)
 
         # if image:
         #     image_width = image.get_width()
@@ -49,3 +50,14 @@ class Button:
         self.rect.height = height
     def getButtonSize(self):
         return self.rect.width, self.rect.height
+
+
+
+
+
+def back_button(game_state, previous_screen):
+    """
+    Creates a back button to return to the previous screen.
+    """
+    button_image = helpers.load_image('assets/images/buttons/greenButton.png')
+    return Button(10, 10, 150, 50, "Back", lambda: previous_screen(game_state), image=button_image)
