@@ -14,7 +14,9 @@ class Client(object):
         #Connects client to server
         self.client.connect((host_ip, port))
         self.id = None       #This will be the SQL id linking client to an account/ JWT??? that will act as an signature for JSON messages
-        self.clientHand = [] #List that will hold the cards sent by server 
+        self.clientHand = [] #List that will hold the cards sent by server
+        self.gameCode = None #This will contain the game code associate with the game that the client is currently playing. Default: None  
+
 
     def send(self,m_type, data):
         #Sends JSON message to server
@@ -22,7 +24,8 @@ class Client(object):
         #signature is there for validation to ensure that no bad actors manipulate messages
         message = {
             'm_type':m_type, 
-            'data': data, 
+            'data': data,
+            'gameID': self.gameCode,  
             'signature': self.id
         }
         self.client.send(json.dumps(message).encode())
@@ -42,6 +45,12 @@ class Client(object):
     
     def setHand(self, hand):
         self.clientHand = hand
+
+    def getGameCode(self):
+        return self.gameCode
+    
+    def setGameCode(self, code):
+        self.gameCode = code
 
 if __name__ == '__main__':
     der = Client('degree-impossible.gl.at.ply.gg', 24046)
