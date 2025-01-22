@@ -44,7 +44,7 @@ class Client(object):
         self.clientHand = hand
 
 if __name__ == '__main__':
-    der = Client('localhost', 80)
+    der = Client('degree-impossible.gl.at.ply.gg', 24046)
     der.send('test', 'How are we')
     while True:
         try:
