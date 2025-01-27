@@ -85,7 +85,7 @@ async def foldClient(reader:StreamReader, writer:StreamWriter, gameCode):
     #GameLogic manipulation 
     #game = games_dict[gameCode]
     #game.foldPlayer()
-   
+    
     #Broadcast messages to all other players 
     for client_writer in client_connected[gameCode]:
         #if client_writer != writer:
