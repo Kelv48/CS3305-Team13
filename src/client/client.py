@@ -1,5 +1,7 @@
 import socket
 import json
+from protocol_temp import Protocols
+from random import randint
 class Client(object):
     '''
     Needs to connect to server
@@ -15,7 +17,7 @@ class Client(object):
         self.client.connect((host_ip, port))
         self.id = None       #This will be the SQL id linking client to an account/ JWT??? that will act as an signature for JSON messages
         self.clientHand = [] #List that will hold the cards sent by server
-        self.gameCode = None #This will contain the game code associate with the game that the client is currently playing. Default: None  
+        self.gameCode = 1 #This will contain the game code associate with the game that the client is currently playing. Default: None  
 
 
     def send(self,m_type, data):
@@ -34,7 +36,8 @@ class Client(object):
     def receive(self):
         #receives JSON message from server
         message = self.client.recv(1024).decode()
-        return json.loads(message)
+        #return json.loads(message)
+        return message
        
     def disconnect(self):
         self.client.close()
@@ -53,12 +56,20 @@ class Client(object):
         self.gameCode = code
 
 if __name__ == '__main__':
-    der = Client('degree-impossible.gl.at.ply.gg', 24046)
-    der.send('test', 'How are we')
+    
+    clients = []
+    protocols = [Protocols.Request.RAISE, Protocols.Request.CHECK, Protocols.Request.CALL, Protocols.Request.FOLD, 
+                  Protocols.Request.LEAVE]
     while True:
-        try:
-            message = input('Type a message: ')
-            der.send('test', message)
-            print(der.receive())
-        except KeyboardInterrupt:
-            break
+        der = Client("localhost", 80)
+        clients.append(der)
+        for client in clients:
+            try:
+                m_type = protocols[randint(0, len(protocols)-1)]
+                print(f"m_type: {m_type}")
+                message = input('Type a message: ')
+                der.send(m_type, message)
+                print(der.receive())
+            except KeyboardInterrupt:
+                print(f"The number of clients {len(clients)}")
+                break
