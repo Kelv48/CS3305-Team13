@@ -1,31 +1,29 @@
 import pygame, sys
-from button import Button
-from utils import BG, get_font, SCREEN
-from single_player import single_player
-from settings import settings
-from multi_player import multi_player
-from guide import guide
+from src.gui.screens.button import Button
+from src.gui.screens.utils import BG, get_font, SCREEN
+from single_player import difficulties
+from src.gui.screens.settings import settings
+from src.gui.screens.multi_player import multi_player
+from src.gui.screens.guide import guide
 
 
 def main_menu():
     while True:
         MAIN_MOUSE_POS = pygame.mouse.get_pos()
 
-
-        # Calculate positions based on current screen size
+        # Calculate positions based on current screen size    # Scale the background to fit the screen
         screen_width, screen_height = SCREEN.get_size()
-        scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height)) # Scale the background to fit the screen
+        scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height)) 
         SCREEN.blit(scaled_bg, (0, 0))
-
         
-
-        MENU_TEXT = get_font(50).render("Poker", True, "Dark Green")
-        MENU_RECT = MENU_TEXT.get_rect(center=(screen_width / 2, screen_height / 8))
-        SCREEN.blit(MENU_TEXT, MENU_RECT)
+        # Calculate positions based on current screen size
+        MAIN_TEXT = get_font(50).render("Poker", True, "Dark Green")
+        MAIN_RECT = MAIN_TEXT.get_rect(center=(screen_width / 2, screen_height / 8))
+        SCREEN.blit(MAIN_TEXT, MAIN_RECT)
 
         # Define button labels and functions
         buttons = [
-            ("SINGLE PLAYER", single_player),
+            ("SINGLE PLAYER", difficulties),
             ("MULTI PLAYER", multi_player),
             ("GUIDE", guide),
             ("SETTINGS", settings),
@@ -45,8 +43,8 @@ def main_menu():
                 text_input=text, 
                 font=get_font(30), 
                 base_color="White", 
-                hovering_color="Light Green"
-            )
+                hovering_color="Light Green")
+            
             button.changeColor(MAIN_MOUSE_POS)
             button.update(SCREEN)
             button_objects.append((button, action))
@@ -64,10 +62,7 @@ def main_menu():
                             sys.exit()
                         else:
                             action(main_menu)
-            # Toggle fullscreen on 'F' key press
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_f:
-                    pygame.display.toggle_fullscreen()
+
 
         pygame.display.update()
 
