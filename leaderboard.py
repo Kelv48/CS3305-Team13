@@ -1,6 +1,6 @@
 import pygame, sys
-from src.gui.screens.button import Button
-from src.gui.screens.utils import BG, get_font, SCREEN
+from src.gui.button import Button
+from src.gui.utils import BG, get_font, SCREEN
 
 def settings(main_menu):
     while True:

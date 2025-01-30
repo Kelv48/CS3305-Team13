@@ -1,5 +1,6 @@
 
 
+""" Can just get rid of this and merge with poker_game.py """
 
 from player import Player
 from deck import Deck

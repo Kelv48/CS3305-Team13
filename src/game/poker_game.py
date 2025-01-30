@@ -39,7 +39,7 @@ class PokerGame:
         self.pot = Pot()
         self.current_bet = 0
         self.active_players = players[:]
-    
+
     def start_round(self):
         """Starts a new poker round"""
         self.dealer.reset_deck()  # Refresh deck
@@ -82,4 +82,24 @@ class PokerGame:
     def eliminate_players(self):
         """Removes players with zero chips"""
         self.players = [player for player in self.players if player.chips > 0]
+
+
+    
+
+    
+
+    # Multiplayer
+    def addPlayer(self, p):
+        """Adds a new player hand to playerCards
+            Might be unnecessary"""
+        self.playersCards[p] = []
+
+
+
+
+
+
+
+
+  
 

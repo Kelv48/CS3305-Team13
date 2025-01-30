@@ -1,10 +1,10 @@
 import pygame, sys
-from src.gui.screens.button import Button
-from src.gui.screens.utils import BG, get_font, SCREEN
+from src.gui.button import Button
+from src.gui.utils import BG, get_font, SCREEN
 from single_player import difficulties
-from src.gui.screens.settings import settings
-from src.gui.screens.multi_player import multi_player
-from src.gui.screens.guide import guide
+from src.gui.settings import settings
+from src.gui.multi_player import multi_player
+from src.gui.guide import guide
 
 
 def main_menu():
