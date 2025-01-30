@@ -37,69 +37,55 @@ class PokerGame:
         self.players = players
         self.dealer = Dealer()
         self.pot = Pot()
-        self.current_bet = 0
-        self.active_players = players[:]
+        self.currentBet = 0
+        self.activePlayers = players[:]
 
-    def start_round(self):
+    def startRound(self):
         """Starts a new poker round"""
-        self.dealer.reset_deck()  # Refresh deck
-        self.dealer.deal_hands(self.players)
-        self.current_bet = 0
+        self.dealer.resetDeck()  # Refresh deck
+        self.dealer.dealHands(self.players)
+        self.currentBet = 0
         for player in self.players:
             player.reset()
-        self.pot.reset_pot()
+        self.pot.resetPot()
     
-    def betting_round(self):
+    def bettingRound(self):
         """Handles a betting round"""
-        for player in self.active_players:
+        for player in self.activePlayers:
             if not player.folded:
 
                 # Placeholder for real betting logic
-                bet = min(self.current_bet, player.chips)
-                player.place_bet(bet)
-                self.pot.add_to_pot(bet)
+                bet = min(self.currentBet, player.chips)
+                player.placeBet(bet)
+                self.pot.addToPot(bet)
     
-    def deal_flop(self):
+    def dealFlop(self):
         """Deals the first 3 community cards"""
-        self.dealer.deal_community_cards(3)
+        self.dealer.dealCommunityCards(3)
     
-    def deal_turn(self):
+    def dealTurn(self):
         """Deals the 4th community card"""
-        self.dealer.deal_community_cards(1)
+        self.dealer.dealCommunityCards(1)
     
-    def deal_river(self):
+    def dealRiver(self):
         """Deals the 5th / final community card"""
-        self.dealer.deal_community_cards(1)
+        self.dealer.dealCommunityCards(1)
     
     def showdown(self):
         """Determines the winner at the end of the round"""
         # Placeholder for hand evaluation logic
-        winner = random.choice(self.active_players)
+        winner = random.choice(self.activePlayers)
         winner.chips += self.pot.total
-        self.pot.reset_pot()
+        self.pot.resetPot()
         print(f"{winner.name} wins the pot")
     
-    def eliminate_players(self):
+    def eliminatePlayers(self):
         """Removes players with zero chips"""
         self.players = [player for player in self.players if player.chips > 0]
 
 
-    
-
-    
-
-    # Multiplayer
+    # Multiplayer   
     def addPlayer(self, p):
         """Adds a new player hand to playerCards
             Might be unnecessary"""
         self.playersCards[p] = []
-
-
-
-
-
-
-
-
-  
-

@@ -1,11 +1,12 @@
-from deck import Deck
+from src.game import ai_player, card, dealer, deck, player, pot
+
 class GameLogic():
     def __init__(self):
         self.ready = False          #Boolean value that is true if game is ready to be played (all players have joined)
         self.playerWent = "LL"      #Idea is that each index represents a player there will be a func that will dynamically add boolean 
         self.communityCards = []    #Array containing community cards
         self.playersCards = {}      #Stores player cards {id:[card]} pairs 
-        self.deck = Deck()          
+        self.deck = deck.Deck()          
 
     def preFlop(self):
         """hands out 2 cards to player """
@@ -39,6 +40,3 @@ class GameLogic():
         """Adds a new player hand to playerCards
             Might be unnecessary"""
         self.playersCards[p] = []
-
-  
-

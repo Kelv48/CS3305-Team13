@@ -1,24 +1,23 @@
-
-
-
+import random
+from card import Card
 
 class Deck:
     """Represents a deck of 52 cards"""
-    suits = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
+    # suits = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
+    suits = ['C', 'D', 'H', 'S']
     ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
 
     def __init__(self):
         self.cards = [Card(suit, rank) for suit in self.suits for rank in self.ranks]
-        random.shuffle(self.cards)
     
-    def deal(self, num: int) -> list[Card]:
-        """Deals 'num' amount of cards from the deck"""
-        return [self.cards.pop() for _ in range(num)]
-    
-    def shuffle(self):
+    def shuffleDeck(self):
         """Shuffles the deck."""
         random.shuffle(self.cards)
 
-
-
-
+    def dealCard(self):
+        """Deals a card from the deck."""
+        if len(self.cards) != 0:
+            self.shuffleDeck()
+            return self.cards.pop()
+        else:
+            print("Deck is empty!")

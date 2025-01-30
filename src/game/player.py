@@ -9,33 +9,26 @@ class Player:
         self.name = name
         self.chips = chips
         self.hand = []  # Players hand
-        self.current_bet = 0  # Current bet amount
+        self.currentBet = 0  # Current bet amount
         self.folded = False  # Checks if player has folded
     
-    def place_bet(self, amount: int):
+    def placeBet(self, amount: int):
         """Places a bet which reduces chip count"""
         if amount > self.chips:
             raise ValueError("Not enough chips blud")
         self.chips -= amount
-        self.current_bet += amount
+        self.currentBet += amount
     
     def fold(self):
         """Player folds which ends his round"""
         self.folded = True
     
-    def receive_cards(self, cards: list[Card]):
+    def receiveCards(self, cards: list[Card]):
         """Receives new hole cards"""
         self.hand = cards
     
     def reset(self):
         """Resets player state for next round"""
-        self.current_bet = 0
+        self.currentBet = 0
         self.folded = False
         self.hand = []
-
-
-
-
-
-
-
