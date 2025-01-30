@@ -10,7 +10,7 @@ game_settings = {
     "starting_money": None
 }
 
-def difficulties(main_menu):
+def difficulties(mainMenu):
     while True:
         MOUSE_POS = pygame.mouse.get_pos()
 
@@ -26,10 +26,10 @@ def difficulties(main_menu):
 
         # Define button labels and functions
         buttons = [
-            ("EASY", lambda: set_difficulty_and_continue(main_menu, "Easy", 1.25)),
-            ("MEDIUM", lambda: set_difficulty_and_continue(main_menu, "Normal", 1.5)),
-            ("HARD", lambda: set_difficulty_and_continue(main_menu, "Hard", 2)),
-            ("Back", main_menu)]
+            ("EASY", lambda: setDifficultyAndContinue(mainMenu, "Easy", 1.25)),
+            ("MEDIUM", lambda: setDifficultyAndContinue(mainMenu, "Normal", 1.5)),
+            ("HARD", lambda: setDifficultyAndContinue(mainMenu, "Hard", 2)),
+            ("Back", mainMenu)]
 
         # Calculate vertical spacing with closer spacing
         button_count = len(buttons)
@@ -62,13 +62,13 @@ def difficulties(main_menu):
    
         pygame.display.update()
 
-def set_difficulty_and_continue(main_menu, difficulty_level, multiplier):
+def setDifficultyAndContinue(mainMenu, difficulty_level, multiplier):
     # Update game settings with selected difficulty
     game_settings["difficulty"] = difficulty_level
     game_settings["multiplier"] = multiplier
-    number_of_players(main_menu)
+    numberOfPlayers(mainMenu)
 
-def number_of_players(main_menu):
+def numberOfPlayers(mainMenu):
     while True:
         NUMBER_OF_PLAYERS_MOUSE_POS = pygame.mouse.get_pos()
 
@@ -84,12 +84,12 @@ def number_of_players(main_menu):
 
         # Define button labels and functions for 2 to 6 players
         buttons = [
-            ("2 Players", lambda: set_players_and_continue(main_menu, 2)),
-            ("3 Players", lambda: set_players_and_continue(main_menu, 3)),
-            ("4 Players", lambda: set_players_and_continue(main_menu, 4)),
-            ("5 Players", lambda: set_players_and_continue(main_menu, 5)),
-            ("6 Players", lambda: set_players_and_continue(main_menu, 6)),
-            ("Back", lambda: difficulties(main_menu))]
+            ("2 Players", lambda: setPlayersAndContinue(mainMenu, 2)),
+            ("3 Players", lambda: setPlayersAndContinue(mainMenu, 3)),
+            ("4 Players", lambda: setPlayersAndContinue(mainMenu, 4)),
+            ("5 Players", lambda: setPlayersAndContinue(mainMenu, 5)),
+            ("6 Players", lambda: setPlayersAndContinue(mainMenu, 6)),
+            ("Back", lambda: difficulties(mainMenu))]
 
         # Calculate vertical spacing
         button_count = len(buttons)
@@ -122,12 +122,12 @@ def number_of_players(main_menu):
 
         pygame.display.update()
 
-def set_players_and_continue(main_menu, player_count):
+def setPlayersAndContinue(mainMenu, player_count):
     # Update game settings with selected number of players
     game_settings["number_of_players"] = player_count
-    select_starting_money(main_menu)
+    selectStartingMoney(mainMenu)
 
-def select_starting_money(main_menu):
+def selectStartingMoney(mainMenu):
     while True:
         MONEY_MOUSE_POS = pygame.mouse.get_pos()
 
@@ -143,8 +143,8 @@ def select_starting_money(main_menu):
 
         # Define button labels and functions for different starting money amounts
         money_options = [100, 200, 300, 400, 500]  # Example amounts
-        buttons = [(f"${amount}", lambda: set_money_and_start_game(main_menu, amount)) for amount in money_options]
-        buttons.append(("Back", lambda: number_of_players(main_menu)))
+        buttons = [(f"${amount}", lambda: setMoneyAndStartGame(mainMenu, amount)) for amount in money_options]
+        buttons.append(("Back", lambda: numberOfPlayers(mainMenu)))
 
         # Calculate vertical spacing
         button_count = len(buttons)
@@ -177,19 +177,19 @@ def select_starting_money(main_menu):
 
         pygame.display.update()
 
-def set_money_and_start_game(main_menu, starting_money):
+def setMoneyAndStartGame(mainMenu, starting_money):
     # Update game settings with selected starting money
     game_settings["starting_money"] = starting_money
-    start_game(main_menu)
+    startGame(mainMenu)
 
-def start_game(main_menu):
+def startGame(mainMenu):
     # Use the game settings to start the game
     print(f"Starting game with settings: {game_settings}")
     # Reset game settings for the next game
-    reset_game_settings()
+    resetGameSettings()
    
 
-def reset_game_settings():
+def resetGameSettings():
     # Reset the game settings to default values
     game_settings["difficulty"] = None
     game_settings["multiplier"] = None

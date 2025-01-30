@@ -2,7 +2,7 @@ import pygame, sys
 from src.gui.button import Button
 from src.gui.utils import BG, get_font, SCREEN
 
-def settings(main_menu):
+def settings(mainMenu):
     while True:
         SETTINGS_MOUSE_POS = pygame.mouse.get_pos()
 
@@ -32,6 +32,6 @@ def settings(main_menu):
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if SETTINGS_BACK.checkForInput(SETTINGS_MOUSE_POS):
-                    main_menu()
+                    mainMenu()
 
         pygame.display.update()

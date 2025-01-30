@@ -2,7 +2,7 @@ import pygame, sys
 from src.gui.button import Button
 from src.gui.utils import BG, get_font, SCREEN
 
-def guide(main_menu):
+def guide(mainMenu):
     while True:
         GUIDE_MOUSE_POS = pygame.mouse.get_pos()
 
@@ -32,6 +32,6 @@ def guide(main_menu):
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if GUIDE_BACK.checkForInput(GUIDE_MOUSE_POS):
-                    main_menu()
+                    mainMenu()
 
         pygame.display.update()

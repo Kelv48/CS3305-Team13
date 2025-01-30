@@ -2,7 +2,7 @@ import pygame, sys
 from src.gui.button import Button
 from src.gui.utils import BG, get_font, SCREEN
 
-def multi_player(main_menu):
+def multiPlayer(mainMenu):
     while True:
         MULTI_MOUSE_POS = pygame.mouse.get_pos()
 
@@ -32,6 +32,6 @@ def multi_player(main_menu):
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if MULTI_BACK.checkForInput(MULTI_MOUSE_POS):
-                    main_menu()
+                    mainMenu()
 
         pygame.display.update()
