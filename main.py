@@ -27,8 +27,7 @@ def main_menu():
             ("MULTI PLAYER", multi_player),
             ("GUIDE", guide),
             ("SETTINGS", settings),
-            ("QUIT", sys.exit)
-        ]
+            ("QUIT", sys.exit)]
 
         # Calculate vertical spacing with closer spacing
         button_count = len(buttons)

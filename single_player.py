@@ -89,8 +89,7 @@ def number_of_players(main_menu):
             ("4 Players", lambda: set_players_and_continue(main_menu, 4)),
             ("5 Players", lambda: set_players_and_continue(main_menu, 5)),
             ("6 Players", lambda: set_players_and_continue(main_menu, 6)),
-            ("Back", lambda: difficulties(main_menu))
-        ]
+            ("Back", lambda: difficulties(main_menu))]
 
         # Calculate vertical spacing
         button_count = len(buttons)
@@ -143,8 +142,8 @@ def select_starting_money(main_menu):
         SCREEN.blit(MONEY_TEXT, MONEY_RECT)
 
         # Define button labels and functions for different starting money amounts
-        money_options = [100, 200, 300, 400, 500] 
-        buttons = [(f"${amount}", lambda: start_game(main_menu, amount)) for amount in money_options]
+        money_options = [100, 200, 300, 400, 500]  # Example amounts
+        buttons = [(f"${amount}", lambda: set_money_and_start_game(main_menu, amount)) for amount in money_options]
         buttons.append(("Back", lambda: number_of_players(main_menu)))
 
         # Calculate vertical spacing
@@ -177,3 +176,22 @@ def select_starting_money(main_menu):
                         action()
 
         pygame.display.update()
+
+def set_money_and_start_game(main_menu, starting_money):
+    # Update game settings with selected starting money
+    game_settings["starting_money"] = starting_money
+    start_game(main_menu)
+
+def start_game(main_menu):
+    # Use the game settings to start the game
+    print(f"Starting game with settings: {game_settings}")
+    # Reset game settings for the next game
+    reset_game_settings()
+   
+
+def reset_game_settings():
+    # Reset the game settings to default values
+    game_settings["difficulty"] = None
+    game_settings["multiplier"] = None
+    game_settings["number_of_players"] = None
+    game_settings["starting_money"] = None
