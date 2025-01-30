@@ -21,7 +21,7 @@ class GameLogic():
     def dealTurnCard(self):
         """reveals/draws 4th community card """
         pass
-
+        
     def dealRiverCard(self):
         """reveals/draws 5th community card """
         pass
