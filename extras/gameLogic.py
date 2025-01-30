@@ -1,12 +1,14 @@
 from src.game import ai_player, card, dealer, deck, player, pot
+import handEvaluation as hEval
 
 class GameLogic():
     def __init__(self):
         self.ready = False          #Boolean value that is true if game is ready to be played (all players have joined)
         self.playerWent = "LL"      #Idea is that each index represents a player there will be a func that will dynamically add boolean 
         self.communityCards = []    #Array containing community cards
-        self.playersCards = {}      #Stores player cards {id:[card]} pairs 
-        self.deck = deck.Deck()          
+        self.playersCards = []     
+        self.deck = deck.Deck()       
+        self.activePlayers = []     #List of players that are still in the game
 
     def preFlop(self):
         """hands out 2 cards to player """
@@ -28,9 +30,16 @@ class GameLogic():
         """Removes cards from players possession"""
         pass
 
-    def winner(self):
-        """evaluates players cards and determines a winner"""
-        pass
+    def evaluateWinner(self):
+        winner = None
+        currentMax = 0
+        for player in self.activePlayers:
+            player.hand = self.communityCards + self.playersCards[player]
+            player.hand = hEval.handEvaluation(player.hand) # Returns an int of players hand strength
+            if player.hand > currentMax:
+                winner = player.getName()
+                currentMax = player.hand
+        return winner
 
     def reset(self):
         """resets variables for new round"""
