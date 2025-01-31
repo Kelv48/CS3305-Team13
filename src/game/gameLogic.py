@@ -1,4 +1,4 @@
-from src.game import ai_player, card, dealer, deck, player, pot
+import ai_player, dealer, deck, player
 import handEvaluation as hEval
 
 class GameLogic():
@@ -7,12 +7,15 @@ class GameLogic():
         self.playerWent = "LL"      #Idea is that each index represents a player there will be a func that will dynamically add boolean 
         self.communityCards = []    #Array containing community cards
         self.playersCards = []     
-        self.deck = deck.Deck()       
+        self.gameDeck = deck.Deck()       
         self.activePlayers = []     #List of players that are still in the game
 
     def preFlop(self):
-        """hands out 2 cards to player """
-        pass
+        for p in self.activePlayers:
+            card1 = self.gameDeck.dealCard()
+            card2 = self.gameDeck.dealCard()
+            p.addCard(card1)
+            p.addCard(card2)
 
     def flop(self):
         """reveals/draws three community cards """
@@ -49,3 +52,18 @@ class GameLogic():
         """Adds a new player hand to playerCards
             Might be unnecessary"""
         self.playersCards[p] = []
+
+
+# Pot only exists when game logic exist, game logic only exists if the game is started, hence pot only exists if and only if the game is ran
+class Pot:
+    """Represents the betting pot for all users"""
+    def __init__(self):
+        self.total = 0
+    
+    def addToPot(self, amount: int):
+        """Adds chips to the pot"""
+        self.total += amount
+
+    def resetPot(self):
+        """Resets the pot at the end of a round"""
+        self.total = 0

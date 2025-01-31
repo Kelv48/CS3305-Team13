@@ -1,7 +1,4 @@
-
-
-
-from card import Card
+import deck
 
 class Player:
     def __init__(self, playerID: int, name: str, chips: int):
@@ -12,7 +9,7 @@ class Player:
         self.currentBet = 0  # Current bet amount
         self.folded = False  # Checks if player has folded
 
-    def addCard(self, card: Card):
+    def addCard(self, card: deck.Card):
         self.hand.append(card)
 
     def getHand(self):
@@ -42,6 +39,11 @@ class Player:
         return self.name
     def getPlayerID(self):
         return self.playerID
+    
+
+
+
+
     
     def __str__(self):
         return f"{self.name} (Chips: {self.chips})"   

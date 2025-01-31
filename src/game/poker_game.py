@@ -2,7 +2,6 @@
 
 from player import Player
 from dealer import Dealer
-from pot import Pot
 import random
 
 
