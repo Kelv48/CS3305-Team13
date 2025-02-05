@@ -9,7 +9,10 @@ class Protocols:
         TURN = 'protocol.turn'
         OPPONENT = 'protocol.opponent'                             #Used to update other clients of an opponents move
         WINNER = 'protocol.winner'                                 #Used to reveal the winner of the round 
-        OPPONENT_LEFT = 'protocol.opponent_left'                   #Used to tell client that another player has left the game   
+        OPPONENT_LEFT = 'protocol.opponent_left'                   #Used to tell client that another player has left the game 
+        REDIRECT = 'protocol.redirect'                             #Used to tell client to connect to a different port
+
+
 
     class Request:
         RAISE = 'protocol.raise'                                #Used by client to send request to raise the pot
@@ -22,5 +25,5 @@ class Protocols:
         CREATE_ACCOUNT = 'protocol.create_account'              #Used to create an account, which is stored in DB 
         LOGOUT = 'protocol.logout'
         LEAVE = 'protocol.leave'                                #Used to send request to leave game 
-
+        
 
