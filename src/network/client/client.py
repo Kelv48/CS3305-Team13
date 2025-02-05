@@ -1,6 +1,7 @@
-import socket
+from websockets.asyncio.client import connect
+from websockets.exceptions import ConnectionClosed
 import json
-from protocol_temp import Protocols
+from network.server.protocol import Protocols
 from random import randint
 class Client(object):
     '''
@@ -10,14 +11,12 @@ class Client(object):
     Send messages to server
     Disconnect from the server in a non-volatile manner
     '''
-    def __init__(self, host_ip, port):
-        #Creates a TCP socket that supports IPv4 & IPv6
-        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  
-        #Connects client to server
-        self.client.connect((host_ip, port))
-        self.id = None       #This will be the SQL id linking client to an account/ JWT??? that will act as an signature for JSON messages
-        self.clientHand = [] #List that will hold the cards sent by server
-        self.gameCode = 1 #This will contain the game code associate with the game that the client is currently playing. Default: None  
+    async def __init__(self, host_ip, port):
+        #Creates client connection
+        #https://websockets.readthedocs.io/en/stable/reference/asyncio/client.html
+        self.client = await connect(f"wss://{host_ip}:{port}") #Connects to server with the given uri. It should be to the auth server port need to further discuss it.
+        self.id = None                          #This will be the SQL id linking client to an account/ JWT??? that will act as an signature for JSON messages
+        self.sessionID = None                   #This will contain the game code associate with the game that the client is currently playing. Default: None  
 
 
     def send(self,m_type, data):
@@ -27,7 +26,7 @@ class Client(object):
         message = {
             'm_type':m_type, 
             'data': data,
-            'gameID': self.gameCode,  
+            'sessionID': self.gameCode,  
             'signature': self.id
         }
         self.client.send(json.dumps(message).encode())
@@ -35,25 +34,44 @@ class Client(object):
 
     def receive(self):
         #receives JSON message from server
-        message = self.client.recv(1024).decode()
-        #return json.loads(message)
-        return message
+        try:
+            message = self.client.recv(True)
+            der = json.loads(message)
+
+            #This code should be in the game script displaying game info
+            if der['m_type'] == Protocols.Response.REDIRECT:
+                self.disconnect()
+                #create new socket to new port
+                self.redirect('localhost', der['data'])
+
+            elif der['m_type'] == Protocols.Response.SESSION_ID:
+                self.setSessionID(der['data'])
+
+
+            #return json.loads(message)
+            return message
+        except ConnectionClosed as e:
+            print("fuck")
        
+    def redirect(self, host, port):
+        #This method is for creating a new websocket to connect to the appropriate server script/port 
+        self.client
+
     def disconnect(self):
+        #disconnects websocket
         self.client.close()
 
-
-    def getCards(self):
-        return self.clientHand
-    
-    def setHand(self, hand):
-        self.clientHand = hand
-
-    def getGameCode(self):
+    def getSessionID(self):
         return self.gameCode
     
-    def setGameCode(self, code):
+    def setSessionID(self, code):
         self.gameCode = code
+
+    def getID(self):
+        return self.id 
+    
+    def setID(self, id):
+        self.id = id 
 
 if __name__ == '__main__':
     

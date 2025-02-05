@@ -11,6 +11,8 @@ class Protocols:
         WINNER = 'protocol.winner'                                 #Used to reveal the winner of the round 
         OPPONENT_LEFT = 'protocol.opponent_left'                   #Used to tell client that another player has left the game 
         REDIRECT = 'protocol.redirect'                             #Used to tell client to connect to a different port
+        SESSION_ID = 'protocol.sessionID'                          #Used to assign client a new sessionID for their game
+        FORCE_START = 'protocol.forceStart'                        #Used to alert clients of a change in the force start vote
 
 
 
