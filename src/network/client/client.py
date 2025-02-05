@@ -26,7 +26,7 @@ class Client(object):
         message = {
             'm_type':m_type, 
             'data': data,
-            'sessionID': self.gameCode,  
+            'sessionID': self.sessionID,  
             'signature': self.id
         }
         self.client.send(json.dumps(message).encode())
