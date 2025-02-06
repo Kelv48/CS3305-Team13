@@ -15,7 +15,7 @@ def run_guide_screen(title, guide_text, back_callback, next_callback):
     screen = INITIAL_SCREEN
     pygame.display.set_caption(title)
 
-    # Build an absolute path for the theme file (assumed to be in the same directory as this file)
+    # Absolute path for the theme file 
     theme_path = os.path.join(os.path.dirname(__file__), 'embedded_images_theme.json')
     manager = pygame_gui.UIManager(screen.get_size(), theme_path)
 
@@ -54,17 +54,17 @@ def run_guide_screen(title, guide_text, back_callback, next_callback):
     back_button, next_button = create_buttons()
 
     while is_running:
-        # Update the screen dimensions and draw the background.
+        # Update screen dimensions and draw the background.
         sw, sh = screen.get_size()
         scaled_bg = pygame.transform.scale(BG, (sw, sh))
         screen.blit(scaled_bg, (0, 0))
 
-        # Draw the screen title.
+        # Draw screen title.
         title_surface = get_font(45).render(title, True, "White")
         title_rect = title_surface.get_rect(center=(sw / 2, sh / 9))
         screen.blit(title_surface, title_rect)
 
-        # Update button positions in case the window has been resized.
+        # Update button positions in case the window has been resized
         back_button.pos = (sw * 0.25, int(sh * 0.85))
         next_button.pos = (sw * 0.75, int(sh * 0.85))
         back_button.changecolour(pygame.mouse.get_pos())
@@ -117,7 +117,7 @@ def run_guide_screen(title, guide_text, back_callback, next_callback):
         pygame.display.update()
 
 
-# --- Guide Screens Defined Using run_guide_screen --- #
+# --- Guide Screens --- #
 
 def guide_beginner(main_menu):
     """Beginner Guide: BACK returns to main_menu, NEXT goes to Intermediate guide."""

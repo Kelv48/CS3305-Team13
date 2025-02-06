@@ -20,10 +20,12 @@ def multiPlayer(mainMenu):
             pos=(screen_width / 2, screen_height * 2 / 2.5), 
             text_input="BACK", 
             font=get_font(30), 
-            base_color="White", 
-            hovering_color="Light Green")
+            base_colour="White", 
+            hovering_colour="Light Green",
+            image=None)
+        
 
-        MULTI_BACK.changeColor(MULTI_MOUSE_POS)
+        MULTI_BACK.changecolour(MULTI_MOUSE_POS)
         MULTI_BACK.update(SCREEN)
 
         for event in pygame.event.get():

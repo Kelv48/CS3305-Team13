@@ -34,10 +34,11 @@ def leaderboard(mainMenu):
                 pos=(screen_width / 2, button_y), 
                 text_input=text, 
                 font=get_font(30), 
-                base_color="White", 
-                hovering_color="Light Green")
+                base_colour="White", 
+                hovering_colour="Light Green",
+                image=None)
             
-            button.changeColor(SETTINGS_MOUSE_POS)
+            button.changecolour(SETTINGS_MOUSE_POS)
             button.update(SCREEN)
             button_objects.append((button, action))
 
@@ -52,8 +53,10 @@ def leaderboard(mainMenu):
                         if action == sys.exit:
                             pygame.quit()
                             sys.exit()
+                        elif action == mainMenu:
+                            mainMenu()
                         else:
-                            action()
+                            action(mainMenu)
 
         # Update the display
         pygame.display.update()

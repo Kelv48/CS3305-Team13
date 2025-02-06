@@ -7,7 +7,7 @@ SCREEN = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
 BG = pygame.image.load("assets/images/extra/Background.jpg")
 FPS = 60
 
-GAME_BG = pygame.image.load("assets/images/extra/Table.png")
+
 
 pygame.display.set_caption("Menu")
 
@@ -64,7 +64,7 @@ def play_winner_sound():
 #     (file path) -> (img)
 #     '''
 #     img = pygame.image.load(BASE_IMG_PATH + path).convert() # helps preformance when rendering
-#     img.set_colorkey((0, 0, 0)) # removes the background in png images
+#     img.set_colourkey((0, 0, 0)) # removes the background in png images
 #     return img
 
 # def load_images(path):
