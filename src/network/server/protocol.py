@@ -11,8 +11,9 @@ class Protocols:
         WINNER = 'protocol.winner'                                 #Used to reveal the winner of the round 
         OPPONENT_LEFT = 'protocol.opponent_left'                   #Used to tell client that another player has left the game 
         REDIRECT = 'protocol.redirect'                             #Used to tell client to connect to a different port
-        SESSION_ID = 'protocol.sessionID'                          #Used to assign client a new sessionID for their game
+        SESSION_ID = 'protocol.sessionID'                          #Used to assign client a new sessionID for their game given to the client that created the game 
         FORCE_START = 'protocol.forceStart'                        #Used to alert clients of a change in the force start vote
+        LOBBY_UPDATE = 'protocol.lobbyUpdate'                      #Used to update client with new info about the amount of players in lobby
 
 
 
@@ -21,11 +22,11 @@ class Protocols:
         CHECK = 'protocol.check'
         FOLD = 'protocol.fold'
         CALL = 'protocol.call'
-        CREATE_GAME = 'protocol.request_create_game'
-        JOIN_GAME = 'protocol_request_join_game'
+        CREATE_GAME = 'protocol.request_create_game'            #Used by client to join a game
+        JOIN_GAME = 'protocol_request_join_game'                #Used by client to create a game 
         AUTHENTICATION = 'protocol.request_authentication'      #Used to request of auth when client logs in 
         CREATE_ACCOUNT = 'protocol.create_account'              #Used to create an account, which is stored in DB 
-        LOGOUT = 'protocol.logout'
+        LOGOUT = 'protocol.logout'                              #Used by client to log out
         LEAVE = 'protocol.leave'                                #Used to send request to leave game 
         
 
