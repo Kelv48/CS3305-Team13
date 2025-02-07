@@ -27,7 +27,7 @@ activeSessions = {}   #Key:pair Game ID → set of connected clients
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-async def handleClient(websocket: ServerConnection, path): #ConnectionResetError maybe raised do this in try block do avoid exceptions being raised 
+async def handleClient(websocket: ServerConnection): #ConnectionResetError maybe raised do this in try block do avoid exceptions being raised 
     logger.info(f"Connection from {websocket.remote_address}")
     while True:
         try:

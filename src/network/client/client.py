@@ -1,6 +1,7 @@
-from websockets.asyncio.client import connect
-from websockets.exceptions import ConnectionClosed
 import json
+import asyncio
+from websockets.asyncio.client import connect,ClientConnection
+from websockets.exceptions import ConnectionClosed
 from network.server.protocol import Protocols
 from random import randint
 class Client(object):
@@ -11,14 +12,25 @@ class Client(object):
     Send messages to server
     Disconnect from the server in a non-volatile manner
     '''
-    async def __init__(self, host_ip, port):
-        #Creates client connection - https://websockets.readthedocs.io/en/stable/reference/asyncio/client.html
-        self.client = await connect(f"wss://{host_ip}:{port}")  #Connects to server with the given uri. It should be to the auth server port need to further discuss it.
+    def __init__(self,websocket=None):
+        
+        self.client:ClientConnection = websocket
         self.id = None                                          #This will be the SQL id linking client to an account/ JWT??? that will act as an signature for JSON messages
-        self.sessionID = None                                   #This will contain the game code associate with the game that the client is currently playing. Default: None  
+        self.sessionID = 1                                   #This will contain the game code associate with the game that the client is currently playing. Default: None  
 
 
-    def send(self,m_type, data):
+    @classmethod
+    async def connect(cls, host, port):
+        try:
+            #Creates client connection - https://websockets.readthedocs.io/en/stable/reference/asyncio/client.html
+            websocket = await connect(f"ws://{host}:{port}")  #Connects to server with the given uri. It should be to the auth server port need to further discuss it.
+            return cls(websocket)
+        
+        except Exception as e:
+            print(e)
+
+
+    async def send(self,m_type, data):
         #Sends JSON message to server
         #m_type tells the server what kind of message it is and what actions its should except to do
         #signature is there for validation to ensure that no bad actors manipulate messages
@@ -29,16 +41,16 @@ class Client(object):
                 'sessionID': self.sessionID,  
                 'signature': self.id
             }
-            self.client.send(json.dumps(message).encode())
+            await self.client.send(json.dumps(message).encode())
             #TODO: write better error handling 
         except ConnectionError as e:
             print("whoops daisy")
     
 
-    def receive(self):
+    async def receive(self):
         #receives JSON message from server
         try:
-            message = self.client.recv(True)
+            message = await self.client.recv(True)
             der = json.loads(message)
 
             #This code should be in the game script displaying game info
@@ -59,20 +71,26 @@ class Client(object):
             print("whoops")
        
     #TODO: Test code
-    def redirect(self, host, port):
+    async def redirect(self, host, port):
         #This method is for creating a new websocket to connect to the appropriate server script/port 
-        self.disconnect()
-        self.client = connect(f"wss://{host}:{port}")
+        await self.disconnect()
+        self.client = await connect(f"ws://{host}:{port}")
+        #For a secure connection need to use wss, but need to config server for SSL/TLS before we can do that 
+        #For local development us ws 
 
-    def disconnect(self):
+
+
+    async def disconnect(self):
         #disconnects websocket
-        self.client.close()
+        await self.client.close()
 
     def resetClient(self):
         #This method is used to remove any data linking the client to a game that it may have left or disconnected from 
         self.setID(None)
         self.setSessionID(None)
 
+
+    #Getters/Setters
     def getSessionID(self):
         return self.gameCode
     
@@ -85,21 +103,33 @@ class Client(object):
     def setID(self, id):
         self.id = id 
 
-if __name__ == '__main__':
-    
+async def main():
     clients = []
-    protocols = [Protocols.Request.RAISE, Protocols.Request.CHECK, Protocols.Request.CALL, Protocols.Request.FOLD, 
-                  Protocols.Request.LEAVE]
+    protocols = [
+        Protocols.Request.RAISE, Protocols.Request.CHECK, Protocols.Request.CALL,
+        Protocols.Request.FOLD, Protocols.Request.LEAVE,
+        Protocols.Request.CREATE_GAME, Protocols.Request.JOIN_GAME
+    ]
+
     while True:
-        der = Client("localhost", 80)
+        # Await the connection if it's an async method
+        der = await Client.connect("localhost", 80 )  
         clients.append(der)
+
         for client in clients:
             try:
-                m_type = protocols[randint(0, len(protocols)-1)]
+                m_type = protocols[randint(0, len(protocols) - 1)]
                 print(f"m_type: {m_type}")
                 message = input('Type a message: ')
-                der.send(m_type, message)
-                print(der.receive())
+
+                # Awaiting asynchronous send and receive methods
+                await client.send(m_type, message)
+                response = await client.receive()  
+                print(response)
+
             except KeyboardInterrupt:
-                print(f"The number of clients {len(clients)}")
-                break
+                print(f"The number of clients: {len(clients)}")
+                return  # Exit gracefully
+
+if __name__ == '__main__':
+    asyncio.run(main())  # Run the async main() function
