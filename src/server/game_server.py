@@ -1,11 +1,9 @@
 import asyncio
-import websockets
 import json
 import logging
+from network.server.protocol import Protocols
 from websockets.exceptions import ConnectionClosedError
 from websockets.asyncio.server import serve, ServerConnection
-import websockets.asyncio.server
-from network.server.protocol import Protocols
 
 
 #This is a demo for what the game server process will look like

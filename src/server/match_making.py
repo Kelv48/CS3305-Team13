@@ -9,14 +9,15 @@ When lobby is full then a subprocess is launched which will handle gameplay
 
 GameIDs are random ints that are hashed with a salt value
 '''
-
+import asyncio
 import base64
 import json
 import logging
 from string import Template
-from  websockets.asyncio.server import serve, ServerConnection, broadcast
-from network.server.protocol import Protocols
 from random import randint, randbytes
+from network.server.protocol import Protocols
+from websockets.exceptions import ConnectionClosed
+from  websockets.asyncio.server import serve, ServerConnection, broadcast
 
 # Server attributes
 host ="localhost"
@@ -33,7 +34,7 @@ def generateSessionCode():
     hash = randbytes(randint(1, 128))
     return base64.b64encode(hash).decode('utf-8')[0:6]
 
-def createGame(websocket:ServerConnection, maxPlayer:int):
+async def createGame(websocket:ServerConnection, maxPlayer:int):
     logger.info("Creating new session")
     session_id = generateSessionCode() #ID of the game 
     activeSessions[session_id] = {
@@ -47,7 +48,7 @@ def createGame(websocket:ServerConnection, maxPlayer:int):
     print("Game Session created")
     message = template.substitute(m_type=Protocols.Response.SESSION_ID, data=session_id)
     logger.debug(f"sending message to {websocket.remote_address}")
-    websocket.send(message.encode())
+    await websocket.send(message.encode())
 
 
 async def joinGame(websocket: ServerConnection, sessionID):
@@ -55,78 +56,108 @@ async def joinGame(websocket: ServerConnection, sessionID):
     #Needs to alter or add info to game instance 
     logger.info(f"adding {websocket.remote_address} to session:{sessionID}")
 
-    activeSessions[sessionID]['numPlayer']+=1
-    activeSessions[sessionID]['clients'].add(websocket)
-    if activeSessions[sessionID]['numPlayer'] >= activeSessions[sessionID]['maxPlayer']:
-        logger.debug(f"session: {sessionID} is ready to be played")
-        activeSessions[sessionID]['ready'] = True
-        #Launch game server as subprocess ??
-        #Or we can start creating the games instance when the lobby is ready
-        pass
+    try:
+        activeSessions[sessionID]['numPlayer']+=1
+        activeSessions[sessionID]['clients'].add(websocket)
+        if activeSessions[sessionID]['numPlayer'] >= activeSessions[sessionID]['maxPlayer']:
+            logger.debug(f"session: {sessionID} is ready to be played")
+            activeSessions[sessionID]['ready'] = True
+            #Launch game server as subprocess ??
+            #Or we can start creating the games instance when the lobby is ready
+            pass
 
-    logger.info("Broadcasting to clients in lobby")
-    message = template.substitute(m_type=Protocols.Response.LOBBY_UPDATE, data=activeSessions[sessionID]['numPlayer'])
-    for serverConnection in  activeSessions[sessionID]['clients']:  #Broadcast info to other clients in lobby
-        #if serverConnection != websocket:
-        await serverConnection.send(message)
+        logger.info("Broadcasting to clients in lobby")
+        message = template.substitute(m_type=Protocols.Response.LOBBY_UPDATE, data=activeSessions[sessionID]['numPlayer'])
+        for serverConnection in  activeSessions[sessionID]['clients']:  #Broadcast info to other clients in lobby
+            if serverConnection != websocket:
+                await serverConnection.send(message)
+        
+    except KeyError as e:
+        error_message = template.substitute(m_type=Protocols.Response.ERROR, data="The game that you are trying to join does not exist")
+        await websocket.send(error_message)
+
+    except ConnectionClosed as e:
+        print("Error occurred trying to send message to client")
+        
         
 
 #TODO: figure out how to link vote to a specific client because they could leave but there vote to start remains 
 #TODO: Have a check to see if sessionID exists  
 async def voteStart(websocket: ServerConnection, sessionID):
     logger.info("vote to start has been counted")
-    activeSessions[sessionID]['forceStart']+=1
-    if activeSessions[sessionID]['forceStart'] >= activeSessions[sessionID]['numPlayer']:
-        activeSessions[sessionID]['ready'] = True
-        #Launch game server as subprocess???
-        pass
-    
-    logger.debug("Broadcasting vote to start game")  
-    message = template.substitute(m_type=Protocols.Response.FORCE_START, data=activeSessions[sessionID]['forceStart'])
-    for serverConnection in activeSessions[sessionID]['clients']:  #Broadcast new info to other clients in lobby 
-        #if serverConnection != websocket:
-        await serverConnection.send(message)
+    try:
+        activeSessions[sessionID]['forceStart']+=1
+        if activeSessions[sessionID]['forceStart'] >= activeSessions[sessionID]['numPlayer']:
+            activeSessions[sessionID]['ready'] = True
+            #Launch game server as subprocess???
+            pass
+        
+        logger.debug("Broadcasting vote to start game")  
+        message = template.substitute(m_type=Protocols.Response.FORCE_START, data=activeSessions[sessionID]['forceStart'])
+        for serverConnection in activeSessions[sessionID]['clients']:  #Broadcast new info to other clients in lobby 
+            if serverConnection != websocket:
+                await serverConnection.send(message)
 
-    #await broadcast(activeSessions[sessionID]['clients'], str(activeSessions[sessionID]['forceStart']).encode(), True)
+        #await broadcast(activeSessions[sessionID]['clients'], str(activeSessions[sessionID]['forceStart']).encode(), True)
+    except KeyError as e:
+        error_message = template.substitute(m_type=Protocols.Response.ERROR, data="The game that you are trying to vote does not exist")
+        await websocket.send(error_message)
+
+    except ConnectionClosed as e:
+        print("Error occurred trying to send message to client")
+        
+
 
 async def leaveGame(websocket: ServerConnection, sessionID):
     #This method removes a player if they choose to leave the game 
     logger.info(f"{websocket.remote_address} is leaving the game")
-    if sessionID not in activeSessions:
-        logger.error("invalid sessionID")
-        print('invalid sessionID')
-        return
-    
-    print("client has left lobby")
-    activeSessions[sessionID]['numPlayer'] -=1 
-    activeSessions[sessionID]['clients'].remove(websocket)
-    if len( activeSessions[sessionID]['clients'])==0:
-        logger.info(f"{sessionID} has been deleted")
-        #Need to remove any involvement that this player has had on the lobby
-        del activeSessions[sessionID]
-        return
-    
+    try:
+        if sessionID not in activeSessions:
+            logger.error("invalid sessionID")
+            print('invalid sessionID')
+            return
+        
+        print("client has left lobby")
+        activeSessions[sessionID]['numPlayer'] -=1 
+        activeSessions[sessionID]['clients'].remove(websocket)
+        if len( activeSessions[sessionID]['clients'])==0:
+            logger.info(f"{sessionID} has been deleted")
+            #Need to remove any involvement that this player has had on the lobby
+            del activeSessions[sessionID]
+            return
+        
 
-    message = template.substitute(m_type=Protocols.Response.LOBBY_UPDATE, data=activeSessions[sessionID]['numPlayer'])
+        message = template.substitute(m_type=Protocols.Response.LOBBY_UPDATE, data=activeSessions[sessionID]['numPlayer'])
 
-    logger.info(f"broadcasting {websocket.remote_address} has left game")
-    #Broadcasting new player count in lobby to other clients 
-    for serverConnection in  activeSessions[sessionID]['clients']:
-        #if serverConnection != websocket:
-        await serverConnection.send(message)
+        logger.info(f"broadcasting {websocket.remote_address} has left game")
+        #Broadcasting new player count in lobby to other clients 
+        for serverConnection in  activeSessions[sessionID]['clients']:
+            #if serverConnection != websocket:
+            await serverConnection.send(message)
 
-    logger.info(f"{websocket.remote_address} has been closed")
-    await websocket.close()
+        logger.info(f"{websocket.remote_address} has been closed")
+        await websocket.close()
+
+    except KeyError as e:
+        error_message = template.substitute(m_type=Protocols.Response.ERROR, data="The game that you are trying to leave does not exist")
+        await websocket.send(error_message)
+
+    except ConnectionClosed as e:
+        print("Error occurred trying to send message to client")        
 
 
 async def closeClient(websocket: ServerConnection, sessionID=None):
     #If client is in a game then invoke leaveGame()
     #else disconnect the bastard
-    if sessionID in activeSessions:
-        await leaveGame(websocket, sessionID)
-    else:
-        logger.info(f"{websocket.remote_address} has been closed")
-        await websocket.close()
+    try:
+        if sessionID in activeSessions:
+            await leaveGame(websocket, sessionID)
+        else:
+            logger.info(f"{websocket.remote_address} has been closed")
+            await websocket.close()
+
+    except ConnectionClosed as e:
+        print(f"Issue sending data to client {e}")
 
  
 async def handleClient(websocket: ServerConnection):
@@ -147,6 +178,7 @@ async def handleClient(websocket: ServerConnection):
             message = json.loads(data.decode())
             currentSessionID = message['sessionID']
             logger.info("message received")
+
             match message['m_type']:
                 
                 case Protocols.Request.CREATE_GAME:
@@ -176,5 +208,5 @@ async def main():
 # asyncio.get_event_loop().run_forever()
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
     print("Game Code: ", generateSessionCode())
