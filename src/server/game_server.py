@@ -2,7 +2,7 @@ import asyncio
 import websockets
 import json
 import logging
-import websockets.asyncio
+from websockets.exceptions import ConnectionClosedError
 from websockets.asyncio.server import serve, ServerConnection
 import websockets.asyncio.server
 from network.server.protocol import Protocols
@@ -27,7 +27,7 @@ activeSessions = {}   #Key:pair Game ID → set of connected clients
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-async def handleClient(websocket: ServerConnection): #ConnectionResetError maybe raised do this in try block do avoid exceptions being raised 
+async def handleClient(websocket: ServerConnection): #ConnectionClosedError maybe raised do this in try block do avoid exceptions being raised 
     logger.info(f"Connection from {websocket.remote_address}")
     while True:
         try:
@@ -69,6 +69,9 @@ async def handleClient(websocket: ServerConnection): #ConnectionResetError maybe
                     break
         except ConnectionResetError as e:
             print(f"disconnected from {websocket.remote_address}")
+
+        except ConnectionClosedError as e:
+            print(f"disconnected from {websocket.remote_address}")
            
             if message != None:  #If there is no message then can't check what game client belongs to
 
@@ -100,7 +103,7 @@ async def foldClient(websocket: ServerConnection, sessionID):
             try:
                 await client_writer.send("player has folded".encode())
 
-            except ConnectionResetError:    #If a player has disconnected 
+            except ConnectionClosedError:    #If a player has disconnected 
                 print("client has disconnected during broadcast")
                 activeSessions[sessionID].remove(client_writer)
     
@@ -118,7 +121,7 @@ async def raiseClient(websocket: ServerConnection, sessionID):
             try:
                 await client_writer.send("player has raise the pot by __".encode())
 
-            except ConnectionResetError:
+            except ConnectionClosedError:
                 print("client has disconnected during broadcast")
                 activeSessions[sessionID].remove(client_writer)
     print("end of function")
@@ -135,7 +138,7 @@ async def clientCheck(websocket: ServerConnection, sessionID):
             try:
                 await client_writer.send("player has checked".encode())
         
-            except ConnectionResetError:
+            except ConnectionClosedError:
                 print("client has disconnected during broadcast")
                 activeSessions[sessionID].remove(client_writer)
 
@@ -152,7 +155,7 @@ async def clientCall(websocket: ServerConnection, sessionID):
             try:
                 await client_writer.send("player has called".encode())
 
-            except ConnectionResetError:
+            except ConnectionClosedError:
                 print("client has disconnected during broadcast")
                 activeSessions[sessionID].remove(client_writer)
     print("end of function")

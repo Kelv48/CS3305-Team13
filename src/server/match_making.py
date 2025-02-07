@@ -129,7 +129,7 @@ async def closeClient(websocket: ServerConnection, sessionID=None):
         await websocket.close()
 
  
-async def handleClient(websocket: ServerConnection, path):
+async def handleClient(websocket: ServerConnection):
     #Read and handle messages
     print(f"client has connected: {websocket.remote_address}") 
     currentSessionID = None #This tracks the latest sessionID associated to the client

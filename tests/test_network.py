@@ -1,7 +1,7 @@
 import asyncio
 import json
 
-async def test_server(host, port, message, client_num):
+async def test_gameServer(host, port, message, client_num):
     try:
         reader, writer = await asyncio.open_connection(host, port)
         print(f"Client {client_num}: connected to the server")
@@ -30,7 +30,7 @@ async def invoke_server_test():
 
     num_clients = 500
 
-    tasks = [test_server(host, port, message, i) for i in range(num_clients)]
+    tasks = [test_gameServer(host, port, message, i) for i in range(num_clients)]
     await asyncio.gather(*tasks)
 
 if __name__ == "__main__":
