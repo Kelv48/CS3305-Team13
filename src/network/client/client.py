@@ -1,7 +1,7 @@
 import json
 import asyncio
 from websockets.asyncio.client import connect,ClientConnection
-from websockets.exceptions import ConnectionClosed
+from websockets.exceptions import ConnectionClosed, InvalidURI
 from network.server.protocol import Protocols
 from random import randint
 class Client(object):
@@ -26,7 +26,7 @@ class Client(object):
             websocket = await connect(f"ws://{host}:{port}")  #Connects to server with the given uri. It should be to the auth server port need to further discuss it.
             return cls(websocket)
         
-        except Exception as e:
+        except InvalidURI as e:
             print(e)
 
 
@@ -44,7 +44,7 @@ class Client(object):
             await self.client.send(json.dumps(message).encode())
             #TODO: write better error handling 
         except ConnectionError as e:
-            print("whoops daisy")
+            print(e)
     
 
     async def receive(self):
@@ -107,8 +107,7 @@ async def main():
     clients = []
     protocols = [
         Protocols.Request.RAISE, Protocols.Request.CHECK, Protocols.Request.CALL,
-        Protocols.Request.FOLD, Protocols.Request.LEAVE,
-        Protocols.Request.CREATE_GAME, Protocols.Request.JOIN_GAME
+        Protocols.Request.FOLD, Protocols.Request.LEAVE
     ]
 
     while True:
