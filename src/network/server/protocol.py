@@ -14,6 +14,7 @@ class Protocols:
         SESSION_ID = 'protocol.sessionID'                          #Used to assign client a new sessionID for their game given to the client that created the game 
         FORCE_START = 'protocol.forceStart'                        #Used to alert clients of a change in the force start vote
         LOBBY_UPDATE = 'protocol.lobbyUpdate'                      #Used to update client with new info about the amount of players in lobby
+        ERROR = 'protocol.error'                                   #Used to tell client that an error has occurred 
 
 
 
