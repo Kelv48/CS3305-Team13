@@ -20,10 +20,11 @@ def user_page(mainMenu):
             pos=(screen_width / 2, screen_height * 2 / 2.5), 
             text_input="HOME", 
             font=get_font(30), 
-            base_color="White", 
-            hovering_color="Light Green")
+            base_colour="White", 
+            hovering_colour="Light Green",
+            image=None)
 
-        USER_BACK.changeColor(USER_MOUSE_POS)
+        USER_BACK.changecolour(USER_MOUSE_POS)
         USER_BACK.update(SCREEN)
 
         for event in pygame.event.get():

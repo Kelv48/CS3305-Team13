@@ -43,10 +43,10 @@ def difficulties(mainMenu):
                 pos=(screen_width / 2, button_y), 
                 text_input=text, 
                 font=get_font(30), 
-                base_color="White", 
-                hovering_color="Light Green"
-            )
-            button.changeColor(MOUSE_POS)
+                base_colour="White", 
+                hovering_colour="Light Green",
+                image=None)
+            button.changecolour(MOUSE_POS)
             button.update(SCREEN)
             button_objects.append((button, action))
 
@@ -103,10 +103,10 @@ def numberOfPlayers(mainMenu):
                 pos=(screen_width / 2, button_y),
                 text_input=text,
                 font=get_font(30),
-                base_color="White",
-                hovering_color="Light Green"
-            )
-            button.changeColor(NUMBER_OF_PLAYERS_MOUSE_POS)
+                base_colour="White",
+                hovering_colour="Light Green",
+                image=None)
+            button.changecolour(NUMBER_OF_PLAYERS_MOUSE_POS)
             button.update(SCREEN)
             button_objects.append((button, action))
 
@@ -158,10 +158,10 @@ def selectStartingMoney(mainMenu):
                 pos=(screen_width / 2, button_y),
                 text_input=text,
                 font=get_font(30),
-                base_color="White",
-                hovering_color="Light Green"
-            )
-            button.changeColor(MONEY_MOUSE_POS)
+                base_colour="White",
+                hovering_colour="Light Green",
+                image=None)
+            button.changecolour(MONEY_MOUSE_POS)
             button.update(SCREEN)
             button_objects.append((button, action))
 

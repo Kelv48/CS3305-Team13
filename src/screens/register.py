@@ -42,10 +42,11 @@ def render_screen(title, username, password, active_input, button_actions):
             pos=(screen_width / 2, button_y), 
             text_input=text, 
             font=get_font(30), 
-            base_color="White", 
-            hovering_color="Light Green")
+            base_colour="White", 
+            hovering_colour="Light Green",
+            image=None)
         
-        button.changeColor(pygame.mouse.get_pos())
+        button.changecolour(pygame.mouse.get_pos())
         button.update(SCREEN)
         button_objects.append((button, action))
 
