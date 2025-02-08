@@ -219,7 +219,7 @@ async def handleClient(websocket: ServerConnection):
 
 async def main():
     logger.info("server has started")
-    async with serve(handleClient, host, port) as server:
+    async with serve(handleClient, host, port, ping_timeout=180) as server:
         await server.serve_forever()
 
 
