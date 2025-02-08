@@ -16,7 +16,7 @@ class Client(object):
         
         self.client:ClientConnection = websocket
         self.id = None                                          #This will be the SQL id linking client to an account/ JWT??? that will act as an signature for JSON messages
-        self.sessionID = 1                                   #This will contain the game code associate with the game that the client is currently playing. Default: None  
+        self.sessionID = None                                   #This will contain the game code associate with the game that the client is currently playing. Default: None  
 
 
     @classmethod
@@ -54,13 +54,14 @@ class Client(object):
             der = json.loads(message)
 
             #This code should be in the game script displaying game info
-            if der['m_type'] == Protocols.Response.REDIRECT:
-                self.disconnect()
-                #create new socket to new port
-                self.redirect('localhost', der['data']['host'], der['data']['port'])
+            match der['m_type']:
+                case Protocols.Response.REDIRECT:
+                    self.disconnect()
+                    #create new socket to new port
+                    self.redirect('localhost', der['data']['host'], der['data']['port'])
 
-            elif der['m_type'] == Protocols.Response.SESSION_ID:
-                self.setSessionID(der['data'])
+                case Protocols.Response.SESSION_ID:
+                    self.setSessionID(der['data'])
 
 
             #return json.loads(message)
@@ -103,30 +104,40 @@ class Client(object):
     def setID(self, id):
         self.id = id 
 
+    sessionID = property(getSessionID, setSessionID)
+    id = property(getID, setID)
+
 async def main():
     clients = []
-    protocols = [
+    game_protocols = [
         Protocols.Request.RAISE, Protocols.Request.CHECK, Protocols.Request.CALL,
         Protocols.Request.FOLD, Protocols.Request.LEAVE
     ]
 
+    matchMaking_protocols = [Protocols.Request.CREATE_GAME, Protocols.Request.JOIN_GAME, Protocols.Request.LEAVE]
+    
+    
+    der = await Client.connect("localhost", 80 )  
+    #clients.append(der)
     while True:
         # Await the connection if it's an async method
-        der = await Client.connect("localhost", 80 )  
-        clients.append(der)
-
-        for client in clients:
-            try:
-                m_type = protocols[randint(0, len(protocols) - 1)]
+        try:
+                index = input('0 or 1: ')
+                m_type = matchMaking_protocols[int(index)]
                 print(f"m_type: {m_type}")
-                message = input('Type a message: ')
 
+                message = input("What message do you want to send: ")
+                if int(index) == 0:
+                    message = int(message)
+
+                print(f"message data type {type(message)}")
                 # Awaiting asynchronous send and receive methods
-                await client.send(m_type, message)
-                response = await client.receive()  
+                await der.send(m_type, message)
+                response = await der.receive()  
                 print(response)
 
-            except KeyboardInterrupt:
+                print(der.sessionID)
+        except KeyboardInterrupt:
                 print(f"The number of clients: {len(clients)}")
                 return  # Exit gracefully
 
