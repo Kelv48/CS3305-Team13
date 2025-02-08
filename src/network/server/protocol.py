@@ -19,15 +19,16 @@ class Protocols:
 
 
     class Request:
-        RAISE = 'protocol.raise'                                #Used by client to send request to raise the pot
+        RAISE = 'protocol.raise'                                        #Used by client to send request to raise the pot
         CHECK = 'protocol.check'
         FOLD = 'protocol.fold'
         CALL = 'protocol.call'
-        CREATE_GAME = 'protocol.request_create_game'            #Used by client to join a game
-        JOIN_GAME = 'protocol_request_join_game'                #Used by client to create a game 
-        AUTHENTICATION = 'protocol.request_authentication'      #Used to request of auth when client logs in 
-        CREATE_ACCOUNT = 'protocol.create_account'              #Used to create an account, which is stored in DB 
-        LOGOUT = 'protocol.logout'                              #Used by client to log out
-        LEAVE = 'protocol.leave'                                #Used to send request to leave game 
+        CREATE_GAME = 'protocol.request_create_game'                    #Used by client to join a game
+        JOIN_GAME = 'protocol.request_join_game'                        #Used by client to create a game 
+        AUTHENTICATION = 'protocol.request_authentication'              #Used to request of auth when client logs in 
+        CREATE_ACCOUNT = 'protocol.request_create_account'              #Used to create an account, which is stored in DB 
+        LOGOUT = 'protocol.request_logout'                              #Used by client to log out
+        LEAVE = 'protocol.request_leave'                                #Used to send request to leave game 
+        LIST_OF_GAMES = 'protocol.request_list_of_games'                #Used to request for a list of games 
         
 
