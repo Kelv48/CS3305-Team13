@@ -16,7 +16,7 @@ import logging
 from string import Template
 from random import randint, randbytes
 from network.server.protocol import Protocols
-from websockets.exceptions import ConnectionClosed
+from websockets.exceptions import ConnectionClosed, ConnectionClosedError
 from  websockets.asyncio.server import serve, ServerConnection, broadcast
 
 # Server attributes
@@ -35,46 +35,62 @@ def generateSessionCode():
     return base64.b64encode(hash).decode('utf-8')[0:6]
 
 async def createGame(websocket:ServerConnection, maxPlayer:int):
+    print(type(maxPlayer))
     logger.info("Creating new session")
-    session_id = generateSessionCode() #ID of the game 
-    activeSessions[session_id] = {
-        'clients': [], 
+    sessionID = generateSessionCode() #ID of the game 
+    activeSessions[sessionID] = {
+        'clients': {websocket}, 
         'game': None,
         'maxPlayer': maxPlayer, 
         'forceStart': 0, 
         'numPlayer': 1, 
         'ready': False
     }
-    print("Game Session created")
-    message = template.substitute(m_type=Protocols.Response.SESSION_ID, data=session_id)
+    print(f"Game Session created\n {activeSessions[sessionID]}")
+    message = template.substitute(m_type=Protocols.Response.SESSION_ID, data=sessionID)
     logger.debug(f"sending message to {websocket.remote_address}")
     await websocket.send(message.encode())
 
-
+#TODO: Figure out how to get a player to join game that is already running
 async def joinGame(websocket: ServerConnection, sessionID):
     # activeSessions[sessionID]['clients'].append(player)
     #Needs to alter or add info to game instance 
     logger.info(f"adding {websocket.remote_address} to session:{sessionID}")
 
     try:
-        activeSessions[sessionID]['numPlayer']+=1
-        activeSessions[sessionID]['clients'].add(websocket)
-        if activeSessions[sessionID]['numPlayer'] >= activeSessions[sessionID]['maxPlayer']:
-            logger.debug(f"session: {sessionID} is ready to be played")
-            activeSessions[sessionID]['ready'] = True
-            #Launch game server as subprocess ??
-            #Or we can start creating the games instance when the lobby is ready
-            pass
+        #If there is room to join game 
+        if activeSessions[sessionID]['numPlayer'] < activeSessions[sessionID]['maxPlayer']: 
 
-        logger.info("Broadcasting to clients in lobby")
-        message = template.substitute(m_type=Protocols.Response.LOBBY_UPDATE, data=activeSessions[sessionID]['numPlayer'])
-        for serverConnection in  activeSessions[sessionID]['clients']:  #Broadcast info to other clients in lobby
-            if serverConnection != websocket:
-                await serverConnection.send(message)
+            activeSessions[sessionID]['numPlayer']+=1
+            activeSessions[sessionID]['clients'].add(websocket)
+
+            #This code might be redundant
+            join_message = template.substitute(m_type=Protocols.Response.SESSION_ID, data=sessionID)
+            await websocket(join_message.encode())
+
+            #If lobby is filled up then launch the game. How do join a client to a game in progress. Maybe we redirect them and send them game instance 
+            if activeSessions[sessionID]['numPlayer'] >= activeSessions[sessionID]['maxPlayer']:
+                logger.debug(f"session: {sessionID} is ready to be played")
+                activeSessions[sessionID]['ready'] = True
+                #Launch game server as subprocess ??
+                #Or we can start creating the games instance when the lobby is ready
+                #Or redirect list of clients to game_server port 
+                pass
+
+            logger.info("Broadcasting to clients in lobby")
+            message = template.substitute(m_type=Protocols.Response.LOBBY_UPDATE, data=activeSessions[sessionID]['numPlayer'])
+            for serverConnection in  activeSessions[sessionID]['clients']:  #Broadcast info to other clients in lobby
+                if serverConnection != websocket:
+                    await serverConnection.send(message.encode())
         
+        #If there isn't any room to join game tell player 
+        else:
+            error_message = template.substitute(m_type=Protocols.Response.ERROR, data="The game that you are trying to join is full")
+            await websocket.send(error_message.encode())
+
     except KeyError as e:
         error_message = template.substitute(m_type=Protocols.Response.ERROR, data="The game that you are trying to join does not exist")
-        await websocket.send(error_message)
+        await websocket.send(error_message.encode())
 
     except ConnectionClosed as e:
         print("Error occurred trying to send message to client")
@@ -82,11 +98,11 @@ async def joinGame(websocket: ServerConnection, sessionID):
         
 
 #TODO: figure out how to link vote to a specific client because they could leave but there vote to start remains 
-#TODO: Have a check to see if sessionID exists  
 async def voteStart(websocket: ServerConnection, sessionID):
     logger.info("vote to start has been counted")
     try:
         activeSessions[sessionID]['forceStart']+=1
+        logger.info(f"Votes: {activeSessions[sessionID]['numPlayer']}")
         if activeSessions[sessionID]['forceStart'] >= activeSessions[sessionID]['numPlayer']:
             activeSessions[sessionID]['ready'] = True
             #Launch game server as subprocess???
@@ -112,12 +128,8 @@ async def leaveGame(websocket: ServerConnection, sessionID):
     #This method removes a player if they choose to leave the game 
     logger.info(f"{websocket.remote_address} is leaving the game")
     try:
-        if sessionID not in activeSessions:
-            logger.error("invalid sessionID")
-            print('invalid sessionID')
-            return
         
-        print("client has left lobby")
+        logger.info("client has left lobby")
         activeSessions[sessionID]['numPlayer'] -=1 
         activeSessions[sessionID]['clients'].remove(websocket)
         if len( activeSessions[sessionID]['clients'])==0:
@@ -159,6 +171,9 @@ async def closeClient(websocket: ServerConnection, sessionID=None):
     except ConnectionClosed as e:
         print(f"Issue sending data to client {e}")
 
+    except ConnectionClosedError as e:
+        print(f"Issue sending data to client {e}")
+
  
 async def handleClient(websocket: ServerConnection):
     #Read and handle messages
@@ -166,7 +181,7 @@ async def handleClient(websocket: ServerConnection):
     currentSessionID = None #This tracks the latest sessionID associated to the client
     while True:
         try:
-            logger.info("message received")
+
             data = await websocket.recv()                       #Receives messages from client 
 
             if not data:                                        #If there is not message or message lost disconnect client 
@@ -185,7 +200,7 @@ async def handleClient(websocket: ServerConnection):
                     await createGame(websocket, message['data'])
 
                 case Protocols.Request.JOIN_GAME:
-                    await joinGame(websocket, message['sessionID'])
+                    await joinGame(websocket, message['data'])
 
                 case Protocols.Request.LEAVE:
                     await leaveGame(websocket, message['sessionID'])
@@ -193,6 +208,11 @@ async def handleClient(websocket: ServerConnection):
         except ConnectionError as e:
             print(f"Whoops\n{e}")
             await leaveGame(websocket)
+            break
+
+        except ConnectionClosedError as e:
+            await websocket.close()
+            break
 
 
 
@@ -209,4 +229,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-    print("Game Code: ", generateSessionCode())
