@@ -1,5 +1,5 @@
 from itertools import combinations
-from evaluationLogic import *
+from src.game.handEvaluator.evaluationLogic import *
 
 def handEvaluation(inputDeck):  # takes 7 cards as input
     """

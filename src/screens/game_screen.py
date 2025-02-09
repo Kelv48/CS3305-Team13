@@ -1,23 +1,24 @@
 import pygame, sys
 import math  
 from src.gui.button import Button
-from src.gui.utils import SCREEN, BG, get_font, play_button_click_sound, play_winner_sound
+from src.gui.constants import SCREEN, BG, get_font, play_button_click_sound, play_winner_sound
 
 screen_width, screen_height = SCREEN.get_size()
 card_width = 70
 card_height = 105
 
 def game_screen(mainMenu):
+
     community_cards = []  # Initialize community cards within the function
 
     # Preload the label image for player info (replace the path with your image file)
-    player_label_image = pygame.image.load("assets/images/buttons/action_button.png")
+    player_label_image = pygame.image.load("assets/buttons/action_button.png")
     # Set desired dimensions for the label image (adjust as needed)
     label_width, label_height = 180, 80
     player_label_image = pygame.transform.scale(player_label_image, (label_width, label_height))
 
     # For example, load your image file:
-    button_image = pygame.image.load("assets/extrabuttons/Asset 4.png").convert_alpha()
+    button_image = pygame.image.load("assets/buttons/Asset 4.png").convert_alpha()
     # Scale the image 
     button_image = pygame.transform.scale(button_image, (150, 50))
 
@@ -32,7 +33,7 @@ def game_screen(mainMenu):
         # SCREEN.blit(scaled_bg, (0, 0))
 
         # Load and display the poker table image
-        poker_table_image = pygame.image.load("assets/images/extra/Table.png") 
+        poker_table_image = pygame.image.load("assets/images/Table.png") 
         poker_table_image = pygame.transform.scale(poker_table_image, (800, 500)) 
         poker_table_rect = poker_table_image.get_rect(center=(screen_width / 2, screen_height / 1.9))
         SCREEN.blit(poker_table_image, poker_table_rect)
@@ -60,22 +61,22 @@ def game_screen(mainMenu):
 
         # Load player card images (placeholder paths)
         player_card_images = [
-            pygame.image.load("assets/images/cards/AC.png"),
-            pygame.image.load("assets/images/cards/AS.png"),
-            pygame.image.load("assets/images/cards/red_back.png"),
-            pygame.image.load("assets/images/cards/red_back.png"),
-            pygame.image.load("assets/images/cards/red_back.png"),
-            pygame.image.load("assets/images/cards/red_back.png"),
-            pygame.image.load("assets/images/cards/red_back.png"),
-            pygame.image.load("assets/images/cards/red_back.png"),
-            pygame.image.load("assets/images/cards/red_back.png"),
-            pygame.image.load("assets/images/cards/red_back.png"),
-            pygame.image.load("assets/images/cards/red_back.png"),
-            pygame.image.load("assets/images/cards/red_back.png"),
-            pygame.image.load("assets/images/cards/red_back.png"),
-            pygame.image.load("assets/images/cards/red_back.png"),
-            pygame.image.load("assets/images/cards/red_back.png"),
-            pygame.image.load("assets/images/cards/red_back.png"),
+            pygame.image.load("assets/cards/AC.png"),
+            pygame.image.load("assets/cards/AS.png"),
+            pygame.image.load("assets/cards/red_back.png"),
+            pygame.image.load("assets/cards/red_back.png"),
+            pygame.image.load("assets/cards/red_back.png"),
+            pygame.image.load("assets/cards/red_back.png"),
+            pygame.image.load("assets/cards/red_back.png"),
+            pygame.image.load("assets/cards/red_back.png"),
+            pygame.image.load("assets/cards/red_back.png"),
+            pygame.image.load("assets/cards/red_back.png"),
+            pygame.image.load("assets/cards/red_back.png"),
+            pygame.image.load("assets/cards/red_back.png"),
+            pygame.image.load("assets/cards/red_back.png"),
+            pygame.image.load("assets/cards/red_back.png"),
+            pygame.image.load("assets/cards/red_back.png"),
+            pygame.image.load("assets/cards/red_back.png"),
         ]
 
         # Scale player cards to fit (updated sizes)
@@ -209,9 +210,9 @@ def game_screen(mainMenu):
 def flop():
     # Load flop card images (placeholder paths)
     flop_card_images = [
-        pygame.image.load("assets/images/cards/2C.png"),
-        pygame.image.load("assets/images/cards/3C.png"),
-        pygame.image.load("assets/images/cards/4C.png"),
+        pygame.image.load("assets/cards/2C.png"),
+        pygame.image.load("assets/cards/3C.png"),
+        pygame.image.load("assets/cards/4C.png"),
     ]
     
     # Scale flop cards to fit
@@ -221,7 +222,7 @@ def flop():
 
 def turn(community_cards):
     # Load turn card image (placeholder path)
-    turn_card_image = pygame.image.load("assets/images/cards/5C.png")
+    turn_card_image = pygame.image.load("assets/cards/5C.png")
     
     # Scale turn card to fit
     turn_card_image = pygame.transform.scale(turn_card_image, (card_width, card_height))
@@ -230,7 +231,7 @@ def turn(community_cards):
 
 def river(community_cards):
     # Load river card image (placeholder path)
-    river_card_image = pygame.image.load("assets/images/cards/6C.png")
+    river_card_image = pygame.image.load("assets/cards/6C.png")
     
     # Scale river card to fit
     river_card_image = pygame.transform.scale(river_card_image, (card_width, card_height))

@@ -2,15 +2,14 @@ import pygame, sys
 import pygame.transform
 from src.gui.button import Button
 from src.gui.constants import BG, get_font, SCREEN, FPS
+from src.game.utils import changePlayersPositions
+from src.game.player import Player
+from src.game.poker_round import pokerRound
 
-from src.gui import changePlayersPositions
-from src.gui import Player
-from src.gui import pokerRound
-from src.gui import FPS
-
-
-
+screen_width = 1280
+screen_height = 720
 START_STACK = 5000
+
 
 def gameMenu():
     """Starts the game loop and keeps it running consistently."""
@@ -69,7 +68,6 @@ def menuStart():
     while True:
         mouse_pos = pygame.mouse.get_pos()
 
-        screen_width, screen_height = SCREEN.get_size()
 
         # Draw background
         scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height))
@@ -125,9 +123,10 @@ def menuEnd():
     win_text = font.render(f'{winner} won the game!', True, "White")
     SCREEN.blit(win_text, ((screen_width - win_text.get_width()) // 2, 100))
 
-    screen_width, screen_height = SCREEN.get_size()
     
+  
     # Buttons
+
     button_new_game = Button(
         pos=(screen_width / 2, 300),
         text_input="New Game",

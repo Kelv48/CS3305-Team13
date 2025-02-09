@@ -1,6 +1,6 @@
 import pygame, sys
 from src.gui.button import Button
-from src.gui.utils import BG, get_font, SCREEN
+from src.gui.constants import BG, get_font, SCREEN
 from src.screens.single_player import difficulties
 from src.screens.settings import settings
 from src.screens.multi_player import multiPlayer
@@ -8,6 +8,8 @@ from src.screens.guide import guide_beginner
 from src.screens.leaderboard import leaderboard
 from src.screens.register import register
 from src.screens.game_screen import game_screen
+
+from src.game.menu import gameMenu
 
 def mainMenu():
     while True:
@@ -52,6 +54,7 @@ def mainMenu():
 
         # Define button labels and functions.
         buttons = [
+            ("Bot Game", gameMenu),
             ("GAME SCREEN TEST", game_screen),
             ("REGISTER & LOGIN", register),
             ("SINGLE PLAYER", difficulties),
@@ -91,7 +94,10 @@ def mainMenu():
                         if action == sys.exit:
                             pygame.quit()
                             sys.exit()
+                        elif action == gameMenu:
+                            gameMenu()
                         else:
                             action(mainMenu)
+
 
         pygame.display.update()

@@ -100,7 +100,7 @@ def recapRound(list_winner, common_cards=None):
         pygame.display.flip()
         # Take a second pause
 
-        pygame.time.delay(3000)
+        pygame.time.delay(10000) # Time between each round. Adjust higher if needed
 
 
 def drawPlayer():
@@ -331,74 +331,77 @@ def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=Non
 
 
 def splitPot():
-    # Function changing players stack and returns how much they win in round.
-    import operator
-
+    """
+    Adjusts each player's chip stack and returns a list of tuples containing
+    the player and the chips they win (from opponents’ bets) for the round.
+    """
+    from itertools import groupby
     from src.game.player import Player
-    player_list = Player.player_list_chair.copy()
 
+    # Filter out players who have folded (both 'live' and 'alin' are False)
+    players = [p for p in Player.player_list_chair if p.live or p.alin]
+    if not players:
+        return []
 
-    # Remove players which fold
-    for player in player_list:
-        if player.live is False and player.alin is False:
-            player_list.remove(player)
+    # Sort players by descending score; for ties, by ascending bet.
+    players.sort(key=lambda p: (-p.score, p.input_stack))
+    n = len(players)
+    scores = [p.score for p in players]
+    # Copy bets for local processing (chips each player put into the pot)
+    bets = [p.input_stack for p in players]
 
-    # To calculate reword function needs sorted players list according to a score with descending
-    # order and then according to input stack with ascending order
-    player_list.sort(key=operator.attrgetter('input_stack'))
-    player_list.sort(key=operator.attrgetter('score'), reverse=True)
-    n = len(player_list)
-    player_score, input_stack = [], []
+    # --- Helper 1: Compute each player's own returned chips ---
+    global_max = max(scores)
 
-    for player in player_list:
-        player_score.append(player.score)
-        input_stack.append(player.input_stack)
+    def compute_input_in_game(i):
+        # Players with the global max score get back all of their bet.
+        if scores[i] == global_max:
+            return bets[i]
+        # Otherwise, subtract the largest bet from any higher‐ranked player with a different score.
+        prev_bets = [bets[j] for j in range(i) if scores[j] != scores[i]]
+        deduction = max(prev_bets) if prev_bets else 0
+        return bets[i] - deduction if bets[i] > deduction else 0
 
-    win_list = [0] * n
-    input_in_game = [0] * n
+    input_in_game = [compute_input_in_game(i) for i in range(n)]
 
-    # Calculates how many players will be given back the chips they have put into the main pot
+    # --- Helper 2: Distribute side-pot winnings using groups by score ---
+    def distribute_side_pots(scores, bets):
+        win_list = [0] * len(scores)
+        # Group indices of players by score (players are already sorted)
+        groups = [list(group) for score, group in groupby(range(len(scores)), key=lambda i: scores[i])]
+        for g_idx, group in enumerate(groups):
+            group_count = len(group)
+            # For each lower-scoring group, process each player in that group.
+            for lower_group in groups[g_idx + 1:]:
+                for j in lower_group:
+                    # Each player in the current group wins from the lower-scoring player's bet.
+                    # The win is either the full bet from j (if the current player's bet is high enough)
+                    # or as much as the current player's own bet.
+                    for i in group:
+                        if bets[i] >= bets[j]:
+                            win_list[i] += bets[j] / group_count
+                            bets[j] = 0
+                        else:
+                            win_list[i] += bets[i] / group_count
+                            bets[j] -= bets[i]
+            # Equalize winnings among players in the same group and adjust their bets.
+            base_win = win_list[group[0]]
+            for i in group[1:]:
+                win_list[i] = base_win
+                bets[i] -= bets[group[0]]
+        return win_list
+
+    win_list = distribute_side_pots(scores, bets)
+
+    # --- Finalize: Update players and build return list ---
+    winners = []
     for i in range(n):
-        if player_score[i] == max(player_score):
-            input_in_game[i] = input_stack[i]
-        else:
-            aux = [0] * n
-            new_input = [0] * n
-            for j in range(n):
-                if player_score[j] != player_score[i]:
-                    aux[j] = 1
-            for j in range(n):
-                new_input[j] = aux[j] * input_stack[j]
-            if input_stack[i] - max(new_input[0:i]) < 0:
-                input_in_game[i] = 0
-            else:
-                input_in_game[i] = input_stack[i] - max(new_input[0:i])
+        total_win = input_in_game[i] + win_list[i]
+        players[i].win(total_win)
+        winners.append((players[i], int(win_list[i])))
 
-    # Calculates how many each player wins the chips
-    for i in range(n):
-        number_division = player_score[i:].count(player_score[i])
-        for j in range(i + 1, n):
-            if player_score[i] > player_score[j]:
-                if input_stack[i] >= input_stack[j]:
-                    win_list[i] += input_stack[j] / number_division
-                    input_stack[j] = 0
-                elif input_stack[i] < input_stack[j]:
-                    win_list[i] += input_stack[i] / number_division
-                    input_stack[j] -= input_stack[i]
-        if number_division > 1:
-            for k in range(i + 1, n):
-                if player_score[i] == player_score[k]:
-                    win_list[k] = win_list[i]
-                    input_stack[k] -= input_stack[i]
+    return winners
 
-    # Sum of chips returned and won
-    list_winner = []
-    for i in range(n):
-        win_value = input_in_game[i] + win_list[i]
-        list_winner.append((player_list[i], int(win_list[i])))
-        player_list[i].win(win_value)
-
-    return list_winner
 
 
 def onePlayerWin():

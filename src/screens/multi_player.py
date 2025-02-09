@@ -1,6 +1,6 @@
 import pygame, sys
 from src.gui.button import Button
-from src.gui.utils import BG, get_font, SCREEN
+from src.gui.constants import BG, get_font, SCREEN
 
 def multiPlayer(mainMenu):
     while True:

@@ -1,4 +1,5 @@
 import random
+from src.gui.constants import BB
 
 
 class Bot:
@@ -25,7 +26,7 @@ class AI:
         :return: probability of win, probability of tie
         """
         import random
-        from src.game.pokerScore import playerScore
+        from src.game.poker_score import playerScore
 
 
 
@@ -79,72 +80,60 @@ class AI:
 
         return n_win / number_games, n_tie / number_games
 
+
     def decision(self):
         """
-        Function make decision based on probability win, p. tie, pot.
-        Function sometimes makes a random decision so as not to be a predictable.
-        :return: bot decision how to play
-        """
-        from src.gui.constants import BB
+        Make decision based on win probability, tie probability, and pot.
+        Sometimes makes a random decision so as not to be predictable.
 
+        Returns:
+            list: [decision (str), rais (int)]
+        """
         p_win, p_tie = self.probabilityWin()
         print('p win', p_win)
-        rais = 0
 
-
+        # Use strong-hand logic if p_win is high; otherwise, use weak-hand logic.
         if p_win > 0.5:
-            if self.dict_options['raise']:
-                factor = int(max(BB, self.pot / 8))
-                if p_win < 0.75:
-                    rais = int((12 * p_win - 5) * factor)
-                else:
-                    rais = int((-12 * p_win + 13) * factor)
+            return self._strong_hand_decision(BB, p_win)
+        return self._weak_hand_decision(p_win, p_tie)
 
-                if rais < self.min_raise:
-                    rais = self.min_raise
-                    decision = 'raise'
-                elif rais > self.max_raise:
-                    rais = self.max_raise
-                    decision = 'all-in'
-                else:
-                    decision = 'raise'
-                    rais = int(rais)
-            else:
-                decision = 'all-in'
-                rais = self.max_raise
-        else:
-            max_call = int(p_win * self.pot + p_tie * self.pot / self.n_players)
-            if self.dict_options['check']:
-                # sometimes 2 of 10 case instead of check make raise
-                random_raise = random.randint(1, 10)
-                if random_raise > 8:
-                    if self.min_raise < max_call: # self.min_raise < self.max_raise
-                        rais = min(max_call, self.max_raise)
-                        decision = 'raise'
-                    else:
-                        decision = 'check'
-                else:
-                    decision = 'check'
-            else:
-                if max_call < self.call_value:
-                    decision = 'fold'
-                else:
-                    # sometimes 2 of 10 case instead of call make raise
-                    random_raise = random.randint(1, 10)
-                    if random_raise > 8:
-                        if self.min_raise < max_call:
-                            rais = min(max_call, self.max_raise)
-                            decision = 'raise'
-                        else:
-                            if self.call_value < self.max_raise:
-                                decision = 'call'
-                            else:
-                                decision = 'all-in'
-                    else:
-                        if self.call_value < self.max_raise:
-                            decision = 'call'
-                        else:
-                            decision = 'all-in'
+    def _strong_hand_decision(self, BB, p_win):
+        """
+        Decision logic when win probability is greater than 0.5.
+        """
+        if self.dict_options['raise']:
+            factor = int(max(BB, self.pot / 8))
+            # Use different raise formulas based on p_win threshold.
+            rais = int((12 * p_win - 5) * factor) if p_win < 0.75 else int((-12 * p_win + 13) * factor)
 
-        return [decision, rais]
+            if rais < self.min_raise:
+                return ['raise', self.min_raise]
+            if rais > self.max_raise:
+                return ['all-in', self.max_raise]
+            return ['raise', rais]
+
+        # If raising is not an option, go all-in.
+        return ['all-in', self.max_raise]
+
+    def _weak_hand_decision(self, p_win, p_tie):
+        """
+        Decision logic when win probability is less than or equal to 0.5.
+        """
+        max_call = int(p_win * self.pot + (p_tie * self.pot) / self.n_players)
+
+        if self.dict_options['check']:
+            # Occasionally try to raise even when checking is allowed.
+            if random.randint(1, 10) > 8 and self.min_raise < max_call:
+                return ['raise', min(max_call, self.max_raise)]
+            return ['check', 0]
+
+        if max_call < self.call_value:
+            return ['fold', 0]
+
+        # Occasionally try to raise instead of calling.
+        if random.randint(1, 10) > 8 and self.min_raise < max_call:
+            return ['raise', min(max_call, self.max_raise)]
+
+        decision = 'call' if self.call_value < self.max_raise else 'all-in'
+        return [decision, 0]
 
