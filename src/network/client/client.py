@@ -3,7 +3,6 @@ import asyncio
 from websockets.asyncio.client import connect,ClientConnection
 from websockets.exceptions import ConnectionClosed, InvalidURI
 from network.server.protocol import Protocols
-from random import randint
 class Client(object):
     '''
     Needs to connect to server
@@ -56,7 +55,6 @@ class Client(object):
             #This code should be in the game script displaying game info
             match der['m_type']:
                 case Protocols.Response.REDIRECT:
-                    self.disconnect()
                     #create new socket to new port
                     self.redirect('localhost', der['data']['host'], der['data']['port'])
 
@@ -118,7 +116,6 @@ async def main():
     
     
     der = await Client.connect("localhost", 80 )  
-    #clients.append(der)
     while True:
         # Await the connection if it's an async method
         try:
