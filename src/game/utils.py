@@ -403,7 +403,6 @@ def splitPot():
     return winners
 
 
-
 def onePlayerWin():
     #  Function changing player stack who win, and return list tuple who win and how much
     from src.game.player import Player

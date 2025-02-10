@@ -11,7 +11,7 @@ BEIGE = (225, 198, 153)
 RED = (255, 0, 0)
 
 # Screen settings
-FPS = 60
+FPS = 1
 WIDTH = 1280
 HEIGHT = 720
 SCREEN = pygame.display.set_mode((1280, 720), pygame.RESIZABLE) # Allow the window to be resizable

@@ -26,7 +26,7 @@ class AI:
         :return: probability of win, probability of tie
         """
         import random
-        from src.game.poker_score import playerScore
+        from src.game.scoreEvaluation import playerScore
 
 
 
