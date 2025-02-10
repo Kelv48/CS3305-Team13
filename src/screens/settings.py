@@ -1,6 +1,6 @@
 import pygame, sys
 from src.gui.button import Button
-from src.gui.utils import BG, get_font, SCREEN
+from src.gui.constants import BG, get_font, SCREEN
 from src.screens.sound import sound
 from src.screens.user_page import user_page
 

@@ -1,6 +1,6 @@
 import pygame, sys
 from src.gui.button import Button
-from src.gui.utils import BG, get_font, SCREEN
+from src.gui.constants import BG, get_font, SCREEN
 
 # Global dictionary to store game settings
 game_settings = {
