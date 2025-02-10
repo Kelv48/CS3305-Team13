@@ -15,6 +15,7 @@ class Protocols:
         FORCE_START = 'protocol.forceStart'                        #Used to alert clients of a change in the force start vote
         LOBBY_UPDATE = 'protocol.lobbyUpdate'                      #Used to update client with new info about the amount of players in lobby
         ERROR = 'protocol.error'                                   #Used to tell client that an error has occurred 
+        PLAYER_ID = 'protocol.playerID'                            #Used to assign an id to client to track what player they are i.e. 1 → player 1
 
 
 
