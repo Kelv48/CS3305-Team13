@@ -2,7 +2,8 @@ import random
 
 from src.game.player import Player
 from src.game.auction import auction
-from src.game.poker_score import playerScore
+# from src.game.poker_score import playerScore
+from src.game.scoreEvaluation import playerScore
 from src.game.utils import recapRound, splitPot, onePlayerWin, changePlayersPositions
 from src.gui.constants import SB, BB
 
