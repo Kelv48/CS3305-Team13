@@ -70,9 +70,11 @@ def get_user_DBorCache(user_name):
         return user_data
     return None
 
-@app.route("/user/<string:user_name>", methods=['GET'])
-def get_user(user_name):
-    user = get_user_DBorCache(user_name)
+@app.route("/user", methods=['POST'])
+def get_user():
+    data = request.json
+    username = data.get('username')
+    user = get_user_DBorCache(username)
     if user:
         return jsonify(user), 200
     return jsonify({'error': 'User not found'}), 404
@@ -80,16 +82,16 @@ def get_user(user_name):
 @app.route("/create_user", methods=['POST']) 
 def create_user():
     data = request.json
-    if not data.get('name') or not data.get('password'):
+    if not data.get('username') and data.get('password'):
         return jsonify({'error': 'Please provide both name and password'}), 400
-    check = get_user_DBorCache(data['name'])
+    check = get_user_DBorCache(data['username'])
     if check:
         return jsonify({'error': 'User already exists'}), 400
-    new_user = User(name=data['name'], password=data['password'])
+    new_user = User(name=data['username'], password=data['password'])
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"message": f"User {data['name']} created successfully!", "id": new_user.id}), 201
+    return jsonify({"message": f"User {data['username']} created successfully!", "id": new_user.id}), 201
 
 # Run the application
 if __name__ == '__main__':

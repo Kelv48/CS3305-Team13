@@ -177,7 +177,7 @@ def login(mainMenu):
 
 
 def login_user(user_name, password):
-    url = f"{base_url}/login"
+    url = f"{base_url}/user"
 
     payload = {
         "username": user_name, 
