@@ -30,6 +30,7 @@ class Protocols:
         CREATE_ACCOUNT = 'protocol.request_create_account'              #Used to create an account, which is stored in DB 
         LOGOUT = 'protocol.request_logout'                              #Used by client to log out
         LEAVE = 'protocol.request_leave'                                #Used to send request to leave game 
-        LIST_OF_GAMES = 'protocol.request_list_of_games'                #Used to request for a list of games 
+        LIST_OF_GAMES = 'protocol.request_list_of_games'                #Used to request for a list of games
+        INITIALISE = 'protocol.initialise'                               
         
 
