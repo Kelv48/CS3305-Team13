@@ -2,7 +2,7 @@ import json
 import asyncio
 from websockets.asyncio.client import connect,ClientConnection
 from websockets.exceptions import ConnectionClosed, InvalidURI
-from network.server.protocol import Protocols
+from server.protocol import Protocols
 class Client(object):
     '''
     Needs to connect to server
