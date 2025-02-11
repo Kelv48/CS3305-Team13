@@ -1,5 +1,6 @@
-import asyncio
 import json
+import redis
+import asyncio
 import logging
 from string import Template
 from network.server.protocol import Protocols
@@ -22,6 +23,9 @@ port = 443
 activeSessions = {}     #Key:pair Game ID → set of connected clients 
 template = Template('{"m_type": "$m_type", "data": "$data"}')   #This is a template for message to be sent to clients
 
+#Redis setup 
+r = redis.Redis('localhost', 6379)
+
 #Configure logging 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -33,8 +37,10 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
     logger.info(f"Connection from {websocket.remote_address}")
     while True:
         try:
+
             logger.info(f"Received message from client: {websocket.remote_address}")
             data = await websocket.recv(100)
+            
             if not data:
                 logger.error(f"Faulty/Missing message from client {websocket.remote_address}")
                 break

@@ -25,7 +25,8 @@ host ="localhost"
 port = 80
 template = Template('{"m_type": "$m_type", "data": "$data"}')   #This is a template for message to be sent to clients
 activeSessions = {}  
-r = redis.Redis()
+r = redis.Redis('localhost', 6379)
+channel = 'activeSessions'
 
 #Configure logging 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -77,7 +78,6 @@ async def joinGame(websocket: ServerConnection, sessionID):
             activeSessions[sessionID]['numPlayer']+=1
             activeSessions[sessionID]['clients'].add(websocket)
 
-          
             join_message = template.substitute(m_type=Protocols.Response.SESSION_ID, data=sessionID)
             await websocket(join_message.encode())
 
@@ -85,8 +85,13 @@ async def joinGame(websocket: ServerConnection, sessionID):
             if activeSessions[sessionID]['numPlayer'] >= activeSessions[sessionID]['maxPlayer']:
                 logger.debug(f"session: {sessionID} is ready to be played")
                 # Create game instance and store in active sessions
-                # Broadcast redirect message to all clients in lobby
-                pass
+
+
+                #Redirect each client in lobby to game server 
+                redirectMessage = template.substitute(m_type=Protocols.Response.REDIRECT, data={'host':'localhost', 'port':443})
+                for serverConnection in activeSessions[sessionID]['clients']:
+                    await serverConnection.send(redirectMessage)
+                
 
             logger.info("Broadcasting to clients in lobby")
             message = template.substitute(m_type=Protocols.Response.LOBBY_UPDATE, data=activeSessions[sessionID]['numPlayer'])
