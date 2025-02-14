@@ -10,21 +10,20 @@ from src.gui.button import Button
 from src.gui.constants import BG, get_font, SCREEN as INITIAL_SCREEN
 
 
-def run_guide_screen(title, guide_text, back_callback, next_callback):
+def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, intermediate_callback, advanced_callback):
 
     screen = INITIAL_SCREEN
     pygame.display.set_caption(title)
 
-    # Absolute path for the theme file 
-    theme_path = os.path.join(os.path.dirname(__file__), 'embedded_images_theme.json')
-    manager = pygame_gui.UIManager(screen.get_size(), theme_path)
+    # Absolute path for the theme file
+    manager = pygame_gui.UIManager(screen.get_size(), 'src/screens/embedded_images_theme.json')
 
     clock = pygame.time.Clock()
     is_running = True
 
     def create_text_box():
         sw, sh = screen.get_size()
-        rect = pygame.Rect(10, int(sh * 0.2), sw - 20, int(sh * 0.6))
+        rect = pygame.Rect(int(sw * 0.1), int(sh * 0.1), int(sw * 0.8), int(sh * 0.75))
         return UITextBox(
             guide_text,
             rect,
@@ -34,43 +33,94 @@ def run_guide_screen(title, guide_text, back_callback, next_callback):
 
     def create_buttons():
         sw, sh = screen.get_size()
+        spacing = sw * 0.2  # Space between buttons
+        y_pos = int(sh * 0.9)
+
         back_button = Button(
-            pos=(sw * 0.25, int(sh * 0.85)),
+            pos=(sw * 0.2, y_pos),
             text_input="BACK",
             font=get_font(30),
             base_colour="White",
             hovering_colour="Light Green",
             image=None)
-        next_button = Button(
-            pos=(sw * 0.75, int(sh * 0.85)),
-            text_input="NEXT",
+
+
+        beginner_button = Button(
+            pos=(sw * 0.4, y_pos),
+            text_input="BEGINNER",
             font=get_font(30),
             base_colour="White",
             hovering_colour="Light Green",
             image=None)
-        return back_button, next_button
+
+
+        intermediate_button = Button(
+            pos=(sw * 0.6, y_pos),
+            text_input="INTERMEDIATE",
+            font=get_font(30),
+            base_colour="White",
+            hovering_colour="Light Green",
+            image=None)
+
+
+        advanced_button = Button(
+            pos=(sw * 0.8, y_pos),
+            text_input="ADVANCED",
+            font=get_font(30),
+            base_colour="White",
+            hovering_colour="Light Green",
+            image=None)
+
+        return back_button, beginner_button, intermediate_button, advanced_button
 
     text_box = create_text_box()
-    back_button, next_button = create_buttons()
+    back_button, beginner_button, intermediate_button, advanced_button = create_buttons()
 
     while is_running:
-        # Update screen dimensions and draw the background.
         sw, sh = screen.get_size()
         scaled_bg = pygame.transform.scale(BG, (sw, sh))
         screen.blit(scaled_bg, (0, 0))
 
-        # Draw screen title.
+
+        screen_width, screen_height = screen.get_size()
+        # Transparent textbox with rounded edges
+        textbox_width = int(screen_width * 0.8)      # 20% of screen width
+        textbox_height = int(screen_height * 0.1)      # 70% of screen height
+        textbox_x = int((screen_width - textbox_width) / 2)
+        textbox_y = int(screen_height * 0.85)          # 80% down from the top
+
+
+        # Create a new Surface with per-pixel alpha (using SRCALPHA).
+        textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
+        # Draw a filled rounded rectangle on the textbox_surface.
+        # The colour (0, 0, 0, 100) is black with an alpha value of 100 (semi-transparent).
+        # Adjust the border_radius (here, 20) to control the roundness of the corners.
+        pygame.draw.rect(
+            textbox_surface, 
+            (0, 0, 0, 100), 
+            (0, 0, textbox_width, textbox_height), 
+            border_radius=30
+        )
+        # Blit the textbox to the main screen.
+        INITIAL_SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
+
         title_surface = get_font(45).render(title, True, "White")
-        title_rect = title_surface.get_rect(center=(sw / 2, sh / 9))
+        title_rect = title_surface.get_rect(center=(sw / 2, sh / 15))
         screen.blit(title_surface, title_rect)
 
-        # Update button positions in case the window has been resized
-        back_button.pos = (sw * 0.25, int(sh * 0.85))
-        next_button.pos = (sw * 0.75, int(sh * 0.85))
-        back_button.changecolour(pygame.mouse.get_pos())
-        next_button.changecolour(pygame.mouse.get_pos())
-        back_button.update(screen)
-        next_button.update(screen)
+        # Update button positions
+        back_button.pos = (sw * 0.2, int(sh * 0.9))
+        beginner_button.pos = (sw * 0.4, int(sh * 0.9))
+        intermediate_button.pos = (sw * 0.6, int(sh * 0.9))
+        advanced_button.pos = (sw * 0.8, int(sh * 0.9))
+
+
+
+
+
+        for button in (back_button, beginner_button, intermediate_button, advanced_button):
+            button.changecolour(pygame.mouse.get_pos())
+            button.update(screen)
 
         time_delta = clock.tick(60) / 1000.0
 
@@ -80,35 +130,26 @@ def run_guide_screen(title, guide_text, back_callback, next_callback):
                 sys.exit()
 
             if event.type == pygame.VIDEORESIZE:
-                # Update the display and UI manager resolution.
                 screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
                 manager.set_window_resolution((event.w, event.h))
-                # Recreate the text box and buttons with the new dimensions.
                 text_box.kill()
                 text_box = create_text_box()
-                back_button = Button(
-                    pos=(event.w * 0.25, int(event.h * 0.85)),
-                    text_input="BACK",
-                    font=get_font(30),
-                    base_colour="White",
-                    hovering_colour="Light Green",
-                    image=None)
-                next_button = Button(
-                    pos=(event.w * 0.75, int(event.h * 0.85)),
-                    text_input="NEXT",
-                    font=get_font(30),
-                    base_colour="White",
-                    hovering_colour="Light Green",
-                    image=None)
+                back_button, beginner_button, intermediate_button, advanced_button = create_buttons()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 if back_button.checkForInput(mouse_pos):
                     is_running = False
-                    back_callback()
-                elif next_button.checkForInput(mouse_pos):
+                    main_menu_callback()
+                elif beginner_button.checkForInput(mouse_pos):
                     is_running = False
-                    next_callback()
+                    beginner_callback()
+                elif intermediate_button.checkForInput(mouse_pos):
+                    is_running = False
+                    intermediate_callback()
+                elif advanced_button.checkForInput(mouse_pos):
+                    is_running = False
+                    advanced_callback()
 
             manager.process_events(event)
 
@@ -120,24 +161,32 @@ def run_guide_screen(title, guide_text, back_callback, next_callback):
 # --- Guide Screens --- #
 
 def guide_beginner(main_menu):
-    """Beginner Guide: BACK returns to main_menu, NEXT goes to Intermediate guide."""
     beginner_text = (
-        '<font face=calibri_bold size=3 colour=#FFFFFF>'
-        '<b>Beginner Poker Guide</b><br><br>'
+        '<font face="noto_sans" size="3" color="#FFFFFF">'
+        '<img src="src/screens/HandRankings.png"  float:right; padding:5px 10px 5px 5px;">'
+        '<img src="src/screens/HandRankings.png"  float:right; padding:5px 10px 5px 5px;">'
+        '<img src="src/screens/HandRankings.png"  float:right; padding:5px 10px 5px 5px;">'
+        '<img src="src/screens/HandRankings.png"  float:right; padding:5px 10px 5px 5px;">'
+        '<img src="src/screens/HandRankings.png"  float:right; padding:5px 10px 5px 5px;">'
+        '<img src="src/screens/HandRankings.png"  float:right; padding:5px 10px 5px 5px;">'
+        'Some test text in a box that will '
+        'This guide is perfect for those just starting out. '
         'Learn the basics of poker including rules, hand rankings, and simple strategies. '
-        'This guide is perfect for those just starting out.'
         '</font>'
+
+
     )
     run_guide_screen(
         title="Beginner Poker Guide",
         guide_text=beginner_text,
-        back_callback=main_menu,
-        next_callback=lambda: guide_intermediate(main_menu)
+        main_menu_callback=main_menu,
+        beginner_callback=lambda: guide_beginner(main_menu),
+        intermediate_callback=lambda: guide_intermediate(main_menu),
+        advanced_callback=lambda: guide_advanced(main_menu)
     )
 
 
 def guide_intermediate(main_menu):
-    """Intermediate Guide: BACK goes back to Beginner, NEXT goes to Advanced."""
     intermediate_text = (
         '<font face=calibri_bold size=3 colour=#FFFFFF>'
         '<b>Intermediate Poker Guide</b><br><br>'
@@ -148,13 +197,14 @@ def guide_intermediate(main_menu):
     run_guide_screen(
         title="Intermediate Poker Guide",
         guide_text=intermediate_text,
-        back_callback=lambda: guide_beginner(main_menu),
-        next_callback=lambda: guide_advanced(main_menu)
+        main_menu_callback=main_menu,
+        beginner_callback=lambda: guide_beginner(main_menu),
+        intermediate_callback=lambda: guide_intermediate(main_menu),
+        advanced_callback=lambda: guide_advanced(main_menu)
     )
 
 
 def guide_advanced(main_menu):
-    """Advanced Guide: BACK goes back to Intermediate, NEXT returns to main_menu."""
     advanced_text = (
         '<font face=calibri_bold size=3 colour=#FFFFFF>'
         '<b>Advanced Poker Guide</b><br><br>'
@@ -165,6 +215,8 @@ def guide_advanced(main_menu):
     run_guide_screen(
         title="Advanced Poker Guide",
         guide_text=advanced_text,
-        back_callback=lambda: guide_intermediate(main_menu),
-        next_callback=main_menu
+        main_menu_callback=main_menu,
+        beginner_callback=lambda: guide_beginner(main_menu),
+        intermediate_callback=lambda: guide_intermediate(main_menu),
+        advanced_callback=lambda: guide_advanced(main_menu)
     )
