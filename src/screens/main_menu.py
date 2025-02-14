@@ -1,35 +1,27 @@
 import pygame, sys
 from src.gui.button import Button
 from src.gui.constants import BG, get_font, SCREEN
-from src.screens.single_player import difficulties
+from src.screens.single_player import singlePlayer
 from src.screens.settings import settings
 from src.screens.multi_player import multiPlayer
 from src.screens.guide import guide_beginner
 from src.screens.leaderboard import leaderboard
 from src.screens.register import register
-from src.screens.game_screen import game_screen
+from src.screens.user_page import user_page
+from src.screens.tools import tools
 
-from src.game.menu import gameMenu
 
 def mainMenu():
     while True:
         MAIN_MOUSE_POS = pygame.mouse.get_pos()
-        screen_width, screen_height = SCREEN.get_size()
-
-        ### 1. BLURRED BACKGROUND ###
-        # First, scale the background to the screen size.
+        
+        # Calculate positions based on current screen size
+        screen_width, screen_height = SCREEN.get_size() 
         scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height))
-        # To blur, downscale the background significantly then upscale it back.
-        blur_scale = 1  # Adjust between 0 and 1; lower values give more blur.
-        small_bg = pygame.transform.smoothscale(
-            scaled_bg, 
-            (max(1, int(screen_width * blur_scale)), max(1, int(screen_height * blur_scale)))
-        )
-        blurred_bg = pygame.transform.smoothscale(small_bg, (screen_width, screen_height))
-        SCREEN.blit(blurred_bg, (0, 0))
+        SCREEN.blit(scaled_bg, (0, 0))
 
         # Transparent textbox with rounded edges
-        textbox_width = int(screen_width * 0.2)      # 20% of screen width
+        textbox_width = int(screen_width * 0.25)      # 20% of screen width
         textbox_height = int(screen_height * 0.7)      # 70% of screen height
         textbox_x = int((screen_width - textbox_width) / 2)
         textbox_y = int(screen_height * 0.15)          # Start 15% down from the top
@@ -54,13 +46,13 @@ def mainMenu():
 
         # Define button labels and functions.
         buttons = [
-            ("Bot Game", gameMenu),
-            ("GAME SCREEN TEST", game_screen),
             ("REGISTER & LOGIN", register),
-            ("SINGLE PLAYER", difficulties),
+            ("USER", user_page),
+            ("SINGLE PLAYER", singlePlayer),
             ("MULTI PLAYER", multiPlayer),
             ("GUIDE", guide_beginner),
             ("SETTINGS", settings),
+            # ("TOOLS", tools),
             ("LEADERBOARD", leaderboard),
             ("QUIT", sys.exit)
         ]
@@ -94,8 +86,6 @@ def mainMenu():
                         if action == sys.exit:
                             pygame.quit()
                             sys.exit()
-                        elif action == gameMenu:
-                            gameMenu()
                         else:
                             action(mainMenu)
 

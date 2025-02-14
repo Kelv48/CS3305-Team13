@@ -31,8 +31,8 @@ def render_screen(title, username, password, active_input, button_actions):
     password_box = pygame.Rect(screen_width / 2 - 100, screen_height / 2.5, 200, 40)
 
     # Set the border color: red if active, white if inactive
-    username_color = "Red" if active_input == "username" else "White"
-    password_color = "Red" if active_input == "password" else "White"
+    username_color = "Green" if active_input == "username" else "White"
+    password_color = "Green" if active_input == "password" else "White"
 
     # Draw the input boxes with the selected colors
     pygame.draw.rect(SCREEN, username_color, username_box, 2)

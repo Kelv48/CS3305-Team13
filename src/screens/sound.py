@@ -29,8 +29,8 @@ def sound(mainMenu):
     sfx_volume = 0.5    # Default sound effects volume
     pygame.mixer.music.set_volume(music_volume)  # Set initial music volume
 
-    music_volume_slider = Slider(pos=(0, 0), width=300)
-    sfx_volume_slider = Slider(pos=(0, 0), width=300)
+    music_volume_slider = Slider(pos=(0, 0), width=250)
+    sfx_volume_slider = Slider(pos=(0, 0), width=250)
 
     while True:
         SOUND_MOUSE_POS = pygame.mouse.get_pos()
@@ -39,6 +39,36 @@ def sound(mainMenu):
         SOUND_width, SOUND_height = SCREEN.get_size()
         scaled_bg = pygame.transform.scale(BG, (SOUND_width, SOUND_height))
         SCREEN.blit(scaled_bg, (0, 0))
+
+
+
+
+        screen_width, screen_height = SCREEN.get_size()
+        # Transparent textbox with rounded edges
+        textbox_width = int(screen_width * 0.25)      # 20% of screen width
+        textbox_height = int(screen_height * 0.7)      # 70% of screen height
+        textbox_x = int((screen_width - textbox_width) / 2)
+        textbox_y = int(screen_height * 0.15)          # Start 15% down from the top
+
+        # Create a new Surface with per-pixel alpha (using SRCALPHA).
+        textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
+        # Draw a filled rounded rectangle on the textbox_surface.
+        # The colour (0, 0, 0, 100) is black with an alpha value of 100 (semi-transparent).
+        # Adjust the border_radius (here, 20) to control the roundness of the corners.
+        pygame.draw.rect(
+            textbox_surface, 
+            (0, 0, 0, 100), 
+            (0, 0, textbox_width, textbox_height), 
+            border_radius=50
+        )
+        # Blit the textbox to the main screen.
+        SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
+
+
+
+
+
+
 
         # Center sliders
         music_volume_slider.rect.x = SOUND_width / 2 - music_volume_slider.rect.width / 2

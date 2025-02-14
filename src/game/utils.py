@@ -51,13 +51,17 @@ def recapRound(list_winner, common_cards=None):
     """
 
 
-    from src.gui.constants import SCREEN, WIDTH, HEIGHT, BEIGE
+    from src.gui.constants import SCREEN, WIDTH, HEIGHT, BEIGE, GAME_BG
     font = pygame.font.SysFont('comicsans', 20)
 
 
 
     screen_width, screen_height = SCREEN.get_size()
-    SCREEN.fill("black")
+    # SCREEN.fill("black")
+
+    # Draw background
+    scaled_bg = pygame.transform.scale(GAME_BG, (screen_width, screen_height))
+    SCREEN.blit(scaled_bg, (0, 0))
 
     poker_table_image = pygame.image.load("assets/images/Table.png")
     poker_table_image = pygame.transform.scale(poker_table_image, (800, 500)) 
@@ -77,7 +81,7 @@ def recapRound(list_winner, common_cards=None):
 
     # Display who, how much win
     if len(list_winner) == 1:
-        text = '{} won {}$'.format(str(list_winner[0][0].name), str(list_winner[0][1]))
+        text = '{} won ${}'.format(str(list_winner[0][0].name), str(list_winner[0][1]))
         text = font.render(text, True, BEIGE)
         y_c = y_coordinate(HEIGHT, text.get_height(), text.get_height() // 2, HEIGHT * 0.1, len(list_winner))
         x, y = WIDTH * 0.05, y_c[0]
@@ -92,7 +96,7 @@ def recapRound(list_winner, common_cards=None):
         text = font.render(text, True, BEIGE)
         y_c = y_coordinate(HEIGHT, text.get_height(), text.get_height() // 2, HEIGHT * 0.1, len(list_winner))
         for i in range(len(list_winner)):
-            text = '{} won {}$ with {}'.format(str(list_winner[i][0].name), str(list_winner[i][1]),
+            text = '{} won ${} with {}'.format(str(list_winner[i][0].name), str(list_winner[i][1]),
                                                str(list_winner[i][0].hand))
             text = font.render(text, True, BEIGE)
             x, y = WIDTH * 0.05, y_c[i]
@@ -185,7 +189,7 @@ def drawButtons(buttons):
 
 def arrangeRoom(common_cards=None):
     # Function draw background and cards
-    from src.gui.constants import SCREEN
+    from src.gui.constants import SCREEN, GAME_BG
 
     from src.game.player import Player
     player_list_chair = Player.player_list_chair
@@ -193,7 +197,11 @@ def arrangeRoom(common_cards=None):
 
 
     screen_width, screen_height = SCREEN.get_size()
-    SCREEN.fill("black")
+    # SCREEN.fill("black")
+
+    # Draw background
+    scaled_bg = pygame.transform.scale(GAME_BG, (screen_width, screen_height))
+    SCREEN.blit(scaled_bg, (0, 0))
 
     poker_table_image = pygame.image.load("assets/images/Table.png")
     poker_table_image = pygame.transform.scale(poker_table_image, (800, 500)) 
@@ -320,7 +328,7 @@ def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=Non
             # if the player could raise, display slider to
             for button in buttons:
                 if button.name == 'raise' and button.active:
-                    output.setText(str(slider.getValue() + min_raise) + '$')
+                    output.setText('$' + str(slider.getValue() + min_raise))
                     #print(output.getText())
                     pygame_widgets.update(event)
                 pygame.display.update()

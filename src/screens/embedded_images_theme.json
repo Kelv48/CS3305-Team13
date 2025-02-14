@@ -31,14 +31,28 @@
     {
         "colours":
         {
-           "dark_bg": "#505068"
+           "dark_bg": "green"
+        },
 
+        "misc":
+        {
+            "shape": "rounded_rectangle",
+            "shape_corner_radius": "20",
+            "border_width": "2",
+            "shadow_width": "3"
         }
     },
     "text_box.vertical_scroll_bar.#sliding_button":
-    {
+    {   
+        "colours":
+        {
+           "dark_bg": "black"
+        },
+        
         "misc":
         {
+           "shape": "rounded_rectangle",
+           "shape_corner_radius": "20",
            "border_width": "1",
            "padding": "5,5",
            "link_normal_underline": "0",

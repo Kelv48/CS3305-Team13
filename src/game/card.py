@@ -27,9 +27,9 @@ class Card(pygame.sprite.Sprite):
 
         # Define positioning data for each card type
         positions = {
-            'first_card_player':    ((screen_width - card_width) // 2, screen_height - 80),
+            'first_card_player':    ((screen_width - card_width) // 2, screen_height - 30),
             'first_card_opponent':  ((screen_width - card_width) // 2, 150),
-            'second_card_player':   ((screen_width + card_width) // 2, screen_height - 80),
+            'second_card_player':   ((screen_width + card_width) // 2, screen_height - 30),
             'second_card_opponent': ((screen_width + card_width) // 2, 150),
             'first_card_flop':      (x_c[0], screen_height // 2 + self.image.get_height() // 2 + 30),
             'second_card_flop':     (x_c[1], screen_height // 2 + self.image.get_height() // 2 + 30),
