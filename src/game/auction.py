@@ -13,7 +13,7 @@ def auction(common_cards=None):
 
     :param common_cards: list of common cards; if preflop, then common_cards is None
     """
-    player_list = [player for player in Player.player_list if player.live]
+    player_list = [player for player in Player.player_list if player.live] 
     number_player = len(player_list)
     every_fold = False
 

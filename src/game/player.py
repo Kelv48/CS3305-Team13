@@ -75,12 +75,12 @@ class Player(object):
         """
         font = pygame.font.SysFont('comicsans', 20)
         text1 = font.render(str(self.name), True, BLACK)
-        text2 = font.render(str(self.stack)+'$', True, BLACK)
+        text2 = font.render('$'+ str(self.stack), True, BLACK)
         width = WIDTH * 0.1
         height = HEIGHT * 0.1
         image = pygame.transform.scale(label_player_image, (width, height))
         if self == self.player_list_chair[0]:
-            x, y = 750, 550
+            x, y = 750, 600
         elif self == self.player_list_chair[1]:
             x, y = 750, 50
         elif self == self.player_list_chair[2]:
@@ -106,11 +106,11 @@ class Player(object):
         """
         if self.bet_auction > 0:
             font = pygame.font.SysFont('comicsans', 20)
-            text = font.render(str(self.bet_auction)+'$', True, BEIGE)
+            text = font.render('$'+str(self.bet_auction), True, BEIGE)
             if self == self.player_list_chair[0]:
                 x, y = (WIDTH - text.get_width()) // 2, 470
             elif self == self.player_list_chair[1]:
-                x, y = (WIDTH - text.get_width()) // 2, 220
+                x, y = (WIDTH - text.get_width()) // 2, 245
             elif self == self.player_list_chair[2]:
                 x, y = (WIDTH - text.get_width()) // 500, 1000
             elif self == self.player_list_chair[3]:
@@ -133,7 +133,7 @@ class Player(object):
         font_size = max(10, int(height * 0.02))  # Ensures the font doesn't get too small
         font = pygame.font.SysFont('comicsans', font_size)
         # Render the text
-        pot_text = f'Pot: {input_stack - bets}$'
+        pot_text = f'Pot: ${input_stack - bets}'
         text_surface = font.render(pot_text, True, BEIGE)#
         
         # Center the text on the screen

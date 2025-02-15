@@ -14,45 +14,45 @@ RED = (255, 0, 0)
 FPS = 1
 WIDTH = 1280
 HEIGHT = 720
-SCREEN = pygame.display.set_mode((1280, 720), pygame.RESIZABLE) # Allow the window to be resizable
+
+# SCREEN = pygame.display.set_mode((1280, 720), pygame.FULLSCREEN)    # Fullscreen
+SCREEN = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)    # Resizable
 
 # Blinds
 SB, BB = 25, 50
 
-# Load images
-buttons_folder = path.join(path.dirname(__file__), '../../assets/buttons')
-cards_folder = path.join(path.dirname(__file__),   '../../assets/cards')
-fonts_folder = path.join(path.dirname(__file__),   '../../assets/fonts')
-images_folder = path.join(path.dirname(__file__),  '../../assets/images')
-music_folder = path.join(path.dirname(__file__),   '../../assets/music')
-sfx_folder = path.join(path.dirname(__file__),     '../../assets/sfx')
-
 
 # Background
-BG = pygame.image.load(path.join(images_folder, 'Background.jpg')).convert_alpha()
+BG = pygame.image.load("assets/images/Background.jpg").convert_alpha()
 BG.set_colorkey(WHITE)
 
 # Icon
-icon = pygame.image.load(path.join(images_folder,'poker_cards_icon.png'))
-pygame.display.set_icon(icon)
+icon = pygame.image.load("assets/images/poker_cards_icon.png").convert_alpha()
+icon.set_colorkey(WHITE)
 
 # Button
-button_image = pygame.image.load(path.join(buttons_folder, 'button.png')).convert_alpha()
+button_image = pygame.image.load("assets/buttons/button.png").convert_alpha()
 button_image.set_colorkey(WHITE)
 
 # Label player
-label_player_image = pygame.image.load(path.join(buttons_folder, 'label_player.png')).convert_alpha()
+label_player_image = pygame.image.load("assets/buttons/label_player.png").convert_alpha()
 label_player_image.set_colorkey(WHITE)
+
+
+# Game Background
+GAME_BG = pygame.image.load("assets/images/GameBackground.jpg").convert_alpha()
+GAME_BG.set_colorkey(WHITE)
+
 
 
 
 # Background music
-pygame.mixer.music.load(path.join(music_folder,'Los Santos.mp3')) # Background music file
+pygame.mixer.music.load("assets/music/Los Santos.mp3") # Background music file
 
 
 # Sound effect
-button_click_sound = pygame.mixer.Sound(path.join(sfx_folder, 'chips.mp3'))  # Sound effect file
-winner_sound = pygame.mixer.Sound(path.join(sfx_folder, 'winner.mp3')) # Winner sound effect file
+button_click_sound = pygame.mixer.Sound("assets/sfx/chips.mp3")  # Sound effect file
+winner_sound = pygame.mixer.Sound("assets/sfx/winner.mp3") # Winner sound effect file
 
 
 # Play background music
@@ -60,7 +60,7 @@ pygame.mixer.music.play(-1)  # Loop indefinitely
 
 
 def get_font(size):  # Returns Press-Start-2P in the desired size
-    return pygame.font.Font(path.join(fonts_folder, 'calibri_bold.ttf'), size)
+    return pygame.font.Font("assets/fonts/calibri_bold.ttf", size)
 
 
 
@@ -71,9 +71,6 @@ def play_button_click_sound():
 
 def play_winner_sound():
     winner_sound.play()  # Play winner sound effect
-
-
-
 
 
 
@@ -92,11 +89,9 @@ cards_list_images = ['2C.png', '3C.png', '4C.png', '5C.png', '6C.png', '7C.png',
                      '2D.png', '3D.png', '4D.png', '5D.png', '6D.png', '7D.png', '8D.png', '9D.png', 'TD.png', 'JD.png', 'QD.png', 'KD.png', 'AD.png']
 
 
-
-
 cards_images = []
 for img in cards_list_images:
-    card_img = pygame.image.load(path.join(cards_folder, img)).convert_alpha()
+    card_img = pygame.image.load("assets/cards/" + img).convert_alpha()
     cards_images.append(card_img)
 
 # Dictionary with cards object
@@ -106,7 +101,7 @@ for i in range(len(cards_images)):
     cards_object[name] = Card(cards_images[i])
 
 # Opponent cards
-card_reverse_image = pygame.image.load(path.join(cards_folder, 'red_back.png')).convert_alpha()
+card_reverse_image = pygame.image.load("assets/cards/red_back.png").convert_alpha()
 cards_object['reverse_1'] = Card(card_reverse_image)
 cards_object['reverse_2'] = Card(card_reverse_image)
 

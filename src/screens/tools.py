@@ -1,24 +1,22 @@
+
 import pygame, sys
 from src.gui.button import Button
 from src.gui.constants import BG, get_font, SCREEN
-from src.screens.single_player import singlePlayer
-from src.screens.settings import settings
-from src.screens.multi_player import multiPlayer
-from src.screens.guide import guide_beginner
-from src.screens.leaderboard import leaderboard
-from src.screens.register import register
-from src.screens.user_page import user_page
-from src.screens.tools import tools
+# from newIdeas.hand_visual import poker_hand_visualizer
+# from newIdeas.calculator import run_poker_calculator
 
 
-def mainMenu():
+
+def tools(mainMenu):
     while True:
-        MAIN_MOUSE_POS = pygame.mouse.get_pos()
-        
-        # Calculate positions based on current screen size
-        screen_width, screen_height = SCREEN.get_size() 
-        scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height))
+        TOOLS_MOUSE_POS = pygame.mouse.get_pos()
+
+        # Calculate positions based on current screen size    # Scale the background to fit the screen
+        screen_width, screen_height = SCREEN.get_size()
+        scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height)) 
         SCREEN.blit(scaled_bg, (0, 0))
+
+
 
         # Transparent textbox with rounded edges
         textbox_width = int(screen_width * 0.25)      # 20% of screen width
@@ -40,54 +38,59 @@ def mainMenu():
         # Blit the textbox to the main screen.
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
-        MAIN_TEXT = get_font(50).render("Poker", True, "Dark Green")
-        MAIN_RECT = MAIN_TEXT.get_rect(center=(screen_width // 2, screen_height // 9))
-        SCREEN.blit(MAIN_TEXT, MAIN_RECT)
 
-        # Define button labels and functions.
+
+
+        
+        # Calculate positions based on current screen size
+        TOOLS_TEXT = get_font(50).render("Tools", True, "Dark Green")
+        TOOLS_RECT = TOOLS_TEXT.get_rect(center=(screen_width / 2, screen_height / 9))
+        SCREEN.blit(TOOLS_TEXT, TOOLS_RECT)
+
+        # Define button labels and functions
         buttons = [
-            ("REGISTER & LOGIN", register),
-            ("USER", user_page),
-            ("SINGLE PLAYER", singlePlayer),
-            ("MULTI PLAYER", multiPlayer),
-            ("GUIDE", guide_beginner),
-            ("SETTINGS", settings),
-            # ("TOOLS", tools),
-            ("LEADERBOARD", leaderboard),
-            ("QUIT", sys.exit)
-        ]
+            # ("HAND VISUALIZER", poker_hand_visualizer),
+            # ("CALCULATOR", run_poker_calculator),
+            ("BACK", mainMenu)]
 
+        # Calculate vertical spacing with closer spacing
         button_count = len(buttons)
-        button_spacing = textbox_height / (button_count + 1)  # Calculate spacing so buttons are evenly distributed inside the textbox.
-        textbox_center_x = textbox_x + textbox_width / 2  # Center of the textbox horizontally.
+        button_height = screen_height / (button_count + 3) # Change number bigger to make the buttons closer
 
+        # Create and position buttons
         button_objects = []
         for index, (text, action) in enumerate(buttons):
-            # Place each button relative to the top of the textbox.
-            button_y = textbox_y + (index + 1) * button_spacing
+            button_y = (index + 2.5) * button_height        # Change number bigger to make buttons go down on y axis
             button = Button(
-                pos=(textbox_center_x, button_y),
-                text_input=text,
-                font=get_font(30),
-                base_colour="White",
+                pos=(screen_width / 2, button_y), 
+                text_input=text, 
+                font=get_font(30), 
+                base_colour="White", 
                 hovering_colour="Light Green",
                 image=None)
-            button.changecolour(MAIN_MOUSE_POS)
+            
+            button.changecolour(TOOLS_MOUSE_POS)
             button.update(SCREEN)
             button_objects.append((button, action))
 
+        # Check for button clicks
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for button, action in button_objects:
-                    if button.checkForInput(MAIN_MOUSE_POS):
+                    if button.checkForInput(TOOLS_MOUSE_POS):
                         if action == sys.exit:
                             pygame.quit()
                             sys.exit()
+                        # elif action == poker_hand_visualizer:
+                        #     poker_hand_visualizer()
+                        # elif action == run_poker_calculator:
+                        #     run_poker_calculator()
                         else:
-                            action(mainMenu)
+                            mainMenu()
 
-
+        # Update the display
         pygame.display.update()
+
