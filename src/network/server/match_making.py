@@ -10,13 +10,15 @@ When lobby is full then a subprocess is launched which will handle gameplay
 GameIDs are random ints that are hashed with a salt value
 '''
 import asyncio
+import queue
 import base64
 import redis
 import json
 import logging
+from game import game_class
 from string import Template
 from random import randint, randbytes
-from network.server.protocol import Protocols
+from server.protocol import Protocols
 from websockets.exceptions import ConnectionClosed, ConnectionClosedError
 from  websockets.asyncio.server import serve, ServerConnection
 
@@ -25,6 +27,8 @@ host ="localhost"
 port = 80
 template = Template('{"m_type": "$m_type", "data": "$data"}')   #This is a template for message to be sent to clients
 activeSessions = {}  
+
+#Redis setup
 r = redis.Redis('localhost', 6379)
 channel = 'activeSessions'
 
@@ -43,7 +47,7 @@ async def createGame(websocket:ServerConnection, maxPlayer:int):
     sessionID = generateSessionCode() #ID of the game 
     activeSessions[sessionID] = {
         'clients': {websocket}, 
-        'game': None,
+        'gameObj': None,
         'maxPlayer': maxPlayer, 
         'forceStart': {}, 
         'numPlayer': 1, 
@@ -91,6 +95,12 @@ async def joinGame(websocket: ServerConnection, sessionID):
                 redirectMessage = template.substitute(m_type=Protocols.Response.REDIRECT, data={'host':'localhost', 'port':443})
                 for serverConnection in activeSessions[sessionID]['clients']:
                     await serverConnection.send(redirectMessage)
+
+                #Publish relevant info to redis server
+                data = {sessionID:{'client':[], 'gameObj':activeSessions[sessionID]['gameObj'], 'queue':queue()}}
+                r.publish(channel, data)
+
+                return  #Exit out of function
                 
 
             logger.info("Broadcasting to clients in lobby")
@@ -129,8 +139,12 @@ async def voteStart(websocket: ServerConnection, sessionID):
             for serverConnection in activeSessions[sessionID]['clients']:
                 await serverConnection.send(redirectMessage)
 
+
+            #Publish relevant info to redis server
+            data = {sessionID:{'client':[], 'gameObj':activeSessions[sessionID]['gameObj'], 'queue':queue()}}
+            r.publish(channel, data)
+
             return  #Exit function 
-            #Push session data to redis 
         
     
         #Broadcast new info to other clients in lobby 
