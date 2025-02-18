@@ -1,5 +1,5 @@
 import pygame
-from src.gui.constants import BLACK, WIDTH, HEIGHT, label_player_image, BEIGE
+from gui.constants import BLACK, WIDTH, HEIGHT, label_player_image, BEIGE
 
 
 class Player(object):
