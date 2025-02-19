@@ -51,5 +51,4 @@ def handEvaluation(inputDeck):
         return 140 + cardRank, "One Pair"
 
     # # Otherwise, High Card
-    # return getHighCard(rankDeck), "High Card"
-    return 0, "High Card"
+    return getHighCard(rankDeck), "High Card"
