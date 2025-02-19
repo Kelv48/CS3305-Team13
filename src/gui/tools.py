@@ -2,8 +2,8 @@
 import pygame, sys
 from src.gui.button import Button
 from src.gui.constants import BG, get_font, SCREEN
-from hand_visual import poker_hand_visualizer
-from calculator import run_poker_calculator
+from src.gui.hand_visual import poker_hand_visualizer
+from src.gui.calculator import run_poker_calculator
 
 
 

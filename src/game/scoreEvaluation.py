@@ -1,5 +1,6 @@
 # Can evaluate 7 cards at once.  @returns the hand score + hand type
 from src.game.handEvaluation import handEvaluation as evaluateCards
+from src.game.evaluationLogic import removeSuits, valueToRank
 import itertools
 
 
@@ -14,8 +15,9 @@ def playerScore(playerList, tableCards):
     """
 
     for player in playerList:
-        bestScore = 0
-        bestHand = ""
+        bestScore = highCard(player)
+        bestHand = "High Card"
+
         # Evaluate all possible 5-card combinations from the union of player's cards and common cards.
         for combination in itertools.combinations(tableCards + player.cards, 5):
             handScore, handName = evaluateCards(list(combination))
@@ -24,3 +26,8 @@ def playerScore(playerList, tableCards):
                 bestHand = handName
         player.score = bestScore
         player.hand = bestHand
+
+def highCard(playerClass):
+    cards = removeSuits(playerClass.cards)
+    highCard = valueToRank(cards)
+    return max(highCard)
