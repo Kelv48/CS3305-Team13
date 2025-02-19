@@ -4,7 +4,6 @@ import random
 import itertools
 from collections import Counter
 from src.gui.constants import get_font, BG, SCREEN
-
 pygame.init()
 
 # ----- Global Constants & Settings -----
@@ -13,7 +12,7 @@ BG_COLOR = pygame.Color('white')
 COLOR_INACTIVE = pygame.Color('lightskyblue3')
 COLOR_ACTIVE = pygame.Color('dodgerblue2')
 BUTTON_COLOR = pygame.Color('gray')
-TEXT_COLOR = pygame.Color('black')
+TEXT_COLOR = pygame.Color('white')
 FONT = pygame.font.Font(None, 32)
 BIG_FONT = pygame.font.Font(None, 48)
 

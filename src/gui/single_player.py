@@ -3,7 +3,7 @@ from src.gui.button import Button
 from src.gui.constants import BG, get_font, SCREEN
 
 from src.gui.game_screen import game_screen
-from src.game.menu import gameMenu
+from src.gui.menu import gameMenu
 
 
 def singlePlayer(mainMenu):
