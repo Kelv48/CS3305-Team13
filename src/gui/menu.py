@@ -4,7 +4,7 @@ from src.gui.button import Button
 from src.gui.constants import BG, get_font, SCREEN, FPS
 from src.game.utils import changePlayersPositions
 from src.game.player import Player
-from src.game.poker_round import pokerRound
+from src.game.poker_round import poker_round
 
 screen_width = 1280
 screen_height = 720
@@ -18,13 +18,6 @@ def gameMenu():
     while True:  # Outer loop to restart the game
         # Reset players for a new game
         Player.player_list_chair.clear()
-        Player('Player 1', START_STACK, 'human')
-        Player('Bot 1', START_STACK, 'AI')
-        # Player('Bot 2', START_STACK, 'AI')
-        # Player('Bot 3', START_STACK, 'AI')
-        # Player('Bot 4', START_STACK, 'AI')
-        # Player('Bot 5', START_STACK, 'AI')
-        player_list_chair = Player.player_list_chair
 
         # Show start menu and get user choice
         start_choice = menuStart()
@@ -42,7 +35,7 @@ def gameMenu():
         game_running = True
         while game_running and len(player_list_chair) > 1:
             clock.tick(FPS)
-            pokerRound()
+            poker_round()
             changePlayersPositions(shift=1)
             for player in player_list_chair:
                 player.nextRound()
@@ -87,6 +80,7 @@ def menuStart():
 
         # Buttons
         buttons = [
+            ("1 Bot", 1),
             ("2 Bots", 2),
             ("3 Bots", 3),
             ("4 Bots", 4),

@@ -15,8 +15,8 @@ def playerScore(playerList, tableCards):
     """
 
     for player in playerList:
-        bestScore = highCard(player)
-        bestHand = "High Card"
+        bestScore = 0
+        bestHand = ""
 
         # Evaluate all possible 5-card combinations from the union of player's cards and common cards.
         for combination in itertools.combinations(tableCards + player.cards, 5):
@@ -26,8 +26,3 @@ def playerScore(playerList, tableCards):
                 bestHand = handName
         player.score = bestScore
         player.hand = bestHand
-
-def highCard(playerClass):
-    cards = removeSuits(playerClass.cards)
-    highCard = valueToRank(cards)
-    return max(highCard)

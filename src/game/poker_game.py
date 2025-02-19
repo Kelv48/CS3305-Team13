@@ -2,7 +2,7 @@ import time
 from flask_socketio import emit
 
 from src.game.player import Player
-from src.game.poker_round import pokerRound
+from src.game.poker_round import poker_round
 from src.game.utils import changePlayersPositions
 from src.game.utils import recapRound
 
@@ -30,7 +30,7 @@ def game(opponent, player_id):
     while not end:
 
         # Play a round
-        yield from pokerRound(player_id)
+        yield from poker_round(player_id)
 
         # Shift the button to the next player
         changePlayersPositions(shift=1)

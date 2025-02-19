@@ -4,7 +4,6 @@ import random
 import itertools
 from collections import Counter
 from src.gui.constants import get_font, BG, SCREEN
-
 pygame.init()
 
 # ----- Global Constants & Settings -----
