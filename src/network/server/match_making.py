@@ -15,10 +15,10 @@ import base64
 import redis
 import json
 import logging
-from game import game_class
+#from game import game_class
 from string import Template
 from random import randint, randbytes
-from server.protocol import Protocols
+from protocol import Protocols
 from websockets.exceptions import ConnectionClosed, ConnectionClosedError
 from  websockets.asyncio.server import serve, ServerConnection
 
@@ -97,8 +97,8 @@ async def joinGame(websocket: ServerConnection, sessionID):
                     await serverConnection.send(redirectMessage)
 
                 #Publish relevant info to redis server
-                data = {sessionID:{'client':[], 'gameObj':activeSessions[sessionID]['gameObj'], 'queue':queue()}}
-                r.publish(channel, data)
+                data = {'sessionID':sessionID, 'client':[], 'gameObj':activeSessions[sessionID]['gameObj'], 'queue':queue()}
+                r.publish(channel, json.dumps(data))
 
                 return  #Exit out of function
                 
@@ -246,7 +246,7 @@ async def handleClient(websocket: ServerConnection):
 
         except ConnectionError as e:
             print(f"Whoops\n{e}")
-            await leaveGame(websocket)
+            await leaveGame(websocket, message['sessionID'])
             break
 
         except ConnectionClosedError as e:
