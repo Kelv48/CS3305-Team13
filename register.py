@@ -3,7 +3,7 @@ from src.gui.button import Button
 from src.gui.utils import BG, get_font, SCREEN
 import requests, json, os
 
-base_url = 'http://127.0.0.1:5000'
+base_url = 'http://84.8.144.77:5000'
 local_storage = "local.json"
 
 def save_user(username, password):
