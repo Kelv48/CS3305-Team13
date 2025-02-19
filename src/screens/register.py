@@ -1,4 +1,4 @@
-import pygame
+import pygame, sys
 from src.gui.button import Button
 from src.gui.constants import BG, get_font, SCREEN
 
