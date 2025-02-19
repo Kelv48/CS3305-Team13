@@ -20,10 +20,10 @@ def gameMenu():
         Player.player_list_chair.clear()
         Player('Player 1', START_STACK, 'human')
         Player('Bot 1', START_STACK, 'AI')
-        # Player('Bot 2', START_STACK, 'AI')
-        # Player('Bot 3', START_STACK, 'AI')
-        # Player('Bot 4', START_STACK, 'AI')
-        # Player('Bot 5', START_STACK, 'AI')
+        Player('Bot 2', START_STACK, 'AI')
+        Player('Bot 3', START_STACK, 'AI')
+        Player('Bot 4', START_STACK, 'AI')
+        Player('Bot 5', START_STACK, 'AI')
         player_list_chair = Player.player_list_chair
 
         # Show start menu and get user choice
