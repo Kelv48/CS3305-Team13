@@ -1,10 +1,10 @@
 import time
 from flask_socketio import emit
 
-from player import Player
-from poker_round import pokerRound
-from utils import changePlayersPositions
-from utils import recapRound
+from src.game.player import Player
+from src.game.poker_round import pokerRound
+from src.game.utils import changePlayersPositions
+from src.game.utils import recapRound
 
 
 def game(opponent, player_id):

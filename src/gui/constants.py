@@ -1,6 +1,6 @@
 import pygame
 from os import path
-from game.card import Card
+from src.game.card import Card
 
 pygame.init()
 

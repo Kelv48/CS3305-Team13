@@ -1,4 +1,4 @@
-from poker_game import game
+from src.game.poker_game import game
 
 
 class Game:
