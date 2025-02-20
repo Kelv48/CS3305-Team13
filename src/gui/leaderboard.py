@@ -78,7 +78,7 @@ def leaderboard(mainMenu):
         # Define buttons with their labels and associated actions.
         buttons = [
             ("USER", user_page),
-            ("BACK", mainMenu)
+            ("HOME", mainMenu)
         ]
 
         # Calculate vertical spacing for the buttons.

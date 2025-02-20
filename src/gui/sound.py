@@ -93,9 +93,9 @@ def sound(mainMenu):
 
     # Define the playlist with song names and file paths
     playlist = [
-        {"name": "Song 1", "path": "assets/music/song1.mp3"},
-        {"name": "Song 2", "path": "assets/music/song2.mp3"},
-        {"name": "Song 3", "path": "assets/music/song3.mp3"},
+        {"name": "Song 1", "path": "assets/music/Los Santos.mp3"},
+        {"name": "Song 2", "path": "assets/music/poker_face.wav"},
+        {"name": "Song 3", "path": "assets/music/Los Santos.mp3"},
     ]
 
     # Create the dropdown menu for songs
@@ -124,7 +124,7 @@ def sound(mainMenu):
         textbox_height = int(screen_height * 0.7)
         textbox_x = int((screen_width - textbox_width) / 2)
         textbox_y = int(screen_height * 0.15)
-
+    
         textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
         pygame.draw.rect(
             textbox_surface, 
@@ -186,8 +186,8 @@ def sound(mainMenu):
         sfx_volume = sfx_volume_slider.value
         pygame.mixer.music.set_volume(music_volume)
 
-        # Draw the dropdown for song selection
-        song_dropdown.draw(SCREEN)
+        # # Draw the dropdown for song selection
+        # song_dropdown.draw(SCREEN)
 
         # Event handling
         for event in pygame.event.get():

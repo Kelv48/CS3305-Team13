@@ -51,7 +51,7 @@ def tools(mainMenu):
         buttons = [
             ("HAND VISUALIZER", poker_hand_visualizer),
             ("CALCULATOR", run_poker_calculator),
-            ("BACK", mainMenu)]
+            ("HOME", mainMenu)]
 
         # Calculate vertical spacing with closer spacing
         button_count = len(buttons)
@@ -85,9 +85,9 @@ def tools(mainMenu):
                             pygame.quit()
                             sys.exit()
                         elif action == poker_hand_visualizer:
-                            poker_hand_visualizer()
+                            poker_hand_visualizer(mainMenu)
                         elif action == run_poker_calculator:
-                            run_poker_calculator()
+                            run_poker_calculator(mainMenu)
                         else:
                             mainMenu()
 

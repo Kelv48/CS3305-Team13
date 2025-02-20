@@ -47,7 +47,7 @@ def settings(mainMenu):
         # Define button labels and functions
         buttons = [
             ("SOUND", sound),
-            ("BACK", mainMenu)]
+            ("HOME", mainMenu)]
 
         # Calculate vertical spacing with closer spacing
         button_count = len(buttons)

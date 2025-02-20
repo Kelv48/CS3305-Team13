@@ -38,7 +38,7 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
 
         back_button = Button(
             pos=(sw * 0.2, y_pos),
-            text_input="BACK",
+            text_input="HOME",
             font=get_font(30),
             base_colour="White",
             hovering_colour="Light Green",
@@ -84,8 +84,8 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
 
         screen_width, screen_height = screen.get_size()
         # Transparent textbox with rounded edges
-        textbox_width = int(screen_width * 0.8)      # 20% of screen width
-        textbox_height = int(screen_height * 0.1)      # 70% of screen height
+        textbox_width = int(screen_width * 0.8)      # 80% of screen width
+        textbox_height = int(screen_height * 0.1)      # 10% of screen height
         textbox_x = int((screen_width - textbox_width) / 2)
         textbox_y = int(screen_height * 0.85)          # 80% down from the top
 

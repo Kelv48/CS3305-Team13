@@ -30,13 +30,13 @@ def render_screen(title, username, password, active_input, button_actions):
     username_box = pygame.Rect(screen_width / 2 - 100, screen_height / 4, 200, 40)
     password_box = pygame.Rect(screen_width / 2 - 100, screen_height / 2.5, 200, 40)
 
-    # Set the border color: red if active, white if inactive
-    username_color = "Green" if active_input == "username" else "White"
-    password_color = "Green" if active_input == "password" else "White"
+    # Set the border colour: red if active, white if inactive
+    username_colour = "Green" if active_input == "username" else "White"
+    password_colour = "Green" if active_input == "password" else "White"
 
-    # Draw the input boxes with the selected colors
-    pygame.draw.rect(SCREEN, username_color, username_box, 2)
-    pygame.draw.rect(SCREEN, password_color, password_box, 2)
+    # Draw the input boxes with the selected colours
+    pygame.draw.rect(SCREEN, username_colour, username_box, 2)
+    pygame.draw.rect(SCREEN, password_colour, password_box, 2)
 
     # Render labels for input boxes
     USERNAME_LABEL = get_font(30).render("Username", True, "White")
@@ -110,7 +110,7 @@ def register(mainMenu):
         username_box, password_box, button_objects = render_screen("Register", username, password, active_input, [
             ("Enter", registerUser),
             ("Switch to Login Page", login),
-            ("BACK", mainMenu)
+            ("HOME", mainMenu)
         ])
 
         for event in pygame.event.get():
@@ -154,7 +154,7 @@ def login(mainMenu):
         username_box, password_box, button_objects = render_screen("Login", username, password, active_input, [
             ("Enter", loginUser),
             ("Switch to Register Page", register),
-            ("BACK", mainMenu)
+            ("HOME", mainMenu)
         ])
 
         for event in pygame.event.get():

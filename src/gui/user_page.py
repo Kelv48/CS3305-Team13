@@ -105,7 +105,7 @@ def user_page(mainMenu):
         # Create the "BACK" button.
         USER_BACK = Button(
             pos=(screen_width / 2, screen_height * 2 / 2.5), 
-            text_input="BACK", 
+            text_input="HOME", 
             font=get_font(30), 
             base_colour="White", 
             hovering_colour="Light Green",

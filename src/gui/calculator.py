@@ -180,7 +180,7 @@ def load_card_images(card_width, card_height):
     return card_images
 
 # ----- Main GUI Loop with Card Selection -----
-def run_poker_calculator(num_simulations=1000):
+def run_poker_calculator(mainMenu, num_simulations=1000):
     clock = pygame.time.Clock()
     
     # Dimensions for card images and grid layout.
@@ -192,7 +192,6 @@ def run_poker_calculator(num_simulations=1000):
     card_images = load_card_images(CARD_WIDTH, CARD_HEIGHT)
     
     # Build a list for the 52-card grid.
-    # Instead of a fixed 13x4 grid, we iterate by suit so that each suit is its own row.
     suit_order = ['C', 'H', 'S', 'D']  # Clubs, Hearts, Spades, Diamonds
     card_grid = []
     for row_index, suit in enumerate(suit_order):
@@ -213,6 +212,9 @@ def run_poker_calculator(num_simulations=1000):
     # Calculate button.
     calculate_button = Button(900, 550 - button_height - 10, 120, 32, "Calculate")
     
+    # ----- Back Button Setup -----
+    back_button = Button(20, 20, 80, 30, "HOME")
+    
     # Dictionary to hold card assignments.
     assignments = {
         "player": [None, None],       # exactly 2 cards required
@@ -230,6 +232,12 @@ def run_poker_calculator(num_simulations=1000):
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
+                
+                # Check if the back button was clicked.
+                if back_button.is_clicked(pos):
+                    mainMenu()	
+                    return
+                
                 # Check if a group button was clicked.
                 for group, button in group_buttons.items():
                     if button.is_clicked(pos):
@@ -272,14 +280,11 @@ def run_poker_calculator(num_simulations=1000):
                                     break
 
         # ----- Drawing the UI -----
-    
-
-        # Grab screen dimensions, draw background
         screen_width, screen_height = SCREEN.get_size()
         scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height))
         SCREEN.blit(scaled_bg, (0, 0))
 
-        # Create a centered textbox background (90% width, 80% height)
+        # Create a centered textbox background (95% width, 85% height)
         textbox_width = int(screen_width * 0.95)
         textbox_height = int(screen_height * 0.85)
         textbox_x = (screen_width - textbox_width) // 2
@@ -307,7 +312,7 @@ def run_poker_calculator(num_simulations=1000):
             button.draw(SCREEN)
             button.color = orig_color  # restore original
 
-      # --- Player Cards ---
+        # --- Player Cards ---
         for i, card in enumerate(assignments["player"]):
             slot_x = 100 + i * (CARD_WIDTH + 10)
             slot_y = 550
@@ -333,7 +338,6 @@ def run_poker_calculator(num_simulations=1000):
             pygame.draw.rect(SCREEN, TEXT_COLOR, rect, 2)
             if card is not None:
                 SCREEN.blit(card_images[card], (slot_x, slot_y))
-
         
         # Draw the Calculate button.
         calculate_button.draw(SCREEN)
@@ -357,6 +361,9 @@ def run_poker_calculator(num_simulations=1000):
                 overlay = pygame.Surface((CARD_WIDTH, CARD_HEIGHT), pygame.SRCALPHA)
                 overlay.fill(overlay_color)
                 SCREEN.blit(overlay, item["rect"].topleft)
+        
+        # Draw the back button.
+        back_button.draw(SCREEN)
         
         pygame.display.flip()
         clock.tick(30)

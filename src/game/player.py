@@ -80,17 +80,17 @@ class Player(object):
         height = HEIGHT * 0.1
         image = pygame.transform.scale(label_player_image, (width, height))
         if self == self.player_list_chair[0]:
-            x, y = 750, 600
+            x, y = 580, 620
         elif self == self.player_list_chair[1]:
-            x, y = 750, 50
+            x, y = 180, 500
         elif self == self.player_list_chair[2]:
-            x, y = 200, 200
+            x, y = 180, 200
         elif self == self.player_list_chair[3]:
-            x, y = 1000, 200
+            x, y = 580, 120
         elif self == self.player_list_chair[4]:
-            x, y = 200, 500
+            x, y = 980, 200
         elif self == self.player_list_chair[5]:
-            x, y = 1000, 500
+            x, y = 980, 500
         win.blit(image, (x, y))
         win.blit(text1,
                  (x + (width // 2 - text1.get_width() // 2),
@@ -138,7 +138,7 @@ class Player(object):
         
         # Center the text on the screen
         x = (width - text_surface.get_width()) // 2
-        y = (height - text_surface.get_height()) // 2.5
+        y = (height - text_surface.get_height()) // 2.3
         
         # Draw the text on the window
         win.blit(text_surface, (x, y))

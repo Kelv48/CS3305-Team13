@@ -1,14 +1,15 @@
 import pygame
 from os import path
-from src.game.card import Card
+from src.gui.card import Card
 
 pygame.init()
 
-# Color RGB
+# Colour RGB
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 BEIGE = (225, 198, 153)
 RED = (255, 0, 0)
+GREEN = (94, 151, 82)
 
 # Screen settings
 FPS = 1
@@ -45,9 +46,8 @@ GAME_BG.set_colorkey(WHITE)
 
 
 
-
 # Background music
-pygame.mixer.music.load("assets/music/Los Santos.mp3") # Background music file
+pygame.mixer.music.load("assets/music/poker_face.wav") # Background music file
 
 
 # Sound effect
@@ -60,7 +60,7 @@ pygame.mixer.music.play(-1)  # Loop indefinitely
 
 
 def get_font(size):  # Returns Press-Start-2P in the desired size
-    return pygame.font.Font("assets/fonts/calibri_bold.ttf", size)
+    return pygame.font.Font("assets/fonts/calibri_bold.TTF", size)
 
 
 

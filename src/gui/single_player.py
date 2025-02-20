@@ -48,7 +48,7 @@ def singlePlayer(mainMenu):
         buttons = [
             ("BOT GAME", gameMenu),
             ("GAME SCREEN TEST", game_screen),
-            ("BACK", mainMenu)]
+            ("HOME", mainMenu)]
 
         # Calculate vertical spacing with closer spacing
         button_count = len(buttons)
