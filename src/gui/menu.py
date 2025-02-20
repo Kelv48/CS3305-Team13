@@ -72,7 +72,27 @@ def menuStart():
         scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height))
         SCREEN.blit(scaled_bg, (0, 0))
         
-        
+        # Transparent textbox with rounded edges
+        textbox_width = int(screen_width * 0.25)      # 20% of screen width
+        textbox_height = int(screen_height * 0.7)      # 70% of screen height
+        textbox_x = int((screen_width - textbox_width) / 2)
+        textbox_y = int(screen_height * 0.15)          # Start 15% down from the top
+
+        # Create a new Surface with per-pixel alpha (using SRCALPHA).
+        textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
+        # Draw a filled rounded rectangle on the textbox_surface.
+        # The colour (0, 0, 0, 100) is black with an alpha value of 100 (semi-transparent).
+        # Adjust the border_radius (here, 20) to control the roundness of the corners.
+        pygame.draw.rect(
+            textbox_surface, 
+            (0, 0, 0, 100), 
+            (0, 0, textbox_width, textbox_height), 
+            border_radius=50
+        )
+        # Blit the textbox to the main screen.
+        SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
+
+
         # Title
         title_text = get_font(45).render("This is the GAME START screen.", True, "White")
         title_rect = title_text.get_rect(center=(screen_width / 2, screen_height / 8))
@@ -88,13 +108,14 @@ def menuStart():
             ("Quit", "quit")
         ]
         button_objects = []
-        button_spacing = screen_height / (len(buttons) + 3)
+        button_spacing = textbox_height / (len(buttons) + 0.5)  # Calculate spacing so buttons are evenly distributed inside the textbox.
+        textbox_center_x = textbox_x + textbox_width / 2  # Center of the textbox horizontally.
 
         # Create buttons
         for index, (text, action) in enumerate(buttons):
-            button_y = (index + 2.5) * button_spacing
+            button_y = (index + 2) * button_spacing
             button_obj = Button(
-                pos=(screen_width / 2, button_y),
+                pos=(textbox_center_x, button_y),
                 text_input=text,
                 font=get_font(30),
                 base_colour="White",
@@ -117,10 +138,16 @@ def menuStart():
 
         pygame.display.update()
 
+
+
+
+
+
 def menuEnd():
     """Displays the end menu and returns True to restart, False to quit."""
     winner = next((player.name for player in Player.player_list_chair if player.stack != 0), "No Winner")
-    SCREEN.blit(BG, (0, 0))
+    scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height))
+    SCREEN.blit(scaled_bg, (0, 0))
     font = pygame.font.SysFont('comicsans', 60)
 
     win_text = font.render(f'{winner} won the game!', True, "White")
@@ -153,7 +180,7 @@ def menuEnd():
     restart = False
     while waiting:
         mouse_pos = pygame.mouse.get_pos()
-        SCREEN.blit(BG, (0, 0))
+        SCREEN.blit(scaled_bg, (0, 0))
         SCREEN.blit(win_text, ((screen_width - win_text.get_width()) // 2, 100))
         
         button_new_game.changecolour(mouse_pos)
