@@ -1,7 +1,7 @@
 import pygame
 
-card_width = 70
-card_height = 105
+card_width = 60
+card_height = 90
 screen_width = 1280
 screen_height = 720
 
@@ -23,13 +23,25 @@ class Card(pygame.sprite.Sprite):
 
 
     def putInPlace(self):
+        # Use a smaller spacing for community cards if needed.
         x_c = self.xCords(0)
 
+        # Adjust the x-positions for player and opponent cards.
+        # Here, we shift them closer to the center by subtracting/adding a custom offset.
+        offset = -10  # Adjust this value to get the desired closeness
+
         positions = {
-            'first_card_player':    ((screen_width - card_width) // 2, screen_height - 30),
-            'first_card_opponent':  ((screen_width - card_width) // 2, 150),
-            'second_card_player':   ((screen_width + card_width) // 2, screen_height - 30),
-            'second_card_opponent': ((screen_width + card_width) // 2, 150),
+            # For player cards, center around screen_width//2
+            'first_card_player':    (screen_width//2 - offset - card_width//2, screen_height - 80),
+            'second_card_player':   (screen_width//2 + offset + card_width//2, screen_height - 80),
+            # For opponent cards, similar adjustments:
+            'first_card_opponent':  (screen_width//2 - offset - card_width//2, 150),
+            'second_card_opponent': (screen_width//2 + offset + card_width//2, 150),
+
+
+
+            
+            # Community cards remain based on xCords calculation
             'first_card_flop':      (x_c[0], screen_height // 2 + self.image.get_height() // 2 + 30),
             'second_card_flop':     (x_c[1], screen_height // 2 + self.image.get_height() // 2 + 30),
             'third_card_flop':      (x_c[2], screen_height // 2 + self.image.get_height() // 2 + 30),
@@ -40,16 +52,16 @@ class Card(pygame.sprite.Sprite):
         if self.type_card in positions:
             pos = positions[self.type_card]
 
+            # Apply tilt for player and opponent cards only
             if self.type_card in ['first_card_player', 'second_card_player',
                                 'first_card_opponent', 'second_card_opponent']:
                 tilt_angles = {
-                    'first_card_player': 10,
-                    'second_card_player': -10,
-                    'first_card_opponent': 10,
-                    'second_card_opponent': -10,
+                    'first_card_player': 15,
+                    'second_card_player': -15,
+                    'first_card_opponent': 15,
+                    'second_card_opponent': -15,
                 }
                 angle = tilt_angles.get(self.type_card, 0)
-                # Rotate using the original image to avoid cumulative errors
                 self.image = pygame.transform.rotate(self.original_image, angle)
             else:
                 self.image = self.original_image
@@ -57,3 +69,4 @@ class Card(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.centerx = pos[0]
             self.rect.bottom = pos[1]
+
