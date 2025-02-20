@@ -2,18 +2,51 @@ import sys
 import pygame
 from src.gui.constants import SCREEN, BG, get_font
 
-def poker_hand_visualizer():
+
+
+def poker_hand_visualizer(mainMenu):
     pygame.init()
 
     #
-    # 1. Complete Equity Dictionary (all 169 combos).
+    # 1. Strategy Data (Replace with your real solver outputs or strategy)
+    #
+    strat_data = {
+        ("Open", "LJ", "BB"): {
+            "raise": {
+                "AA","KK","QQ","JJ","TT","99","88","77","66",
+                "AKs","AQs","AJs","ATs","KQs","KJs","QJs","JTs","T9s","98s"
+            },
+            "call": set()
+        },
+        ("Open", "HJ", "BB"): {
+            "raise": {
+                "AA","KK","QQ","JJ","TT","99","88","77","66",
+                "AKs","AQs","AJs","ATs","KQs","KJs","QJs","JTs","T9s","98s"
+            },
+            "call": set()
+        },
+        ("vs 3bet", "LJ", "BB"): {
+            "raise": {"AA","KK","QQ","AKs","AQs","AJs"},
+            "call": {"JJ","TT","99","88","77","AQo","AJo","KQs","QJs","JTs"}
+        },
+        ("vs 3bet", "BTN", "SB"): {
+            "raise": {"AA","KK","QQ","JJ","AKs","AQs","AJs","KQs","A5s"},
+            "call": {"TT","99","88","77","AQo","AJo","KJs","QJs","JTs","T9s"}
+        },
+        ("vs 5bet", "SB", "BB"): {
+            "raise": {"AA","KK","AKs","A5s"},
+            "call": {"QQ","JJ"}
+        },
+    }
+
+    #
+    # 2. Equity Dictionary (for reference; not used in strategy lookup)
     #
     hand_equities = {
         # Pairs
         "AA": 85.2, "KK": 82.1, "QQ": 79.9, "JJ": 77.5, "TT": 75.2,
         "99": 71.9, "88": 68.5, "77": 65.2, "66": 61.7, "55": 58.3,
         "44": 54.9, "33": 51.3, "22": 47.9,
-
         # A-combos
         "AKs": 66.2, "AKo": 65.3,
         "AQs": 65.0, "AQo": 64.1,
@@ -27,7 +60,6 @@ def poker_hand_visualizer():
         "A4s": 54.0, "A4o": 52.5,
         "A3s": 53.2, "A3o": 51.7,
         "A2s": 52.5, "A2o": 51.0,
-
         # K-combos
         "KQs": 59.0, "KQo": 57.5,
         "KJs": 57.9, "KJo": 56.4,
@@ -40,7 +72,6 @@ def poker_hand_visualizer():
         "K4s": 50.2, "K4o": 48.5,
         "K3s": 49.6, "K3o": 47.8,
         "K2s": 48.9, "K2o": 47.0,
-
         # Q-combos
         "QJs": 56.2, "QJo": 54.7,
         "QTs": 55.1, "QTo": 53.5,
@@ -52,7 +83,6 @@ def poker_hand_visualizer():
         "Q4s": 48.2, "Q4o": 46.3,
         "Q3s": 47.2, "Q3o": 45.3,
         "Q2s": 46.3, "Q2o": 44.4,
-
         # J-combos
         "JTs": 54.1, "JTo": 52.5,
         "J9s": 52.7, "J9o": 51.0,
@@ -63,7 +93,6 @@ def poker_hand_visualizer():
         "J4s": 46.2, "J4o": 44.2,
         "J3s": 45.0, "J3o": 43.0,
         "J2s": 44.0, "J2o": 42.0,
-
         # T-combos
         "T9s": 51.6, "T9o": 50.0,
         "T8s": 50.3, "T8o": 48.6,
@@ -73,7 +102,6 @@ def poker_hand_visualizer():
         "T4s": 45.0, "T4o": 43.1,
         "T3s": 43.7, "T3o": 41.7,
         "T2s": 42.4, "T2o": 40.4,
-
         # 9-combos
         "98s": 49.0, "98o": 47.1,
         "97s": 47.6, "97o": 45.6,
@@ -82,7 +110,6 @@ def poker_hand_visualizer():
         "94s": 43.4, "94o": 41.3,
         "93s": 42.0, "93o": 40.0,
         "92s": 40.7, "92o": 38.6,
-
         # 8-combos
         "87s": 46.3, "87o": 44.3,
         "86s": 44.8, "86o": 42.7,
@@ -90,53 +117,43 @@ def poker_hand_visualizer():
         "84s": 42.0, "84o": 39.8,
         "83s": 40.7, "83o": 38.4,
         "82s": 39.4, "82o": 37.1,
-
         # 7-combos
         "76s": 43.8, "76o": 41.5,
         "75s": 42.4, "75o": 40.1,
         "74s": 41.0, "74o": 38.7,
         "73s": 39.7, "73o": 37.3,
         "72s": 38.3, "72o": 35.9,
-
         # 6-combos
         "65s": 41.3, "65o": 38.9,
         "64s": 39.9, "64o": 37.5,
         "63s": 38.5, "63o": 36.1,
         "62s": 37.2, "62o": 34.7,
-
         # 5-combos
         "54s": 39.0, "54o": 36.5,
         "53s": 37.6, "53o": 35.1,
         "52s": 36.3, "52o": 33.7,
-
         # 4-combos
         "43s": 35.0, "43o": 32.4,
         "42s": 33.7, "42o": 31.0,
-
         # 3-combos
         "32s": 32.4, "32o": 29.6
     }
 
-    # Grab screen dimensions and draw background
+    #
+    # 3. Window Setup and Overlay
+    #
     screen_width, screen_height = SCREEN.get_size()
     scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height))
     SCREEN.blit(scaled_bg, (0, 0))
 
-    # Create a centered textbox background (90% width, 80% height)
     textbox_width = int(screen_width * 0.95)
     textbox_height = int(screen_height * 0.85)
     textbox_x = (screen_width - textbox_width) // 2
     textbox_y = (screen_height - textbox_height) // 2
     textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
-    pygame.draw.rect(
-        textbox_surface,
-        (0, 0, 0, 100),  # black semi-transparent background
-        (0, 0, textbox_width, textbox_height),
-        border_radius=50
-    )
+    pygame.draw.rect(textbox_surface, (0, 0, 0, 100), (0, 0, textbox_width, textbox_height), border_radius=50)
     SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
-    # Place header text near the top of the textbox
     header_text = "This is the HAND VISUALIZER screen."
     HAND_VISUALIZER_TEXT = get_font(45).render(header_text, True, "White")
     header_y = textbox_y - 20
@@ -144,104 +161,28 @@ def poker_hand_visualizer():
     SCREEN.blit(HAND_VISUALIZER_TEXT, HAND_VISUALIZER_RECT)
 
     #
-    # 2. Grid/Slider Parameters
+    # 4. Grid Layout
     #
     GRID_SIZE = 13
     CELL_SIZE = 43
     MARGIN = 0
     GRID_WIDTH = MARGIN + (CELL_SIZE + MARGIN) * GRID_SIZE
     GRID_HEIGHT = MARGIN + (CELL_SIZE + MARGIN) * GRID_SIZE
-    SLIDER_AREA_HEIGHT = 70
 
-    # We'll position the grid on the left side
-    container_x = 70
-    container_y = 100
-    container_width = GRID_WIDTH
-    container_height = GRID_HEIGHT + SLIDER_AREA_HEIGHT
+    container_x = 60
+    container_y = 70
 
-    # Colors
-    BLACK = (0, 0, 0)
-    GREEN = (0, 200, 0)
-    LIGHT_GREY = (220, 220, 220)
-    VERY_LIGHT_GREY = (240, 240, 240)
-    PAIR_GREY = (200, 200, 200)
-    SLIDER_TRACK_COLOUR = (180, 180, 180)
-    SLIDER_KNOB_COLOUR = (100, 100, 250)
+    # Updated colors
+    RAISE_COLOR = (255, 0, 0)      # bright red
+    CALL_COLOR  = (0, 200, 0)      # green
+    FOLD_COLOR  = (100, 100, 100)  # dark grey
+    BLACK       = (0, 0, 0)
 
     font = pygame.font.SysFont(None, 20)
-    slider_font = pygame.font.SysFont(None, 24)
-
-    ranks = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"]
-
-    # Data structure to hold which cells are selected
-    selected = [[False for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
-
-    # Start the slider at 100% (select everything)
-    slider_value = 100.0
-    slider_dragging = False
-
-    # Slider geometry
-    slider_x = container_x
-    slider_y = container_y + GRID_HEIGHT + 10
-    slider_width = 200
-    slider_height = SLIDER_AREA_HEIGHT - 2 * MARGIN
-    track_height = 4
-    knob_radius = 10
 
     #
-    # Add Text Input Box for Percentage Entry
+    # 5. Radio Buttons for Side Panel (Scenario, Hero, Villain)
     #
-    input_box_rect = pygame.Rect(slider_x + slider_width + 20, slider_y, 100, 30)
-    input_text = str(round(slider_value))
-    input_active = False
-
-    # Define colours for the text box (inactive/active)
-    TEXT_BOX_colour = (255, 255, 255)
-    TEXT_BOX_ACTIVE_colour = (200, 200, 200)
-
-    #
-    # 3. Helper Functions
-    #
-    def get_hand_notation(row, col):
-        """Return e.g. 'QQ', 'AKs', 'AKo' based on row/col indices."""
-        if row == col:
-            return ranks[row] + ranks[col]         # e.g. "QQ"
-        elif row < col:
-            return ranks[row] + ranks[col] + "s"   # e.g. "AQs"
-        else:
-            return ranks[col] + ranks[row] + "o"   # e.g. "AQo"
-
-    def hand_strength_score(row, col):
-        """Look up the hand's equity in the dictionary."""
-        notation = get_hand_notation(row, col)
-        return hand_equities.get(notation, 0.0)
-
-    # Build a list of all 169 combos with their scores
-    ordered_cells = []
-    for row in range(GRID_SIZE):
-        for col in range(GRID_SIZE):
-            score = hand_strength_score(row, col)
-            ordered_cells.append((score, row, col))
-    # Sort descending by score
-    ordered_cells.sort(key=lambda x: x[0], reverse=True)
-
-    def update_range_from_slider():
-        """Select the top X% of combos based on slider_value."""
-        nonlocal selected
-        total = len(ordered_cells)  # should be 169
-        count = round((slider_value / 100.0) * total)
-        selected = [[False for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
-        for i in range(count):
-            _, r, c = ordered_cells[i]
-            selected[r][c] = True
-
-    # Initialize selection at 100%
-    update_range_from_slider()
-
-    #
-    # 4. Radio Buttons on the RIGHT side
-    #
-    # Only these three categories:
     options_data = {
         "Scenario": {
             "options": ["Open", "vs raise", "vs 3bet", "vs 4bet", "vs 5bet"],
@@ -257,75 +198,54 @@ def poker_hand_visualizer():
         }
     }
 
-    # We'll store the clickable rectangles in side_panel_buttons
     side_panel_buttons = []
 
     def draw_radio_buttons(label, x_start, y_start, options_list, selected_option):
-        """
-        Draw a label (e.g. 'Scenario'), then a vertical stack of buttons for each option.
-        Returns a list of (rect, option_string) for click detection.
-        """
         button_rects = []
         label_surf = font.render(label, True, (255, 255, 255))
         SCREEN.blit(label_surf, (x_start, y_start))
-
-        # We'll place each option on its own line
         spacing_y = 30
-        btn_y = y_start + 25  # move down from label
-
+        btn_y = y_start + 25
         for opt in options_list:
             color = (100, 200, 100) if opt == selected_option else (200, 200, 200)
             rect = pygame.Rect(x_start, btn_y, 110, 25)
             pygame.draw.rect(SCREEN, color, rect, border_radius=5)
             pygame.draw.rect(SCREEN, BLACK, rect, 1, border_radius=5)
-
             text_surf = font.render(opt, True, BLACK)
             text_rect = text_surf.get_rect(center=rect.center)
             SCREEN.blit(text_surf, text_rect)
-
             button_rects.append((rect, opt))
-            btn_y += spacing_y  # move down for next button
-
+            btn_y += spacing_y
         return button_rects
 
     def draw_side_panel():
-        """
-        Draw the three categories in separate rows on the right side of the grid.
-        """
         side_panel_buttons.clear()
-
-        # Position for the side panel (to the right of the grid)
         panel_x = container_x + GRID_WIDTH + 50
         panel_y = container_y
-
-        # Draw 'Scenario' at the top
-        scenario_rects = draw_radio_buttons(
-            "Scenario", panel_x, panel_y,
-            options_data["Scenario"]["options"],
-            options_data["Scenario"]["selected"]
-        )
-        side_panel_buttons.append(("Scenario", scenario_rects))
-
-        # Move down for 'Hero'
-        hero_y = panel_y + 180  # some vertical spacing
-        hero_rects = draw_radio_buttons(
-            "Hero", panel_x, hero_y,
-            options_data["Hero"]["options"],
-            options_data["Hero"]["selected"]
-        )
-        side_panel_buttons.append(("Hero", hero_rects))
-
-        # Move down further for 'Villain'
-        villain_y = hero_y + 180
-        villain_rects = draw_radio_buttons(
-            "Villain", panel_x, villain_y,
-            options_data["Villain"]["options"],
-            options_data["Villain"]["selected"]
-        )
-        side_panel_buttons.append(("Villain", villain_rects))
+        visible_categories = ["Scenario", "Hero", "Villain"]
+        if options_data["Scenario"]["selected"] == "Open":
+            visible_categories.remove("Villain")
+        offset_y = 0
+        for cat in visible_categories:
+            cat_rects = draw_radio_buttons(
+                cat, panel_x, panel_y + offset_y,
+                options_data[cat]["options"],
+                options_data[cat]["selected"]
+            )
+            side_panel_buttons.append((cat, cat_rects))
+            offset_y += 180
 
     #
-    # 5. Main Loop
+    # 6. Back Button Setup
+    #
+    # Define a back button rectangle (e.g., top-left corner)
+    back_button_rect = pygame.Rect(20, 20, 80, 30)
+    back_button_color = (180, 180, 180)
+    back_button_text = font.render("HOME", True, BLACK)
+    back_button_text_rect = back_button_text.get_rect(center=back_button_rect.center)
+
+    #
+    # 7. Main Loop
     #
     clock = pygame.time.Clock()
     running = True
@@ -336,124 +256,89 @@ def poker_hand_visualizer():
                 running = False
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_x, mouse_y = event.pos
+                mx, my = event.pos
 
-                # Check if user clicked on side panel radio buttons
+                # Check if the back button was clicked.
+                if back_button_rect.collidepoint(mx, my):
+                    mainMenu()
+                    running = False
+                    
+
+                # Check clicks on visible side-panel buttons.
                 for category, rect_list in side_panel_buttons:
                     for (rect, opt) in rect_list:
-                        if rect.collidepoint(mouse_x, mouse_y):
-                            # Update the selected option
+                        if rect.collidepoint(mx, my):
                             options_data[category]["selected"] = opt
 
-                # Check if the text box was clicked
-                if input_box_rect.collidepoint(mouse_x, mouse_y):
-                    input_active = True
-                else:
-                    input_active = False
-
-                    # Check if slider area was clicked
-                    if (slider_y <= mouse_y <= slider_y + SLIDER_AREA_HEIGHT and
-                        slider_x <= mouse_x <= slider_x + slider_width):
-                        slider_dragging = True
-                        relative_x = mouse_x - slider_x
-                        relative_x = max(0, min(relative_x, slider_width))
-                        slider_value = (relative_x / slider_width) * 100
-                        update_range_from_slider()
-                    else:
-                        # Check if grid area was clicked (toggle single combos)
-                        if (container_x <= mouse_x <= container_x + GRID_WIDTH and 
-                            container_y <= mouse_y <= container_y + GRID_HEIGHT):
-                            col = (mouse_x - (container_x + MARGIN)) // (CELL_SIZE + MARGIN)
-                            row = (mouse_y - (container_y + MARGIN)) // (CELL_SIZE + MARGIN)
-                            if 0 <= col < GRID_SIZE and 0 <= row < GRID_SIZE:
-                                selected[row][col] = not selected[row][col]
-
-            elif event.type == pygame.MOUSEBUTTONUP:
-                slider_dragging = False
-
-            elif event.type == pygame.MOUSEMOTION:
-                if slider_dragging:
-                    mouse_x, _ = event.pos
-                    relative_x = mouse_x - slider_x
-                    relative_x = max(0, min(relative_x, slider_width))
-                    slider_value = (relative_x / slider_width) * 100
-                    update_range_from_slider()
-
-            elif event.type == pygame.KEYDOWN:
-                if input_active:
-                    if event.key == pygame.K_RETURN:
-                        # Validate and update the slider_value from text input
-                        try:
-                            new_val = float(input_text)
-                        except ValueError:
-                            new_val = slider_value
-                        new_val = max(0, min(new_val, 100))  # clamp
-                        slider_value = new_val
-                        update_range_from_slider()
-                        input_text = str(round(slider_value))
-                        input_active = False
-                    elif event.key == pygame.K_BACKSPACE:
-                        input_text = input_text[:-1]
-                    else:
-                        # Only allow digits
-                        if event.unicode.isdigit():
-                            input_text += event.unicode
-
-        # Redraw the background
+        # Redraw background and overlay.
         SCREEN.blit(scaled_bg, (0, 0))
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
         SCREEN.blit(HAND_VISUALIZER_TEXT, HAND_VISUALIZER_RECT)
 
-        # Draw the 13x13 grid on the left
+        # Draw the back button.
+        pygame.draw.rect(SCREEN, back_button_color, back_button_rect, border_radius=5)
+        pygame.draw.rect(SCREEN, BLACK, back_button_rect, 1, border_radius=5)
+        SCREEN.blit(back_button_text, back_button_text_rect)
+
+        # Draw side panel based on current selections.
+        draw_side_panel()
+
+        # Retrieve current selections.
+        scenario_sel = options_data["Scenario"]["selected"]
+        hero_sel     = options_data["Hero"]["selected"]
+        villain_sel  = options_data["Villain"]["selected"] if "Villain" in [cat for (cat, _) in side_panel_buttons] else "BB"
+
+        strategy_key = (scenario_sel, hero_sel, villain_sel)
+        if strategy_key in strat_data:
+            raise_set = strat_data[strategy_key]["raise"]
+            call_set = strat_data[strategy_key]["call"]
+        else:
+            raise_set = set()
+            call_set = set()
+
+        total_combos = 169
+        raise_count = 0
+        call_count = 0
+
+        def get_hand_notation(r, c):
+            ranks = ["A","K","Q","J","T","9","8","7","6","5","4","3","2"]
+            if r == c:
+                return ranks[r] + ranks[c]
+            elif r < c:
+                return ranks[r] + ranks[c] + "s"
+            else:
+                return ranks[c] + ranks[r] + "o"
+
         for row in range(GRID_SIZE):
             for col in range(GRID_SIZE):
-                x = container_x + MARGIN + col * (CELL_SIZE + MARGIN)
-                y = container_y + MARGIN + row * (CELL_SIZE + MARGIN)
-                cell_rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
-
-                if selected[row][col]:
-                    colour = GREEN
+                hand_str = get_hand_notation(row, col)
+                if hand_str in raise_set:
+                    color = RAISE_COLOR
+                    raise_count += 1
+                elif hand_str in call_set:
+                    color = CALL_COLOR
+                    call_count += 1
                 else:
-                    if row == col:
-                        colour = PAIR_GREY
-                    elif row < col:
-                        colour = LIGHT_GREY
-                    else:
-                        colour = VERY_LIGHT_GREY
+                    color = FOLD_COLOR
 
-                pygame.draw.rect(SCREEN, colour, cell_rect)
+                x = container_x + col * (CELL_SIZE + MARGIN)
+                y = container_y + row * (CELL_SIZE + MARGIN)
+                cell_rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
+                pygame.draw.rect(SCREEN, color, cell_rect)
                 pygame.draw.rect(SCREEN, BLACK, cell_rect, 1)
-
-                text_surface = font.render(get_hand_notation(row, col), True, BLACK)
+                text_surface = font.render(hand_str, True, BLACK)
                 text_rect = text_surface.get_rect(center=cell_rect.center)
                 SCREEN.blit(text_surface, text_rect)
 
-        # Draw the slider below the grid
-        pygame.draw.rect(
-            SCREEN,
-            SLIDER_TRACK_COLOUR,
-            (slider_x, slider_y + slider_height // 2 - track_height // 2, slider_width, track_height)
+        raise_pct = 100.0 * raise_count / total_combos
+        call_pct  = 100.0 * call_count / total_combos
+        fold_pct  = 100.0 - (raise_pct + call_pct)
+        stats_font = pygame.font.SysFont(None, 28)
+        stats_text = stats_font.render(
+            f"Raise ({raise_pct:.1f}%) | Call ({call_pct:.1f}%) | Fold ({fold_pct:.1f}%)",
+            True, (255,255,255)
         )
-        pygame.draw.circle(
-            SCREEN,
-            SLIDER_KNOB_COLOUR,
-            (int(slider_x + (slider_value / 100.0) * slider_width), int(slider_y + slider_height // 2)),
-            knob_radius
-        )
-        slider_text = slider_font.render(f"Hand Range: {slider_value:.0f}%", True, BLACK)
-        SCREEN.blit(slider_text, (slider_x, slider_y - 25))
-
-        # Draw the text input box for the slider value
-        if not input_active:
-            input_text = str(round(slider_value))
-        box_colour = TEXT_BOX_ACTIVE_colour if input_active else TEXT_BOX_colour
-        pygame.draw.rect(SCREEN, box_colour, input_box_rect)
-        pygame.draw.rect(SCREEN, BLACK, input_box_rect, 2)  # Border
-        input_surface = slider_font.render(input_text, True, BLACK)
-        SCREEN.blit(input_surface, (input_box_rect.x + 5, input_box_rect.y + 5))
-
-        # Finally, draw the side panel (Scenario, Hero, Villain)
-        draw_side_panel()
+        SCREEN.blit(stats_text, (container_x, container_y + GRID_HEIGHT + 15))
 
         pygame.display.flip()
         clock.tick(30)
@@ -461,6 +346,5 @@ def poker_hand_visualizer():
     pygame.quit()
     sys.exit()
 
-# To run the visualizer, call the function:
 if __name__ == "__main__":
     poker_hand_visualizer()
