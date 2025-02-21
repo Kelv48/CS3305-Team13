@@ -1,5 +1,6 @@
 import pygame
 import pygame_widgets
+from src.gui.constants import game_font
 
 def showdown(common_cards):
     """
@@ -56,7 +57,7 @@ def recapRound(list_winner, common_cards=None):
 
 
     from src.gui.constants import SCREEN, WIDTH, HEIGHT, BEIGE, GAME_BG
-    font = pygame.font.SysFont('comicsans', 20)
+    font = game_font(20) 
 
 
 
@@ -315,7 +316,7 @@ def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=Non
     x_output = 1060  # Fixed x position for the output box
     y_output = 590   # Fixed y position (adjust as needed)
 
-    font = pygame.font.SysFont('comicsans', 20)
+    font = game_font(20)
     output = TextBox(SCREEN, x_output, y_output, 100, 50, fontSize=20, 
                     colour=GREEN, textColour=BEIGE, font=font)
     output.setText('1')

@@ -1,5 +1,5 @@
 import pygame
-from src.gui.constants import BLACK, WIDTH, HEIGHT, label_player_image, BEIGE
+from src.gui.constants import BLACK, WIDTH, HEIGHT, label_player_image, BEIGE, game_font
 
 
 class Player(object):
@@ -73,7 +73,7 @@ class Player(object):
         :param win: window object
         :return: displays label
         """
-        font = pygame.font.SysFont('comicsans', 20)
+        font = game_font(20)
         text1 = font.render(str(self.name), True, BLACK)
         text2 = font.render('$'+ str(self.stack), True, BLACK)
         width = WIDTH * 0.1
@@ -105,7 +105,7 @@ class Player(object):
         :return: displays bet of players
         """
         if self.bet_auction > 0:
-            font = pygame.font.SysFont('comicsans', 20)
+            font = game_font(20)
             text = font.render('$'+str(self.bet_auction), True, BEIGE)
             if self == self.player_list_chair[0]:
                 x, y = (WIDTH - text.get_width()) // 2, 470
@@ -131,7 +131,7 @@ class Player(object):
         height = win.get_height()
         # Optionally, scale the font size based on the screen size (e.g., 5% of screen height)
         font_size = max(10, int(height * 0.02))  # Ensures the font doesn't get too small
-        font = pygame.font.SysFont('comicsans', font_size)
+        font = game_font(font_size)
         # Render the text
         pot_text = f'Pot: ${input_stack - bets}'
         text_surface = font.render(pot_text, True, BEIGE)#

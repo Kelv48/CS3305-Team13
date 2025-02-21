@@ -1,5 +1,5 @@
 import pygame
-from src.gui.constants import button_image, BLACK, WIDTH, HEIGHT
+from src.gui.constants import button_image, BLACK, WIDTH, HEIGHT, game_font
 
 
 class Button:
@@ -8,7 +8,7 @@ class Button:
         self.x = x
         self.y = y
         self.active = False
-        font = pygame.font.SysFont('comicsans', 20)
+        font = game_font(20)
         self.text = font.render(text, True, BLACK)
         self.width = width
         self.height = height
@@ -30,7 +30,7 @@ class Button:
         return False
 
     def bigger(self, mouse_position):
-        font = pygame.font.SysFont('comicsans', 20)
+        font = game_font(20)
         if self.draft.collidepoint(mouse_position):
             self.text = font.render(self.name, True, (0, 0, 255))
 

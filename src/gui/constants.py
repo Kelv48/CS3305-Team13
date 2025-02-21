@@ -59,9 +59,11 @@ winner_sound = pygame.mixer.Sound("assets/sfx/winner.mp3") # Winner sound effect
 pygame.mixer.music.play(-1)  # Loop indefinitely
 
 
-def get_font(size):  # Returns Press-Start-2P in the desired size
+def screen_font(size):  # Returns Press-Start-2P in the desired size
     return pygame.font.Font("assets/fonts/calibri_bold.TTF", size)
 
+def game_font(size):
+    return pygame.font.Font("assets/fonts/CARDC.TTF", size)
 
 
 def play_button_click_sound():

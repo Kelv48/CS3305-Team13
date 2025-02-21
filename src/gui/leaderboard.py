@@ -1,6 +1,6 @@
 import pygame, sys, json, os
 from src.gui.button import Button
-from src.gui.constants import BG, get_font, SCREEN
+from src.gui.constants import BG, screen_font, SCREEN
 from src.gui.user_page import user_page
 
 # Define the temporary JSON file for the leaderboard.
@@ -57,7 +57,7 @@ def leaderboard(mainMenu):
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
         # Draw the "Leaderboard" title.
-        title_text = get_font(50).render("Top Earners", True, "Dark Green")
+        title_text = screen_font(50).render("Top Earners", True, "Dark Green")
         title_rect = title_text.get_rect(center=(screen_width / 2, screen_height / 15))
         SCREEN.blit(title_text, title_rect)
 
@@ -65,7 +65,7 @@ def leaderboard(mainMenu):
         leaderboard_data = load_leaderboard()
 
         # Display each leaderboard entry within the textbox.
-        entry_font = get_font(30)
+        entry_font = screen_font(30)
         for i, entry in enumerate(leaderboard_data):
             # Format each entry as "Rank. Username - Tokens"
             entry_str = f"{i+1}. {entry['username']} - {entry['tokens']}"
@@ -92,7 +92,7 @@ def leaderboard(mainMenu):
             button = Button(
                 pos=(screen_width / 2, button_y), 
                 text_input=text, 
-                font=get_font(30), 
+                font=screen_font(30), 
                 base_colour="White", 
                 hovering_colour="Light Green",
                 image=None

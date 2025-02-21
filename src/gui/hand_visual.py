@@ -1,6 +1,6 @@
 import sys
 import pygame
-from src.gui.constants import SCREEN, BG, get_font
+from src.gui.constants import SCREEN, BG, screen_font
 
 
 
@@ -155,7 +155,7 @@ def poker_hand_visualizer(mainMenu):
     SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
     header_text = "This is the HAND VISUALIZER screen."
-    HAND_VISUALIZER_TEXT = get_font(45).render(header_text, True, "White")
+    HAND_VISUALIZER_TEXT = screen_font(45).render(header_text, True, "White")
     header_y = textbox_y - 20
     HAND_VISUALIZER_RECT = HAND_VISUALIZER_TEXT.get_rect(center=(textbox_x + textbox_width // 2, header_y))
     SCREEN.blit(HAND_VISUALIZER_TEXT, HAND_VISUALIZER_RECT)
@@ -178,7 +178,7 @@ def poker_hand_visualizer(mainMenu):
     FOLD_COLOR  = (100, 100, 100)  # dark grey
     BLACK       = (0, 0, 0)
 
-    font = pygame.font.SysFont(None, 20)
+    font = screen_font(20)
 
     #
     # 5. Radio Buttons for Side Panel (Scenario, Hero, Villain)

@@ -1,6 +1,6 @@
 import pygame, sys
 from src.gui.button import Button
-from src.gui.constants import BG, get_font, SCREEN
+from src.gui.constants import BG, screen_font, SCREEN
 
 def render_screen(title, username, password, active_input, button_actions):
     screen_width, screen_height = SCREEN.get_size()
@@ -22,7 +22,7 @@ def render_screen(title, username, password, active_input, button_actions):
     )
     SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
     
-    TITLE_TEXT = get_font(45).render(title, True, "White")
+    TITLE_TEXT = screen_font(45).render(title, True, "White")
     TITLE_RECT = TITLE_TEXT.get_rect(center=(screen_width / 2, screen_height / 9))
     SCREEN.blit(TITLE_TEXT, TITLE_RECT)
 
@@ -39,16 +39,16 @@ def render_screen(title, username, password, active_input, button_actions):
     pygame.draw.rect(SCREEN, password_colour, password_box, 2)
 
     # Render labels for input boxes
-    USERNAME_LABEL = get_font(30).render("Username", True, "White")
+    USERNAME_LABEL = screen_font(30).render("Username", True, "White")
     USERNAME_LABEL_RECT = USERNAME_LABEL.get_rect(center=(username_box.centerx, username_box.y - 20))
     SCREEN.blit(USERNAME_LABEL, USERNAME_LABEL_RECT)
 
-    PASSWORD_LABEL = get_font(30).render("Password", True, "White")
+    PASSWORD_LABEL = screen_font(30).render("Password", True, "White")
     PASSWORD_LABEL_RECT = PASSWORD_LABEL.get_rect(center=(password_box.centerx, password_box.y - 20))
     SCREEN.blit(PASSWORD_LABEL, PASSWORD_LABEL_RECT)
 
     # Render the username text and draw a blinking cursor if active.
-    USERNAME_TEXT = get_font(30).render(username, True, "White")
+    USERNAME_TEXT = screen_font(30).render(username, True, "White")
     username_text_pos = (username_box.x + 5, username_box.y + 5)
     SCREEN.blit(USERNAME_TEXT, username_text_pos)
     
@@ -64,7 +64,7 @@ def render_screen(title, username, password, active_input, button_actions):
 
     # Render the password text (masked) and draw a blinking cursor if active.
     masked_password = '*' * len(password)
-    PASSWORD_TEXT = get_font(30).render(masked_password, True, "White")
+    PASSWORD_TEXT = screen_font(30).render(masked_password, True, "White")
     password_text_pos = (password_box.x + 5, password_box.y + 5)
     SCREEN.blit(PASSWORD_TEXT, password_text_pos)
     
@@ -86,7 +86,7 @@ def render_screen(title, username, password, active_input, button_actions):
         button = Button(
             pos=(screen_width / 2, button_y), 
             text_input=text, 
-            font=get_font(30), 
+            font=screen_font(30), 
             base_colour="White", 
             hovering_colour="Light Green",
             image=None

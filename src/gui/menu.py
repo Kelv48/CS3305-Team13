@@ -1,7 +1,7 @@
 import pygame, sys
 import pygame.transform
 from src.gui.button import Button
-from src.gui.constants import BG, get_font, SCREEN, FPS
+from src.gui.constants import BG, screen_font, SCREEN, FPS
 from src.game.utils import changePlayersPositions
 from src.game.player import Player
 from src.game.poker_round import poker_round
@@ -94,7 +94,7 @@ def menuStart():
 
 
         # Title
-        title_text = get_font(45).render("This is the GAME START screen.", True, "White")
+        title_text = screen_font(45).render("This is the GAME START screen.", True, "White")
         title_rect = title_text.get_rect(center=(screen_width / 2, screen_height / 8))
         SCREEN.blit(title_text, title_rect)
 
@@ -117,7 +117,7 @@ def menuStart():
             button_obj = Button(
                 pos=(textbox_center_x, button_y),
                 text_input=text,
-                font=get_font(30),
+                font=screen_font(30),
                 base_colour="White",
                 hovering_colour="Light Green",
                 image=None
@@ -148,7 +148,7 @@ def menuEnd():
     winner = next((player.name for player in Player.player_list_chair if player.stack != 0), "No Winner")
     scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height))
     SCREEN.blit(scaled_bg, (0, 0))
-    font = pygame.font.SysFont('comicsans', 60)
+    font = screen_font(60)
 
     win_text = font.render(f'{winner} won the game!', True, "White")
     SCREEN.blit(win_text, ((screen_width - win_text.get_width()) // 2, 100))
@@ -160,7 +160,7 @@ def menuEnd():
     button_new_game = Button(
         pos=(screen_width / 2, 300),
         text_input="New Game",
-        font=get_font(30),
+        font=screen_font(30),
         base_colour="White",
         hovering_colour="Light Green",
         image=None
@@ -169,7 +169,7 @@ def menuEnd():
     button_exit = Button(
         pos=(screen_width / 2, 500),
         text_input="Exit",
-        font=get_font(30),
+        font=screen_font(30),
         base_colour="White",
         hovering_colour="Light Green",
         image=None

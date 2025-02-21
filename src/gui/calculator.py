@@ -3,7 +3,7 @@ import sys
 import random
 import itertools
 from collections import Counter
-from src.gui.constants import get_font, BG, SCREEN
+from src.gui.constants import screen_font, BG, SCREEN
 pygame.init()
 
 # ----- Global Constants & Settings -----
@@ -13,8 +13,8 @@ COLOR_INACTIVE = pygame.Color('lightskyblue3')
 COLOR_ACTIVE = pygame.Color('dodgerblue2')
 BUTTON_COLOR = pygame.Color('gray')
 TEXT_COLOR = pygame.Color('white')
-FONT = pygame.font.Font(None, 32)
-BIG_FONT = pygame.font.Font(None, 48)
+FONT = screen_font(32)
+BIG_FONT = screen_font(48)
 
 # Overlay colors for each group (RGBA where A is transparency)
 PLAYER_OVERLAY_COLOR = (0, 0, 255, 100)     # Blue semi-transparent
@@ -300,7 +300,7 @@ def run_poker_calculator(mainMenu, num_simulations=1000):
 
         # Place header text near top of textbox
         header_text = "This is the POKER CALCULATOR screen."
-        CALCULATOR_TEXT = get_font(45).render(header_text, True, "White")
+        CALCULATOR_TEXT = screen_font(45).render(header_text, True, "White")
         header_y = 30
         CALCULATOR_RECT = CALCULATOR_TEXT.get_rect(center=(textbox_x + textbox_width // 2, header_y))
         SCREEN.blit(CALCULATOR_TEXT, CALCULATOR_RECT)
