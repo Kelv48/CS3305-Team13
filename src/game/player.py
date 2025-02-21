@@ -101,44 +101,91 @@ class Player(object):
         
     def drawBet(self, win):
         """
-        :param win:
-        :return: displays bet of players
+        :param win: window object
+        :return: displays bet of players slightly below the player's label with a semi-transparent oval underneath,
+                using hardcoded positions.
         """
         if self.bet_auction > 0:
             font = game_font(20)
-            text = font.render('$'+str(self.bet_auction), True, BEIGE)
+            text = font.render('$' + str(self.bet_auction), True, BEIGE)
+            
+            # Hardcode bet positions based on player's position in player_list_chair
             if self == self.player_list_chair[0]:
-                x, y = (WIDTH - text.get_width()) // 2, 470
+                bet_x, bet_y = 620, 510  # example coordinates for player 0's bet text
+
             elif self == self.player_list_chair[1]:
-                x, y = (WIDTH - text.get_width()) // 2, 245
+                bet_x, bet_y = 310, 440  # example coordinates for player 1's bet text
             elif self == self.player_list_chair[2]:
-                x, y = (WIDTH - text.get_width()) // 500, 1000
+                bet_x, bet_y = 310, 270  # example coordinates for player 2's bet text
             elif self == self.player_list_chair[3]:
-                x, y = (WIDTH - text.get_width()) // 500, 900
+                bet_x, bet_y = 580, 205  # example coordinates for player 3's bet text
             elif self == self.player_list_chair[4]:
-                x, y = (WIDTH - text.get_width()) // 500, 700
+                bet_x, bet_y = 980, 265  # example coordinates for player 4's bet text
             elif self == self.player_list_chair[5]:
-                x, y = (WIDTH - text.get_width()) // 500, 800
-            win.blit(text, (x, y))
+                bet_x, bet_y = 980, 565  # example coordinates for player 5's bet text
+
+            # Create a surface for the semi-transparent oval
+            padding = 10  # extra space around the text inside the oval
+            oval_width = text.get_width() + padding * 2
+            oval_height = text.get_height() + padding * 2
+            oval_surface = pygame.Surface((oval_width, oval_height), pygame.SRCALPHA)
+            
+            # Define a semi-transparent color (RGBA)
+            oval_color = (0, 0, 0, 128)  # black with 50% transparency
+            
+            # Draw the oval on the oval_surface
+            pygame.draw.ellipse(oval_surface, oval_color, (0, 0, oval_width, oval_height))
+            
+            # Calculate the oval's position so that it's centered on the bet text
+            oval_x = bet_x + text.get_width() // 2 - oval_width // 2
+            oval_y = bet_y + text.get_height() // 2 - oval_height // 2
+            
+            # Blit the oval first, then the bet text on top
+            win.blit(oval_surface, (oval_x, oval_y))
+            win.blit(text, (bet_x, bet_y))
+
+
+
+
 
     @staticmethod
     def drawPot(win):
         # Calculate the pot from all players
         input_stack = sum(player.input_stack for player in Player.player_list)
         bets = sum(player.bet_auction for player in Player.player_list)
+        
         # Get the current width and height of the window
         width = win.get_width()
         height = win.get_height()
-        # Optionally, scale the font size based on the screen size (e.g., 5% of screen height)
-        font_size = max(10, int(height * 0.02))  # Ensures the font doesn't get too small
+        
+        # Scale the font size based on the screen size (e.g., 2% of screen height)
+        font_size = max(20, int(height * 0.02))  # Ensures the font doesn't get too small
         font = game_font(font_size)
+        
         # Render the text
         pot_text = f'Pot: ${input_stack - bets}'
-        text_surface = font.render(pot_text, True, BEIGE)#
+        text_surface = font.render(pot_text, True, BEIGE)
         
         # Center the text on the screen
         x = (width - text_surface.get_width()) // 2
-        y = (height - text_surface.get_height()) // 2.3
+        y = int((height - text_surface.get_height()) // 2.3)
         
-        # Draw the text on the window
+        # Create a surface for the semi-transparent oval
+        padding = 10  # extra space around the text inside the oval
+        oval_width = text_surface.get_width() + padding * 2
+        oval_height = text_surface.get_height() + padding * 2
+        oval_surface = pygame.Surface((oval_width, oval_height), pygame.SRCALPHA)
+        
+        # Define a semi-transparent color (RGBA) - black with 50% transparency
+        oval_color = (0, 0, 0, 128)
+        
+        # Draw the oval on the oval_surface
+        pygame.draw.ellipse(oval_surface, oval_color, (0, 0, oval_width, oval_height))
+        
+        # Calculate the oval's position so that it's centered behind the text
+        oval_x = x + (text_surface.get_width() // 2) - (oval_width // 2)
+        oval_y = y + (text_surface.get_height() // 2) - (oval_height // 2)
+        
+        # Blit the oval first, then the pot text on top
+        win.blit(oval_surface, (oval_x, oval_y))
         win.blit(text_surface, (x, y))
