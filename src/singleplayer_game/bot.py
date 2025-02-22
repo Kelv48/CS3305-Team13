@@ -26,7 +26,7 @@ class AI:
         :return: probability of win, probability of tie
         """
         import random
-        from src.game.poker_score import players_score as playerScore
+        from src.singleplayer_game.poker_score import players_score as playerScore
 
         number_games = 500
         n_win = 0

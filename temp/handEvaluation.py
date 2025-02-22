@@ -1,4 +1,4 @@
-from src.game.evaluationLogic import *
+from src.singleplayer_game.evaluationLogic import *
 
 def handEvaluation(inputDeck): 
     values = removeSuits(inputDeck)

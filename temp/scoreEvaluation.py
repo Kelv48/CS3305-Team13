@@ -1,6 +1,6 @@
 # Can evaluate 7 cards at once.  @returns the hand score + hand type
-from src.game.handEvaluation import handEvaluation as evaluateCards
-from src.game.evaluationLogic import removeSuits, valueToRank
+from src.singleplayer_game.handEvaluation import handEvaluation as evaluateCards
+from src.singleplayer_game.evaluationLogic import removeSuits, valueToRank
 import itertools
 
 

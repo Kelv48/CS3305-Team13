@@ -1,7 +1,7 @@
-from src.game.player import Player
-from src.game.game_button import buttons
-from src.game.bot import AI
-from src.game.utils import playerDecision, arrangeRoom, drawPlayer
+from src.singleplayer_game.game_gui.player import Player
+from src.singleplayer_game.game_gui.game_button import buttons
+from src.singleplayer_game.bot import AI
+from src.singleplayer_game.game_gui.utils import playerDecision, arrangeRoom, drawPlayer
 from src.gui.constants import BB
 
 

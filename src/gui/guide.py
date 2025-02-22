@@ -16,7 +16,7 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
     pygame.display.set_caption(title)
 
     # Absolute path for the theme file
-    manager = pygame_gui.UIManager(screen.get_size(), 'src/gui/embedded_images_theme.json')
+    manager = pygame_gui.UIManager(screen.get_size(), 'assets/embedded_images_theme.json')
 
     clock = pygame.time.Clock()
     is_running = True
@@ -33,7 +33,6 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
 
     def create_buttons():
         sw, sh = screen.get_size()
-        spacing = sw * 0.2  # Space between buttons
         y_pos = int(sh * 0.9)
 
         back_button = Button(
@@ -44,7 +43,6 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
             hovering_colour="Light Green",
             image=None)
 
-
         beginner_button = Button(
             pos=(sw * 0.4, y_pos),
             text_input="BEGINNER",
@@ -53,7 +51,6 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
             hovering_colour="Light Green",
             image=None)
 
-
         intermediate_button = Button(
             pos=(sw * 0.6, y_pos),
             text_input="INTERMEDIATE",
@@ -61,7 +58,6 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
             base_colour="White",
             hovering_colour="Light Green",
             image=None)
-
 
         advanced_button = Button(
             pos=(sw * 0.8, y_pos),
@@ -81,20 +77,16 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
         scaled_bg = pygame.transform.scale(BG, (sw, sh))
         screen.blit(scaled_bg, (0, 0))
 
-
         screen_width, screen_height = screen.get_size()
         # Transparent textbox with rounded edges
         textbox_width = int(screen_width * 0.8)      # 80% of screen width
         textbox_height = int(screen_height * 0.1)      # 10% of screen height
         textbox_x = int((screen_width - textbox_width) / 2)
-        textbox_y = int(screen_height * 0.85)          # 80% down from the top
-
+        textbox_y = int(screen_height * 0.85)          # 85% down from the top
 
         # Create a new Surface with per-pixel alpha (using SRCALPHA).
         textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
         # Draw a filled rounded rectangle on the textbox_surface.
-        # The colour (0, 0, 0, 100) is black with an alpha value of 100 (semi-transparent).
-        # Adjust the border_radius (here, 20) to control the roundness of the corners.
         pygame.draw.rect(
             textbox_surface, 
             (0, 0, 0, 100), 
@@ -113,10 +105,6 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
         beginner_button.pos = (sw * 0.4, int(sh * 0.9))
         intermediate_button.pos = (sw * 0.6, int(sh * 0.9))
         advanced_button.pos = (sw * 0.8, int(sh * 0.9))
-
-
-
-
 
         for button in (back_button, beginner_button, intermediate_button, advanced_button):
             button.changecolour(pygame.mouse.get_pos())
@@ -158,19 +146,24 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
         pygame.display.update()
 
 
-# --- Guide Screens --- #
-
 def guide_beginner(main_menu):
     beginner_text = (
-        '<font face="noto_sans" size="3" color="#FFFFFF">'
-        '<img src="src/gui/HandRankings.png"  float:right; padding:5px 10px 5px 5px;">'
-
-        'Some test text in a box that will '
-        'This guide is perfect for those just starting out. '
-        'Learn the basics of poker including rules, hand rankings, and simple strategies. '
+        '<font face="calibri_bold" size="3" color="#FFFFFF">'
+        '<img src="assets/images/HandRankings.png" '
+                     'float=right '
+                     'padding="5px 10px 5px 5px">'
+        '<h2>Beginner Poker Guide</h2>'
+        '<p><b>Overview:</b> This guide is designed for players who are new to poker. It covers the basics, including rules, hand rankings, and simple strategies.</p>'
+        '<p><b>Key Topics:</b></p>'
+        '<ul>'
+        '<li><b>Poker Basics & Rules:</b> Learn the common rules of popular variants like Texas Hold’em, including betting rounds, blinds, and game flow.</li>'
+        '<li><b>Hand Rankings:</b> Understand the hierarchy of hands—from high card to royal flush—with visual aids to help you remember.</li>'
+        '<li><b>Basic Terminology:</b> Get familiar with essential poker terms like call, raise, fold, bluff, and pot odds.</li>'
+        '<li><b>Simple Strategies:</b> Start with fundamentals such as playing tight, understanding position, and knowing when to fold.</li>'
+        '<li><b>Practical Examples:</b> Walk through sample hands to learn decision-making at various stages of a game.</li>'
+        '</ul>'
+        '<p>Additional tips: observe experienced players, practice in low-stakes games, and use free online tutorials for extra help.</p>'
         '</font>'
-
-
     )
     run_guide_screen(
         title="Beginner Poker Guide",
@@ -184,10 +177,18 @@ def guide_beginner(main_menu):
 
 def guide_intermediate(main_menu):
     intermediate_text = (
-        '<font face=calibri_bold size=3 colour=#FFFFFF>'
-        '<b>Intermediate Poker Guide</b><br><br>'
-        'Build on your fundamentals with topics like betting strategies, bluffing, and reading opponents. '
-        'Take your game to the next level with these tips.'
+        '<font face="calibri_bold" size="3" color="#FFFFFF">'
+        '<h2>Intermediate Poker Guide</h2>'
+        '<p><b>Overview:</b> This guide helps you refine your skills and dive into more nuanced poker strategies beyond the basics.</p>'
+        '<p><b>Key Topics:</b></p>'
+        '<ul>'
+        '<li><b>Advanced Betting Strategies:</b> Learn when to bet, raise, or fold based on your hand, table position, and opponent behavior.</li>'
+        '<li><b>Bluffing & Reading Opponents:</b> Develop techniques for effective bluffing and for interpreting betting patterns and tells.</li>'
+        '<li><b>Positional Awareness:</b> Understand the advantages of acting later in a hand and how to use that information to your benefit.</li>'
+        '<li><b>Introduction to Pot Odds:</b> Start calculating pot odds to make more informed decisions regarding calls and raises.</li>'
+        '<li><b>Game Dynamics:</b> Learn how different formats—cash games versus tournaments—and varying stack sizes affect your strategy.</li>'
+        '</ul>'
+        '<p>Enhance your learning with interactive scenarios, hand analysis, and simulated practice rounds.</p>'
         '</font>'
     )
     run_guide_screen(
@@ -202,10 +203,19 @@ def guide_intermediate(main_menu):
 
 def guide_advanced(main_menu):
     advanced_text = (
-        '<font face=calibri_bold size=3 colour=#FFFFFF>'
-        '<b>Advanced Poker Guide</b><br><br>'
-        'Delve into high-level tactics including pot odds, expected value calculations, '
-        'and advanced psychological strategies. Ideal for serious players.'
+        '<font face="calibri_bold" size="3" color="#FFFFFF">'
+        '<h2>Advanced Poker Guide</h2>'
+        '<p><b>Overview:</b> For experienced players, this guide delves into high-level tactics including mathematical analysis, game theory, and psychological strategies.</p>'
+        '<p><b>Key Topics:</b></p>'
+        '<ul>'
+        '<li><b>Mathematical Foundations:</b> Understand expected value (EV) calculations, variance, and risk management for long-term success.</li>'
+        '<li><b>Game Theory Optimal (GTO) Play:</b> Learn strategies to make your play unexploitable, striking a balance between exploitative and GTO approaches.</li>'
+        '<li><b>Advanced Bluffing Techniques:</b> Master semi-bluffs and refine the timing of your bluffs for maximum effect.</li>'
+        '<li><b>Psychological Strategies:</b> Develop mental toughness, manage tilt, and exploit opponents’ psychological weaknesses.</li>'
+        '<li><b>Range Analysis & Bet Sizing:</b> Hone your ability to assign plausible hand ranges to opponents and choose optimal bet sizes.</li>'
+        '<li><b>Tournament vs. Cash Game Nuances:</b> Understand the strategic adjustments required for tournament play versus cash games.</li>'
+        '</ul>'
+        '<p>Utilize in-depth case studies, detailed hand histories, and simulation tools to further refine your advanced tactics.</p>'
         '</font>'
     )
     run_guide_screen(

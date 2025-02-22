@@ -1,9 +1,9 @@
 import pygame, sys
 from src.gui.button import Button
 from src.gui.constants import BG, screen_font, SCREEN, scaled_cursor
-from src.gui.single_player import singlePlayer
+from src.gui.singleplayer import singlePlayer
 from src.gui.settings import settings
-from src.gui.multi_player import multiPlayer
+from src.gui.multiplayer import multiPlayer
 from src.gui.guide import guide_beginner
 from src.gui.leaderboard import leaderboard
 from src.gui.register import register
