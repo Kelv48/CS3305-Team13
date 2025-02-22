@@ -36,14 +36,12 @@ channel = 'activeSessions'
 r = redis.Redis('localhost', 6379)
 pubsub = r.pubsub()
 
-def addActiveSession():
+def addActiveSession(message):
     '''This method is for adding new active game sessions created by match_making.py
     to the activeSessions dict. This method is for initialising new sessions and NOT
     for updating already tracked sessions'''
 
-    #This is an infinite loop listening to any updates from the redis server
-    for message in pubsub.listen():
-        if message['type'] == 'message':
+    if message['type'] == 'message':
             data = json.loads(message['data'])
             sessionID = data.get('sessionID')
             with lock:
@@ -56,7 +54,7 @@ pubsub.run_in_thread(1, True)
     #Threads will have to be used but that only provides concurrent execution 
 
 #Config Thread
-lock = threading.Lock()
+lock = threading.Lock() #Prevents deadlocks and race conditions 
 
 #Configure logging 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
