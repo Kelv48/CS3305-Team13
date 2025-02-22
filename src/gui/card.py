@@ -1,8 +1,8 @@
 import pygame
 
 
-card_width = 60
-card_height = 90
+card_width = 69.1
+card_height = 105.6
 screen_width = 1280
 screen_height = 720
 
@@ -58,11 +58,11 @@ class Card(pygame.sprite.Sprite):
         'first_card_opponent3':  (620, 150),
         'second_card_opponent3': (660, 150),
 
-        'first_card_opponent4':  (1020, 530),
-        'second_card_opponent4': (1060, 530),
+        'first_card_opponent4':  (1020, 230),
+        'second_card_opponent4': (1060, 230),
 
-        'first_card_opponent5':  (1020, 230),
-        'second_card_opponent5': (1060, 230),
+        'first_card_opponent5':  (1020, 530),
+        'second_card_opponent5': (1060, 530),
     
 
             # Community cards (flop, turn, river) positioned based on xCords.

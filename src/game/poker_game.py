@@ -33,7 +33,7 @@ def game(opponent, player_id):
         yield from poker_round(player_id)
 
         # Shift the button to the next player
-        changePlayersPositions(shift=1)
+        changePlayersPositions()
 
         # Reset properties for each player
         [player.next_round() for player in player_list_chair]

@@ -3,7 +3,7 @@ from src.gui.button import Button
 from src.gui.constants import BG, screen_font, SCREEN
 
 from src.gui.game_screen import game_screen
-from src.gui.menu import gameMenu
+from src.gui.game_menu import gameMenu
 
 
 def singlePlayer(mainMenu):
@@ -82,7 +82,7 @@ def singlePlayer(mainMenu):
                             pygame.quit()
                             sys.exit()
                         elif action == gameMenu:
-                            gameMenu()
+                            gameMenu(mainMenu)
                         elif action == game_screen:
                             game_screen(mainMenu)
                         else:

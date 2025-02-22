@@ -20,7 +20,23 @@ HEIGHT = 720
 SCREEN = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)    # Resizable
 
 # Blinds
-SB, BB = 25, 50
+SB, BB = 100, 200
+
+
+# Load and scale the role icons as needed
+dealer_icon = pygame.image.load('assets/buttons/dealer.png')
+dealer_icon = pygame.transform.scale(dealer_icon, (70, 70))
+
+sb_icon = pygame.image.load('assets/buttons/small_blind.png')
+sb_icon = pygame.transform.scale(sb_icon, (70, 70))
+
+bb_icon = pygame.image.load('assets/buttons/big_blind.png')
+bb_icon = pygame.transform.scale(bb_icon, (70, 70))
+
+
+
+
+
 
 
 # Background
