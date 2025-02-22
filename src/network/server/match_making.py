@@ -10,7 +10,6 @@ When lobby is full then a subprocess is launched which will handle gameplay
 GameIDs are random ints that are hashed with a salt value
 '''
 import asyncio
-import queue
 import base64
 import redis
 import json
@@ -25,7 +24,7 @@ from  websockets.asyncio.server import serve, ServerConnection
 # Server attributes
 host ="localhost"
 port = 80
-template = Template('{"m_type": "$m_type", "data": "$data"}')   #This is a template for message to be sent to clients
+template = Template('{"m_type": "$m_type", "data": $data}')   #This is a template for message to be sent to clients
 activeSessions = {}  
 
 #Redis setup
@@ -47,15 +46,15 @@ async def createGame(websocket:ServerConnection, maxPlayer:int):
     sessionID = generateSessionCode() #ID of the game 
     activeSessions[sessionID] = {
         'clients': {websocket}, 
-        'gameObj': None,
+        'gameObj': None,    #Can get rid of this
         'maxPlayer': maxPlayer, 
         'forceStart': {}, 
         'numPlayer': 1, 
         'ready': False
     }
     print(f"Game Session created\n {activeSessions[sessionID]}")
-    message = template.substitute(m_type=Protocols.Response.SESSION_ID, data=sessionID)
-    logger.debug(f"sending message to {websocket.remote_address}")
+    message = template.substitute(m_type=Protocols.Response.SESSION_ID, data=json.dumps(sessionID))
+    logger.debug(f"sending message: {message}")
     await websocket.send(message.encode())
 
 
@@ -66,14 +65,15 @@ async def joinGame(websocket: ServerConnection, sessionID):
     try:
         if activeSessions[sessionID]['numPlayer'] < activeSessions[sessionID]['maxPlayer'] and activeSessions[sessionID]['ready']:
             #If there is room in the game to join but the game is in play add the new client to a queue which will be accessed by game server at the end of round
+            logger.debug("Player is joining a game already being played")
             activeSessions[sessionID]['numPlayer']+=1
 
             #Assigns sessionID to client
-            message = template.substitute(m_type=Protocols.Response.SESSION_ID, data=sessionID)
+            message = template.substitute(m_type=Protocols.Response.SESSION_ID, data=json.dumps(sessionID))
             await websocket.send(message.encode())
 
             #Redirects client to the game server
-            redirect_message = template.substitute(m_type=Protocols.Response.REDIRECT, data={'host':'localhost', 'port':443})
+            redirect_message = template.substitute(m_type=Protocols.Response.REDIRECT, data=json.dumps({"host":"localhost", "port":443}))
             await websocket.send(redirect_message.encode())
         
 
@@ -82,8 +82,8 @@ async def joinGame(websocket: ServerConnection, sessionID):
             activeSessions[sessionID]['numPlayer']+=1
             activeSessions[sessionID]['clients'].add(websocket)
 
-            join_message = template.substitute(m_type=Protocols.Response.SESSION_ID, data=sessionID)
-            await websocket(join_message.encode())
+            join_message = template.substitute(m_type=Protocols.Response.SESSION_ID, data=json.dumps(sessionID))
+            await websocket.send(join_message)
 
             #If lobby is filled up then launch the game. How do join a client to a game in progress. Maybe we redirect them and send them game instance 
             if activeSessions[sessionID]['numPlayer'] >= activeSessions[sessionID]['maxPlayer']:
@@ -92,12 +92,12 @@ async def joinGame(websocket: ServerConnection, sessionID):
 
 
                 #Redirect each client in lobby to game server 
-                redirectMessage = template.substitute(m_type=Protocols.Response.REDIRECT, data={'host':'localhost', 'port':443})
+                redirectMessage = template.substitute(m_type=Protocols.Response.REDIRECT, data=json.dumps({"host":"localhost", "port":443}))
                 for serverConnection in activeSessions[sessionID]['clients']:
                     await serverConnection.send(redirectMessage)
 
                 #Publish relevant info to redis server
-                data = {'sessionID':sessionID, 'client':[], 'gameObj':activeSessions[sessionID]['gameObj'], 'queue':queue()}
+                data = {'sessionID':sessionID, 'clients':[], 'gameObj':activeSessions[sessionID]['gameObj']}
                 r.publish(channel, json.dumps(data))
 
                 return  #Exit out of function
@@ -141,7 +141,7 @@ async def voteStart(websocket: ServerConnection, sessionID):
 
 
             #Publish relevant info to redis server
-            data = {sessionID:{'client':[], 'gameObj':activeSessions[sessionID]['gameObj'], 'queue':queue()}}
+            data = {sessionID:{'clients':[], 'gameObj':activeSessions[sessionID]['gameObj']}}
             r.publish(channel, data)
 
             return  #Exit function 
@@ -171,6 +171,8 @@ async def leaveGame(websocket: ServerConnection, sessionID):
         logger.info("client has left lobby")
         activeSessions[sessionID]['numPlayer'] -=1 
         activeSessions[sessionID]['clients'].remove(websocket)
+        
+
         if len( activeSessions[sessionID]['clients'])==0:
             logger.info(f"{sessionID} has been deleted")
             #Need to remove any involvement that this player has had on the lobby
@@ -178,7 +180,7 @@ async def leaveGame(websocket: ServerConnection, sessionID):
             return
         
 
-        message = template.substitute(m_type=Protocols.Response.LOBBY_UPDATE, data=activeSessions[sessionID]['numPlayer'])
+        message = template.substitute(m_type=Protocols.Response.LOBBY_UPDATE, data=activeSessions[sessionID])
 
         logger.info(f"broadcasting {websocket.remote_address} has left game")
         #Broadcasting new player count in lobby to other clients 
@@ -194,6 +196,7 @@ async def leaveGame(websocket: ServerConnection, sessionID):
         await websocket.send(error_message)
 
     except ConnectionClosed as e:
+        
         print("Error occurred trying to send message to client")        
 
 
@@ -231,7 +234,7 @@ async def handleClient(websocket: ServerConnection):
 
             message = json.loads(data.decode())
             currentSessionID = message['sessionID']
-            logger.info("message received")
+            logger.info(f"message received: {message}")
 
             match message['m_type']:
                 

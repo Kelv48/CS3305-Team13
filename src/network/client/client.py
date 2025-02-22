@@ -2,7 +2,7 @@ import json
 import asyncio
 from websockets.asyncio.client import connect,ClientConnection
 from websockets.exceptions import ConnectionClosed, InvalidURI
-from server.protocol import Protocols
+from network.server.protocol import Protocols
 class Client(object):
     '''
     Needs to connect to server
@@ -29,7 +29,7 @@ class Client(object):
             print(e)
 
 
-    async def send(self,m_type, data):
+    async def send(self,m_type, data=None):
         #Sends JSON message to server
         #m_type tells the server what kind of message it is and what actions its should except to do
         #signature is there for validation to ensure that no bad actors manipulate messages
@@ -51,12 +51,13 @@ class Client(object):
         try:
             message = await self.client.recv(True)
             der = json.loads(message)
+            print(der['m_type'])
 
             #This code should be in the game script displaying game info
             match der['m_type']:
                 case Protocols.Response.REDIRECT:
                     #create new socket to new port
-                    self.redirect('localhost', der['data']['host'], der['data']['port'])
+                    await self.redirect(der['data']['host'], der['data']['port'])
 
                 case Protocols.Response.SESSION_ID:
                     self.setSessionID(der['data'])
@@ -73,6 +74,7 @@ class Client(object):
     async def redirect(self, host, port):
         #This method is for creating a new websocket to connect to the appropriate server script/port 
         await self.disconnect()
+        print("Client redirected")
         self.client = await connect(f"ws://{host}:{port}")
         #For a secure connection need to use wss, but need to config server for SSL/TLS before we can do that 
         #For local development us ws 
@@ -80,7 +82,8 @@ class Client(object):
 
 
     async def disconnect(self):
-        #disconnects websocket
+        #disconnects websocket from server
+        await self.client.send(Protocols.Request.LEAVE)
         await self.client.close()
 
     def resetClient(self):
@@ -102,8 +105,8 @@ class Client(object):
     def setID(self, id):
         self.id = id 
 
-    sessionID = property(getSessionID, setSessionID)
-    id = property(getID, setID)
+    # sessionID = property(getSessionID, setSessionID)
+    # id = property(getID, setID)
 
 async def main():
     clients = []
@@ -114,29 +117,37 @@ async def main():
 
     matchMaking_protocols = [Protocols.Request.CREATE_GAME, Protocols.Request.JOIN_GAME, Protocols.Request.LEAVE]
     
-    
-    der = await Client.connect("localhost", 80 )  
-    while True:
-        # Await the connection if it's an async method
-        try:
-                index = input('0 or 1: ')
-                m_type = matchMaking_protocols[int(index)]
-                print(f"m_type: {m_type}")
+        
+    # Await the connection if it's an async method
 
-                message = input("What message do you want to send: ")
-                if int(index) == 0:
-                    message = int(message)
 
-                print(f"message data type {type(message)}")
-                # Awaiting asynchronous send and receive methods
-                await der.send(m_type, message)
-                response = await der.receive()  
-                print(response)
+async def main():
+    c1, c2 = None, None  # Ensure variables exist before assignment
 
-                print(der.sessionID)
-        except KeyboardInterrupt:
-                print(f"The number of clients: {len(clients)}")
-                return  # Exit gracefully
+    try:
+        c1 = await Client.connect("localhost", 80 )  
+        await asyncio.sleep(2)
+
+        c2  = await Client.connect("localhost", 80)
+        await asyncio.sleep(2)
+
+        await c1.send(Protocols.Request.CREATE_GAME, 2)
+        await c1.receive()
+        await asyncio.sleep(5)
+
+        await c2.send(Protocols.Request.JOIN_GAME, c1.getSessionID())
+        await c2.receive()
+        await asyncio.sleep(2)
+
+        await c1.receive()
+        await c2.receive()
+
+        await c1.send(Protocols.Request.CALL)
+        await c2.send(Protocols.Request.CALL)
+
+    except KeyboardInterrupt:
+       
+        return  # Exit gracefully
 
 if __name__ == '__main__':
     asyncio.run(main())  # Run the async main() function
