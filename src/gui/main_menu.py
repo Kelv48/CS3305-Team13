@@ -1,6 +1,6 @@
 import pygame, sys
 from src.gui.button import Button
-from src.gui.constants import BG, screen_font, SCREEN
+from src.gui.constants import BG, screen_font, SCREEN, scaled_cursor
 from src.gui.single_player import singlePlayer
 from src.gui.settings import settings
 from src.gui.multi_player import multiPlayer
@@ -9,6 +9,7 @@ from src.gui.leaderboard import leaderboard
 from src.gui.register import register
 from src.gui.user_page import user_page
 from src.gui.tools import tools
+
 
 
 def mainMenu():
@@ -89,6 +90,8 @@ def mainMenu():
                         else:
                             action(mainMenu)
 
+        # Draw the scaled cursor image at the mouse position
+        SCREEN.blit(scaled_cursor, (MAIN_MOUSE_POS[0], MAIN_MOUSE_POS[1]))
 
         pygame.display.update()
 

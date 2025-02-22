@@ -1,7 +1,7 @@
 
 import pygame, sys
 from src.gui.button import Button
-from src.gui.constants import BG, screen_font, SCREEN, screen_font
+from src.gui.constants import BG, screen_font, SCREEN, screen_font, scaled_cursor
 from src.gui.hand_visual import poker_hand_visualizer
 from src.gui.calculator import run_poker_calculator
 
@@ -90,6 +90,9 @@ def tools(mainMenu):
                             run_poker_calculator(mainMenu)
                         else:
                             mainMenu()
+
+        # Draw the scaled cursor image at the mouse position
+        SCREEN.blit(scaled_cursor, (TOOLS_MOUSE_POS[0], TOOLS_MOUSE_POS[1]))
 
         # Update the display
         pygame.display.update()

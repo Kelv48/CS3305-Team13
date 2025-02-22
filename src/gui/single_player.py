@@ -1,9 +1,9 @@
 import pygame, sys
 from src.gui.button import Button
-from src.gui.constants import BG, screen_font, SCREEN
+from src.gui.constants import BG, screen_font, SCREEN, scaled_cursor
 
-from src.gui.game_screen import game_screen
-from src.gui.game_menu import gameMenu
+
+from src.game.game_menu import gameMenu
 
 
 def singlePlayer(mainMenu):
@@ -47,7 +47,6 @@ def singlePlayer(mainMenu):
         # Define button labels and functions
         buttons = [
             ("BOT GAME", gameMenu),
-            ("GAME SCREEN TEST", game_screen),
             ("HOME", mainMenu)]
 
         # Calculate vertical spacing with closer spacing
@@ -83,10 +82,11 @@ def singlePlayer(mainMenu):
                             sys.exit()
                         elif action == gameMenu:
                             gameMenu(mainMenu)
-                        elif action == game_screen:
-                            game_screen(mainMenu)
                         else:
                             action()
+
+        # Draw the scaled cursor image at the mouse position
+        SCREEN.blit(scaled_cursor, (SINGLE_MOUSE_POS[0], SINGLE_MOUSE_POS[1]))
 
         # Update the display
         pygame.display.update()

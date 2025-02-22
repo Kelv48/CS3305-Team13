@@ -1,6 +1,6 @@
 import sys
 import pygame
-from src.gui.constants import SCREEN, BG, screen_font
+from src.gui.constants import SCREEN, BG, screen_font, scaled_cursor
 
 
 

@@ -1,6 +1,6 @@
 import pygame, sys, json, os
 from src.gui.button import Button
-from src.gui.constants import BG, screen_font, SCREEN
+from src.gui.constants import BG, screen_font, SCREEN, scaled_cursor
 from src.gui.user_page import user_page
 
 # Define the temporary JSON file for the leaderboard.
@@ -117,6 +117,9 @@ def leaderboard(mainMenu):
                             mainMenu()
                         else:
                             action(mainMenu)
+
+        # Draw the scaled cursor image at the mouse position
+        SCREEN.blit(scaled_cursor, (SETTINGS_MOUSE_POS[0], SETTINGS_MOUSE_POS[1]))
 
         # Update the display.
         pygame.display.update()
