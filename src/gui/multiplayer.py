@@ -1,6 +1,6 @@
 import pygame, sys
 from src.gui.button import Button
-from src.gui.constants import BG, screen_font, SCREEN
+from src.gui.constants import BG, screen_font, SCREEN, scaled_cursor
 
 def multiPlayer(mainMenu):
     while True:
@@ -84,5 +84,9 @@ def multiPlayer(mainMenu):
                         else:
                             action()
 
-        # Update the display
+        # Draw the scaled cursor image at the mouse position
+        SCREEN.blit(scaled_cursor, (MULTI_MOUSE_POS[0], MULTI_MOUSE_POS[1]))
+
         pygame.display.update()
+
+       

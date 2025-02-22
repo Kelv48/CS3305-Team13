@@ -1,6 +1,6 @@
 import pygame, sys
 from src.gui.button import Button
-from src.gui.constants import BG, screen_font, SCREEN, screen_font
+from src.gui.constants import BG, screen_font, SCREEN, screen_font, scaled_cursor
 
 class Slider:
     def __init__(self, pos, width, initial_value=0.5):
@@ -214,5 +214,8 @@ def sound(mainMenu):
                     pygame.mixer.music.play(-1)  # Loop the song
                 except Exception as e:
                     print(f"Error loading {selected_song['path']}: {e}")
+
+        # Draw the scaled cursor image at the mouse position
+        SCREEN.blit(scaled_cursor, (SOUND_MOUSE_POS[0], SOUND_MOUSE_POS[1]))
 
         pygame.display.update()

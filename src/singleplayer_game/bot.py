@@ -22,13 +22,11 @@ class AI:
 
     def probabilityWin(self):
         """
-        Calculates the probability of winning simulating n games with such own cards
+        Calculates the probability of winning by simulating n games with the given own cards.
         :return: probability of win, probability of tie
         """
         import random
-        # from src.game.scoreEvaluation import playerScore
-        from src.game.poker_score import players_score as playerScore
-
+        from src.singleplayer_game.poker_score import players_score as playerScore
 
         number_games = 500
         n_win = 0
@@ -36,49 +34,59 @@ class AI:
         ai = Bot()
         ai.cards = self.own_cards
 
-        deck = ['2C', '3C', '4C', '5C', '6C', '7C', '8C', '9C', 'TC', 'JC', 'QC', 'KC', 'AC', '2S', '3S', '4S',
-                '5S',
-                '6S', '7S', '8S', '9S', 'TS', 'JS', 'QS', 'KS', 'AS', '2H', '3H', '4H', '5H', '6H', '7H', '8H',
-                '9H',
-                'TH', 'JH', 'QH', 'KH', 'AH', '2D', '3D', '4D', '5D', '6D', '7D', '8D', '9D', 'TD', 'JD', 'QD',
-                'KD', 'AD']
+        deck = ['2C', '3C', '4C', '5C', '6C', '7C', '8C', '9C', 'TC', 'JC', 'QC', 'KC', 'AC',
+                '2S', '3S', '4S', '5S', '6S', '7S', '8S', '9S', 'TS', 'JS', 'QS', 'KS', 'AS',
+                '2H', '3H', '4H', '5H', '6H', '7H', '8H', '9H', 'TH', 'JH', 'QH', 'KH', 'AH',
+                '2D', '3D', '4D', '5D', '6D', '7D', '8D', '9D', 'TD', 'JD', 'QD', 'KD', 'AD']
 
-        [deck.remove(card) for card in ai.cards]
+        # Remove AI's own cards from the deck.
+        for card in ai.cards:
+            deck.remove(card)
 
+        # Remove any common cards that are already on the table.
         if self.common_cards is not None:
-            [deck.remove(card) for card in self.common_cards]
+            for card in self.common_cards:
+                deck.remove(card)
 
-        # create artificial bots as many as there are opponents
+        # Create artificial bots for the opponents.
         list_bots = []
-        for nbot in range(self.n_players - 1):
+        for _ in range(self.n_players - 1):
             list_bots.append(Bot())
 
-        # simulating games
+        # If there are no opponents, win probability is 1.
+        if not list_bots:
+            return 1.0, 0.0
+
+        # Simulate games.
         for i in range(number_games):
             bot_deck = deck.copy()
             for bot in list_bots:
+                # Draw two cards for each bot.
                 bot.cards = random.sample(bot_deck, 2)
-                [bot_deck.remove(bot.cards[i]) for i in range(2)]
+                for card in bot.cards:
+                    bot_deck.remove(card)
 
+            # Determine the community cards.
             if self.common_cards is None:
                 table = random.sample(bot_deck, 5)
             else:
                 table = self.common_cards + random.sample(bot_deck, 5 - len(self.common_cards))
 
+            # Evaluate scores for both bots and the AI.
             playerScore(list_bots, table)
             playerScore([ai], table)
 
+            # Gather scores from all opponents.
+            list_score = [bot.score for bot in list_bots]
 
-            list_score = []
-            for bot in list_bots:
-                list_score.append(bot.score)
-
+            # Compare AI's score to the opponents' highest score.
             if ai.score > max(list_score):
                 n_win += 1
             elif ai.score == max(list_score):
                 n_tie += 1
 
         return n_win / number_games, n_tie / number_games
+
 
 
     def decision(self):
@@ -136,4 +144,3 @@ class AI:
 
         decision = 'call' if self.call_value < self.max_raise else 'all-in'
         return [decision, 0]
-

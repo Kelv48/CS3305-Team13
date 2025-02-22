@@ -1,6 +1,6 @@
 import pygame
 from os import path
-from src.gui.card import Card
+from src.singleplayer_game.game_gui.card import Card
 
 pygame.init()
 
@@ -19,8 +19,35 @@ HEIGHT = 720
 # SCREEN = pygame.display.set_mode((1280, 720), pygame.FULLSCREEN)    # Fullscreen
 SCREEN = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)    # Resizable
 
+
+
+# Load and scale the cursor image to 32x32
+cursor_image = pygame.image.load("assets/images/pointer_c.png").convert_alpha()
+scaled_cursor = pygame.transform.smoothscale(cursor_image, (32, 32))
+
+# # Hide the default cursor
+# pygame.mouse.set_visible(False)
+
+
+
 # Blinds
-SB, BB = 25, 50
+SB, BB = 100, 200
+
+
+# Load and scale the role icons as needed
+dealer_icon = pygame.image.load('assets/buttons/dealer.png')
+dealer_icon = pygame.transform.scale(dealer_icon, (70, 70))
+
+sb_icon = pygame.image.load('assets/buttons/small_blind.png')
+sb_icon = pygame.transform.scale(sb_icon, (70, 70))
+
+bb_icon = pygame.image.load('assets/buttons/big_blind.png')
+bb_icon = pygame.transform.scale(bb_icon, (70, 70))
+
+
+
+
+
 
 
 # Background

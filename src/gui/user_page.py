@@ -1,6 +1,6 @@
 import pygame, sys, json, os
 from src.gui.button import Button
-from src.gui.constants import BG, screen_font, SCREEN
+from src.gui.constants import BG, screen_font, SCREEN, scaled_cursor
 
 # Define the temporary JSON file for user data.
 USER_DATA_FILE = "temp_user_data.json"
@@ -123,5 +123,8 @@ def user_page(mainMenu):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if USER_BACK.checkForInput(USER_MOUSE_POS):
                     mainMenu()
+        
+        # Draw the scaled cursor image at the mouse position
+        SCREEN.blit(scaled_cursor, (USER_MOUSE_POS[0], USER_MOUSE_POS[1]))
 
         pygame.display.update()

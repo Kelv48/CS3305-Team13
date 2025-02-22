@@ -10,7 +10,7 @@ def showdown(common_cards):
     :param common_cards: List of common card identifiers.
                          Expected order: [flop1, flop2, flop3, turn, river]
     """
-    from src.game.player import Player
+    from src.singleplayer_game.game_gui.player import Player
     from src.gui.constants import SCREEN
 
     player_list_chair = Player.player_list_chair
@@ -21,12 +21,12 @@ def showdown(common_cards):
         for card in giveCard('player', player_list_chair[0].cards):
             cards_group.add(card)
 
-    # Draw opponent cards for each opponent if they haven't folded.
-    # Assuming opponents are stored at indices 1 to 5:
-    for i in range(1, 6):
-        if player_list_chair[i].live or player_list_chair[i].alin:
-            opponent_type = f'opponent{i}'
-            for card in giveCard(opponent_type, player_list_chair[i].cards):
+    # Dynamically draw opponent cards for each opponent if they haven't folded.
+    # Opponents are stored starting from index 1.
+    for idx, opponent in enumerate(player_list_chair[1:], start=1):
+        if opponent.live or opponent.alin:
+            opponent_type = f'opponent{idx}'
+            for card in giveCard(opponent_type, opponent.cards):
                 cards_group.add(card)
 
     # Draw community cards:
@@ -44,6 +44,7 @@ def showdown(common_cards):
     cards_group.draw(SCREEN)
     drawPlayer()
     pygame.display.flip()
+
 
 
 
@@ -114,7 +115,7 @@ def recapRound(list_winner, common_cards=None):
 
 def drawPlayer():
     # Function displays player labels and bet information
-    from src.game.player import Player
+    from src.singleplayer_game.game_gui.player import Player
     from src.gui.constants import SCREEN
     player_list_chair = Player.player_list_chair
     for player in player_list_chair:
@@ -180,7 +181,7 @@ def coverUpCards(player_list):
     """
     import pygame
     from src.gui.constants import cards_object
-    from src.gui.card import Card  # Adjust the import path if needed
+    from src.singleplayer_game.game_gui.card import Card  # Adjust the import path if needed
 
     reverse_cards = pygame.sprite.Group()
     base_reverse_card_1 = cards_object['reverse_1']
@@ -216,14 +217,14 @@ def drawButtons(buttons):
 
 
 
-def arrangeRoom(common_cards=None):
+def arrangeRoom(mainMenu, common_cards=None):
     """
-    Draws the game room background and cards.
+    Draws the game room background, cards, and a Main Menu button.
     Only active players (not folded) have their cards displayed.
     """
     import pygame
     from src.gui.constants import SCREEN, GAME_BG
-    from src.game.player import Player
+    from src.singleplayer_game.game_gui.player import Player
 
     player_list_chair = Player.player_list_chair
     screen_width, screen_height = SCREEN.get_size()
@@ -245,7 +246,7 @@ def arrangeRoom(common_cards=None):
             cards.add(card)
 
     # Draw opponent cards for indices 1 to 4.
-    for i, opponent_type in enumerate(['opponent1', 'opponent2', 'opponent3', 'opponent4'], start=1):
+    for i, opponent_type in enumerate(['opponent1'], start=1):
         if player_list_chair[i].live or player_list_chair[i].alin:
             sub_card = giveCard(opponent_type, player_list_chair[i].cards)
             for card in sub_card:
@@ -261,7 +262,7 @@ def arrangeRoom(common_cards=None):
 
     # Draw community cards (if provided) and update the display.
     if common_cards is not None:
-        from src.game.player import Player
+        from src.singleplayer_game.game_gui.player import Player
         Player.drawPot(SCREEN)
         sub_card = giveCard('flop', common_cards[0:3])
         for card in sub_card:
@@ -278,38 +279,50 @@ def arrangeRoom(common_cards=None):
                 cards.add(card)
             cards.draw(SCREEN)
 
+    # ----- Add Main Menu Button -----
+    # Define the button rectangle (positioned at top left)
+    button_rect = pygame.Rect(10, 10, 150, 50)  # (x, y, width, height)
+    # Draw the button (using a simple color fill)
+    pygame.draw.rect(SCREEN, (200, 0, 0), button_rect)  # red button
+    # Draw the text on the button
+    font = pygame.font.Font(None, 36)
+    text = font.render("Main Menu", True, (255, 255, 255))
+    text_rect = text.get_rect(center=button_rect.center)
+    SCREEN.blit(text, text_rect)
+
+    # Optionally, you might return the button's rect so your event loop can access it.
+    return button_rect
 
 
+
+
+
+import time
+from src.gui.constants import SCREEN, BEIGE, GREEN
+from src.singleplayer_game.game_gui.game_button import x_buttons, y_button, width_button
+from pygame_widgets.slider import Slider
+from pygame_widgets.textbox import TextBox
 
 def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=None):
     """
-    Function display gui for player and return action
+    Display GUI for a player and return their action.
+    
     :param buttons: buttons object
-    :param dict_options: dict options where is information about which buttons is active
-    :param min_raise: min raise value
-    :param max_raise: max raise value
-
-    :param common_cards: list of common cards
-    :return: information about which button has been pressed,
-    and if the button raise has been pressed then information about how much is the raise
+    :param dict_options: dict with information about which buttons are active
+    :param min_raise: minimum raise value
+    :param max_raise: maximum raise value
+    :param common_cards: list of common cards (if any)
+    :return: a list with the decision; if 'raise' is chosen, also returns the raise amount.
+             If no action is made within 20 seconds, returns ['fold'].
     """
-
-    from src.gui.constants import SCREEN, BEIGE, GREEN
-    from src.game.game_button import x_buttons, y_button, width_button
-    from pygame_widgets.slider import Slider
-    from pygame_widgets.textbox import TextBox
-    # from PlayerClass import Player
-    # player_list_chair = Player.player_list_chair
-
-
 
     # Fixed position for the slider (independent from x_buttons)
     x_slider = 1070  # Fixed x position for the slider
-    y_slider = 650  # Fixed y position (adjust based on layout)
+    y_slider = 650   # Fixed y position (adjust based on layout)
 
     # Slider setup (decoupled from button positions)
-    slider = Slider(SCREEN, x_slider, y_slider, width_button * 2, 40, 
-                    min=0, max=max_raise - min_raise, initial=0, step=1, 
+    slider = Slider(SCREEN, x_slider, y_slider, width_button * 2, 40,
+                    min=0, max=max_raise - min_raise, initial=0, step=1,
                     colour=(94, 151, 82), handleColour=BEIGE, handleRadius=19)
 
     # Fixed position for the output text box
@@ -317,32 +330,31 @@ def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=Non
     y_output = 590   # Fixed y position (adjust as needed)
 
     font = game_font(20)
-    output = TextBox(SCREEN, x_output, y_output, 100, 50, fontSize=20, 
-                    colour=GREEN, textColour=BEIGE, font=font)
+    output = TextBox(SCREEN, x_output, y_output, 100, 50, fontSize=20,
+                     colour=GREEN, textColour=BEIGE, font=font)
     output.setText('1')
     output.disable()
 
-
-    # activate proper buttons
+    # Activate proper buttons based on options
     for button in buttons:
-        if dict_options[button.name]:
-            button.active = True
-        else:
-            button.active = False
+        button.active = dict_options.get(button.name, False)
 
-    cards = pygame.sprite.Group()
+    # Arrange common cards and update player display (assumes these functions are defined elsewhere)
     arrangeRoom(common_cards)
-
-
-    cards.update()
     drawPlayer()
 
-
     pause_action = True
-    while pause_action:
-        # waits for the player to make a decision
-        drawButtons(buttons)
+    start_time = time.time()
+    decision = None
 
+    while pause_action:
+        # Check if 20 seconds have elapsed and auto-fold if so.
+        if time.time() - start_time >= 5:
+            decision = ['fold']
+            pause_action = False
+            break
+
+        drawButtons(buttons)
 
         for event in pygame.event.get():
             mouse_position = pygame.mouse.get_pos()
@@ -359,21 +371,20 @@ def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=Non
                         else:
                             decision = [button.name]
                         pause_action = False
+                        break  # Exit the inner loop once a decision is made
+
             if event.type == pygame.MOUSEMOTION:
                 for button in buttons:
                     if button.active:
                         button.bigger(mouse_position)
 
-            # if the player could raise, display slider to
+            # For the raise button, update the slider output display if active
             for button in buttons:
                 if button.name == 'raise' and button.active:
                     output.setText('$' + str(slider.getValue() + min_raise))
-                    #print(output.getText())
                     pygame_widgets.update(event)
                 pygame.display.update()
 
-        # get_pressed = pygame.key.get_pressed()
-        # event_ESC_pressed(get_pressed)
     return decision
 
 
@@ -383,7 +394,7 @@ def splitPot():
     the player and the chips they win (from opponents’ bets) for the round.
     """
     from itertools import groupby
-    from src.game.player import Player
+    from src.singleplayer_game.game_gui.player import Player
 
     # Filter out players who have folded (both 'live' and 'alin' are False)
     players = [p for p in Player.player_list_chair if p.live or p.alin]
@@ -452,7 +463,7 @@ def splitPot():
 
 def onePlayerWin():
     #  Function changing player stack who win, and return list tuple who win and how much
-    from src.game.player import Player
+    from src.singleplayer_game.game_gui.player import Player
     player_list = Player.player_list_chair.copy()
     list_winner = []
     for player in player_list:
@@ -465,24 +476,11 @@ def onePlayerWin():
     return list_winner
 
 
-def changePlayersPositions(shift):
+def changePlayersPositions():
     """
-    Function change each player position
-    order in Player.player_list are changed
-    :param shift:
-    :return: change each player position
-
+    Advance the dealer index by one seat clockwise.
+    This rotates the roles (dealer, SB, BB) without affecting the on-screen positions.
     """
-
-    import operator
-    from src.game.player import Player
-    player_list = Player.player_list
-    number_players = len(player_list)
-    for player in player_list:
-
-        player.position = (player.position + shift) % number_players
-    player_list.sort(key=operator.attrgetter('position'))
-
-
-
-
+    from src.singleplayer_game.game_gui.player import Player
+    num_players = len(Player.player_list)
+    Player.dealer_index = (Player.dealer_index + 1) % num_players  

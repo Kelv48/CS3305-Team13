@@ -1,7 +1,7 @@
 import random
 
-from src.game.player import Player
-from src.game.poker_score import playerScore
+from src.singleplayer_game.game_gui.player import Player
+from src.singleplayer_game.poker_score import playerScore
 
 # Test, how many rounds should be played to see which probability given hand is to win flop
 deck = ['2C', '3C', '4C', '5C', '6C', '7C', '8C', '9C', 'TC', 'JC', 'QC', 'KC', 'AC',

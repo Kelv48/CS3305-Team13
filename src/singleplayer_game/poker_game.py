@@ -1,10 +1,10 @@
 import time
 from flask_socketio import emit
 
-from src.game.player import Player
-from src.game.poker_round import poker_round
-from src.game.utils import changePlayersPositions
-from src.game.utils import recapRound
+from src.singleplayer_game.game_gui.player import Player
+from src.singleplayer_game.poker_round import poker_round
+from src.singleplayer_game.game_gui.utils import changePlayersPositions
+from src.singleplayer_game.game_gui.utils import recapRound
 
 
 def game(opponent, player_id):
@@ -33,7 +33,7 @@ def game(opponent, player_id):
         yield from poker_round(player_id)
 
         # Shift the button to the next player
-        changePlayersPositions(shift=1)
+        changePlayersPositions()
 
         # Reset properties for each player
         [player.next_round() for player in player_list_chair]

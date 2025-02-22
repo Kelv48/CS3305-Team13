@@ -3,7 +3,7 @@ import sys
 import random
 import itertools
 from collections import Counter
-from src.gui.constants import screen_font, BG, SCREEN
+from src.gui.constants import screen_font, BG, SCREEN, scaled_cursor
 pygame.init()
 
 # ----- Global Constants & Settings -----
@@ -364,6 +364,9 @@ def run_poker_calculator(mainMenu, num_simulations=1000):
         
         # Draw the back button.
         back_button.draw(SCREEN)
+
+        # # Draw the scaled cursor image at the mouse position
+        # SCREEN.blit(scaled_cursor, (MOUSE_POS[0], MOUSE_POS[1]))
         
         pygame.display.flip()
         clock.tick(30)

@@ -53,11 +53,11 @@ y_button = [n_spaces[i] * height_space + n_buttons[i] * height_button for i in r
 y_button = [top_space + y_button[i] for i in range(5)]
 
 button_fold = Button(x_buttons, y_button[0], width_button, height_button, 'fold')
-button_allin = Button(x_buttons, y_button[1], width_button, height_button, 'all-in')
-button_call = Button(x_buttons, y_button[2], width_button, height_button, 'call')
-button_check = Button(x_buttons, y_button[2], width_button, height_button, 'check')
+button_call = Button(x_buttons, y_button[1], width_button, height_button, 'call')
+button_check = Button(x_buttons, y_button[1], width_button, height_button, 'check')
+button_allin = Button(x_buttons, y_button[2], width_button, height_button, 'all-in')
 button_raise = Button(x_buttons, y_button[3], width_button, height_button, 'raise')
-buttons = [button_fold, button_allin, button_call, button_check, button_raise]
+buttons = [button_fold, button_call, button_check, button_allin, button_raise]
 
 
 

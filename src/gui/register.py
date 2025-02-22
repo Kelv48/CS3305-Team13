@@ -1,6 +1,6 @@
 import pygame, sys
 from src.gui.button import Button
-from src.gui.constants import BG, screen_font, SCREEN
+from src.gui.constants import BG, screen_font, SCREEN, scaled_cursor
 
 def render_screen(title, username, password, active_input, button_actions):
     screen_width, screen_height = SCREEN.get_size()
@@ -142,6 +142,9 @@ def register(mainMenu):
                     elif len(password) < 10 and event.unicode.isalnum():
                         password += event.unicode
 
+        # Draw the scaled cursor image at the mouse position
+        SCREEN.blit(scaled_cursor, (REGISTER_MOUSE_POS[0], REGISTER_MOUSE_POS[1]))
+
         pygame.display.update()
 
 def login(mainMenu):
@@ -185,6 +188,9 @@ def login(mainMenu):
                         password = password[:-1]
                     elif len(password) < 12 and event.unicode.isalnum():
                         password += event.unicode
+        
+        # Draw the scaled cursor image at the mouse position
+        SCREEN.blit(scaled_cursor, (LOGIN_MOUSE_POS[0], LOGIN_MOUSE_POS[1]))
 
         pygame.display.update()
 
