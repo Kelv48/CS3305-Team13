@@ -1,6 +1,6 @@
 import pygame, sys, json, os
 from src.gui.button import Button
-from src.gui.constants import BG, get_font, SCREEN
+from src.gui.constants import BG, screen_font, SCREEN
 
 # Define the temporary JSON file for user data.
 USER_DATA_FILE = "temp_user_data.json"
@@ -69,7 +69,7 @@ def user_page(mainMenu):
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
         # Display header text.
-        header_text = get_font(45).render("This is the USER screen.", True, "White")
+        header_text = screen_font(45).render("This is the USER screen.", True, "White")
         header_rect = header_text.get_rect(center=(screen_width / 2, screen_height / 15))
         SCREEN.blit(header_text, header_rect)
 
@@ -77,7 +77,7 @@ def user_page(mainMenu):
         user_data = load_user_data()
 
         # Set up a font and starting coordinates for the user data.
-        data_font = get_font(20)
+        data_font = screen_font(20)
         line_spacing = 30
         current_line = 0
         data_x = textbox_x + 20
@@ -105,8 +105,8 @@ def user_page(mainMenu):
         # Create the "BACK" button.
         USER_BACK = Button(
             pos=(screen_width / 2, screen_height * 2 / 2.5), 
-            text_input="BACK", 
-            font=get_font(30), 
+            text_input="HOME", 
+            font=screen_font(30), 
             base_colour="White", 
             hovering_colour="Light Green",
             image=None

@@ -1,5 +1,5 @@
 from src.game.player import Player
-from src.game.button import buttons
+from src.game.game_button import buttons
 from src.game.bot import AI
 from src.game.utils import playerDecision, arrangeRoom, drawPlayer
 from src.gui.constants import BB

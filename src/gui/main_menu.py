@@ -1,6 +1,6 @@
 import pygame, sys
 from src.gui.button import Button
-from src.gui.constants import BG, get_font, SCREEN
+from src.gui.constants import BG, screen_font, SCREEN
 from src.gui.single_player import singlePlayer
 from src.gui.settings import settings
 from src.gui.multi_player import multiPlayer
@@ -40,7 +40,7 @@ def mainMenu():
         # Blit the textbox to the main screen.
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
-        MAIN_TEXT = get_font(50).render("Poker", True, "Dark Green")
+        MAIN_TEXT = screen_font(50).render("Poker", True, "Dark Green")
         MAIN_RECT = MAIN_TEXT.get_rect(center=(screen_width // 2, screen_height // 9))
         SCREEN.blit(MAIN_TEXT, MAIN_RECT)
 
@@ -48,8 +48,8 @@ def mainMenu():
         buttons = [
             ("REGISTER & LOGIN", register),
             ("USER", user_page),
-            ("SINGLE PLAYER", singlePlayer),
-            ("MULTI PLAYER", multiPlayer),
+            ("SINGLEPLAYER", singlePlayer),
+            ("MULTIPLAYER", multiPlayer),
             ("GUIDE", guide_beginner),
             ("SETTINGS", settings),
             ("TOOLS", tools),
@@ -68,7 +68,7 @@ def mainMenu():
             button = Button(
                 pos=(textbox_center_x, button_y),
                 text_input=text,
-                font=get_font(30),
+                font=screen_font(30),
                 base_colour="White",
                 hovering_colour="Light Green",
                 image=None)

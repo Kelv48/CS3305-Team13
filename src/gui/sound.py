@@ -1,6 +1,6 @@
 import pygame, sys
 from src.gui.button import Button
-from src.gui.constants import BG, get_font, SCREEN
+from src.gui.constants import BG, screen_font, SCREEN, screen_font
 
 class Slider:
     def __init__(self, pos, width, initial_value=0.5):
@@ -93,13 +93,13 @@ def sound(mainMenu):
 
     # Define the playlist with song names and file paths
     playlist = [
-        {"name": "Song 1", "path": "assets/music/song1.mp3"},
-        {"name": "Song 2", "path": "assets/music/song2.mp3"},
-        {"name": "Song 3", "path": "assets/music/song3.mp3"},
+        {"name": "Song 1", "path": "assets/music/Los Santos.mp3"},
+        {"name": "Song 2", "path": "assets/music/poker_face.wav"},
+        {"name": "Song 3", "path": "assets/music/Los Santos.mp3"},
     ]
 
     # Create the dropdown menu for songs
-    dropdown_font = get_font(25)
+    dropdown_font = screen_font(25)
     dropdown_width = 250
     dropdown_height = 40
     # Position it below the sfx slider (adjust as needed)
@@ -124,7 +124,7 @@ def sound(mainMenu):
         textbox_height = int(screen_height * 0.7)
         textbox_x = int((screen_width - textbox_width) / 2)
         textbox_y = int(screen_height * 0.15)
-
+    
         textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
         pygame.draw.rect(
             textbox_surface, 
@@ -141,8 +141,8 @@ def sound(mainMenu):
         sfx_volume_slider.rect.y = SOUND_height / 2
 
         # Render slider labels
-        music_label = get_font(30).render("Music Volume", True, "White")
-        sfx_label = get_font(30).render("Sound Effects Volume", True, "White")
+        music_label = screen_font(30).render("Music Volume", True, "White")
+        sfx_label = screen_font(30).render("Sound Effects Volume", True, "White")
         music_label_rect = music_label.get_rect(center=(SOUND_width / 2, music_volume_slider.rect.y - 20))
         sfx_label_rect = sfx_label.get_rect(center=(SOUND_width / 2, sfx_volume_slider.rect.y - 20))
         SCREEN.blit(music_label, music_label_rect)
@@ -151,15 +151,15 @@ def sound(mainMenu):
         # Render slider percentage texts
         music_percentage = f"{int(music_volume_slider.value * 100)}%"
         sfx_percentage = f"{int(sfx_volume_slider.value * 100)}%"
-        music_percentage_label = get_font(30).render(music_percentage, True, "White")
-        sfx_percentage_label = get_font(30).render(sfx_percentage, True, "White")
+        music_percentage_label = screen_font(30).render(music_percentage, True, "White")
+        sfx_percentage_label = screen_font(30).render(sfx_percentage, True, "White")
         music_percentage_rect = music_percentage_label.get_rect(center=(SOUND_width / 2, music_volume_slider.rect.y + 40))
         sfx_percentage_rect = sfx_percentage_label.get_rect(center=(SOUND_width / 2, sfx_volume_slider.rect.y + 40))
         SCREEN.blit(music_percentage_label, music_percentage_rect)
         SCREEN.blit(sfx_percentage_label, sfx_percentage_rect)
 
         # Render main text
-        SOUND_TEXT = get_font(45).render("This is the SOUND screen.", True, "White")
+        SOUND_TEXT = screen_font(45).render("This is the SOUND screen.", True, "White")
         SOUND_RECT = SOUND_TEXT.get_rect(center=(SOUND_width / 2, SOUND_height / 8))
         SCREEN.blit(SOUND_TEXT, SOUND_RECT)
 
@@ -167,7 +167,7 @@ def sound(mainMenu):
         SOUND_BACK = Button(
             pos=(SOUND_width / 2, SOUND_height * 2 / 2.5), 
             text_input="HOME", 
-            font=get_font(30), 
+            font=screen_font(30), 
             base_colour="White", 
             hovering_colour="Light Green",
             image=None
@@ -186,8 +186,8 @@ def sound(mainMenu):
         sfx_volume = sfx_volume_slider.value
         pygame.mixer.music.set_volume(music_volume)
 
-        # Draw the dropdown for song selection
-        song_dropdown.draw(SCREEN)
+        # # Draw the dropdown for song selection
+        # song_dropdown.draw(SCREEN)
 
         # Event handling
         for event in pygame.event.get():

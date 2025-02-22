@@ -1,6 +1,6 @@
 import pygame, sys
 from src.gui.button import Button
-from src.gui.constants import BG, get_font, SCREEN
+from src.gui.constants import BG, screen_font, SCREEN
 from src.gui.sound import sound
 
 
@@ -40,14 +40,14 @@ def settings(mainMenu):
 
         
         # Calculate positions based on current screen size
-        SETTINGS_TEXT = get_font(50).render("Poker", True, "Dark Green")
+        SETTINGS_TEXT = screen_font(50).render("Poker", True, "Dark Green")
         SETTINGS_RECT = SETTINGS_TEXT.get_rect(center=(screen_width / 2, screen_height / 9))
         SCREEN.blit(SETTINGS_TEXT, SETTINGS_RECT)
 
         # Define button labels and functions
         buttons = [
             ("SOUND", sound),
-            ("BACK", mainMenu)]
+            ("HOME", mainMenu)]
 
         # Calculate vertical spacing with closer spacing
         button_count = len(buttons)
@@ -60,7 +60,7 @@ def settings(mainMenu):
             button = Button(
                 pos=(screen_width / 2, button_y), 
                 text_input=text, 
-                font=get_font(30), 
+                font=screen_font(30), 
                 base_colour="White", 
                 hovering_colour="Light Green",
                 image=None)

@@ -3,7 +3,7 @@ import sys
 import random
 import itertools
 from collections import Counter
-from src.gui.constants import get_font, BG, SCREEN
+from src.gui.constants import screen_font, BG, SCREEN
 pygame.init()
 
 # ----- Global Constants & Settings -----
@@ -13,8 +13,8 @@ COLOR_INACTIVE = pygame.Color('lightskyblue3')
 COLOR_ACTIVE = pygame.Color('dodgerblue2')
 BUTTON_COLOR = pygame.Color('gray')
 TEXT_COLOR = pygame.Color('white')
-FONT = pygame.font.Font(None, 32)
-BIG_FONT = pygame.font.Font(None, 48)
+FONT = screen_font(32)
+BIG_FONT = screen_font(48)
 
 # Overlay colors for each group (RGBA where A is transparency)
 PLAYER_OVERLAY_COLOR = (0, 0, 255, 100)     # Blue semi-transparent
@@ -180,19 +180,18 @@ def load_card_images(card_width, card_height):
     return card_images
 
 # ----- Main GUI Loop with Card Selection -----
-def run_poker_calculator(num_simulations=1000):
+def run_poker_calculator(mainMenu, num_simulations=1000):
     clock = pygame.time.Clock()
     
     # Dimensions for card images and grid layout.
     CARD_WIDTH, CARD_HEIGHT = 60, 90
     GRID_MARGIN_X, GRID_MARGIN_Y = 5, 5
-    GRID_START_X, GRID_START_Y = 50, 250
+    GRID_START_X, GRID_START_Y = 80, 90
 
     # Load all card images (from files or placeholders)
     card_images = load_card_images(CARD_WIDTH, CARD_HEIGHT)
     
     # Build a list for the 52-card grid.
-    # Instead of a fixed 13x4 grid, we iterate by suit so that each suit is its own row.
     suit_order = ['C', 'H', 'S', 'D']  # Clubs, Hearts, Spades, Diamonds
     card_grid = []
     for row_index, suit in enumerate(suit_order):
@@ -206,12 +205,15 @@ def run_poker_calculator(num_simulations=1000):
     # Create buttons for selecting which set to assign to.
     group_buttons = {}
     button_width, button_height = 120, 32
-    group_buttons["player"] = Button(50, 50, button_width, button_height, "Player")
-    group_buttons["opponent"] = Button(200, 50, button_width, button_height, "Opponent")
-    group_buttons["board"] = Button(350, 50, button_width, button_height, "Board")
-    
+    group_buttons["player"] = Button(100, 550 - button_height - 10, button_width, button_height, "Player")
+    group_buttons["opponent"] = Button(300, 550 - button_height - 10, button_width, button_height, "Opponent")
+    group_buttons["board"] = Button(500, 550 - button_height - 10, button_width, button_height, "Board")
+
     # Calculate button.
-    calculate_button = Button(50, GRID_START_Y + 4 * (CARD_HEIGHT + GRID_MARGIN_Y) + 20, 120, 32, "Calculate")
+    calculate_button = Button(900, 550 - button_height - 10, 120, 32, "Calculate")
+    
+    # ----- Back Button Setup -----
+    back_button = Button(20, 20, 80, 30, "HOME")
     
     # Dictionary to hold card assignments.
     assignments = {
@@ -230,6 +232,12 @@ def run_poker_calculator(num_simulations=1000):
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
+                
+                # Check if the back button was clicked.
+                if back_button.is_clicked(pos):
+                    mainMenu()	
+                    return
+                
                 # Check if a group button was clicked.
                 for group, button in group_buttons.items():
                     if button.is_clicked(pos):
@@ -250,8 +258,8 @@ def run_poker_calculator(num_simulations=1000):
                         pygame.display.flip()  # Update display before simulation.
                         win_rate, tie_rate, loss_rate = simulate_win_rate(
                             player_cards, board_cards, opp_cards if opp_cards else None, num_simulations)
-                        result_text = (f"Win: {win_rate:.1f}%  "
-                                       f"Tie: {tie_rate:.1f}%  "
+                        result_text = (f"Win: {win_rate:.1f}%\n"
+                                       f"Tie: {tie_rate:.1f}%\n"
                                        f"Lose: {loss_rate:.1f}%")
                 # Check if a card in the grid was clicked.
                 for item in card_grid:
@@ -272,16 +280,13 @@ def run_poker_calculator(num_simulations=1000):
                                     break
 
         # ----- Drawing the UI -----
-    
-
-        # Grab screen dimensions, draw background
         screen_width, screen_height = SCREEN.get_size()
         scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height))
         SCREEN.blit(scaled_bg, (0, 0))
 
-        # Create a centered textbox background (90% width, 80% height)
-        textbox_width = int(screen_width * 0.9)
-        textbox_height = int(screen_height * 0.8)
+        # Create a centered textbox background (95% width, 85% height)
+        textbox_width = int(screen_width * 0.95)
+        textbox_height = int(screen_height * 0.85)
         textbox_x = (screen_width - textbox_width) // 2
         textbox_y = (screen_height - textbox_height) // 2
         textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
@@ -295,7 +300,7 @@ def run_poker_calculator(num_simulations=1000):
 
         # Place header text near top of textbox
         header_text = "This is the POKER CALCULATOR screen."
-        CALCULATOR_TEXT = get_font(45).render(header_text, True, "White")
+        CALCULATOR_TEXT = screen_font(45).render(header_text, True, "White")
         header_y = 30
         CALCULATOR_RECT = CALCULATOR_TEXT.get_rect(center=(textbox_x + textbox_width // 2, header_y))
         SCREEN.blit(CALCULATOR_TEXT, CALCULATOR_RECT)
@@ -306,36 +311,29 @@ def run_poker_calculator(num_simulations=1000):
             button.color = COLOR_ACTIVE if group == active_group else BUTTON_COLOR
             button.draw(SCREEN)
             button.color = orig_color  # restore original
-        
-        # Draw assigned cards for each group.
+
         # --- Player Cards ---
-        player_label = FONT.render("Player Cards:", True, TEXT_COLOR)
-        SCREEN.blit(player_label, (50, 100))
         for i, card in enumerate(assignments["player"]):
-            slot_x = 10 + player_label.get_width() + 10 + i * (CARD_WIDTH + 10)
-            slot_y = 100
+            slot_x = 100 + i * (CARD_WIDTH + 10)
+            slot_y = 550
             rect = pygame.Rect(slot_x, slot_y, CARD_WIDTH, CARD_HEIGHT)
             pygame.draw.rect(SCREEN, TEXT_COLOR, rect, 2)
             if card is not None:
                 SCREEN.blit(card_images[card], (slot_x, slot_y))
-        
+
         # --- Opponent Cards ---
-        opponent_label = FONT.render("Opponent Cards:", True, TEXT_COLOR)
-        SCREEN.blit(opponent_label, (250, 100))
         for i, card in enumerate(assignments["opponent"]):
-            slot_x = 170 + opponent_label.get_width() + 10 + i * (CARD_WIDTH + 10)
-            slot_y = 100
+            slot_x = 300 + i * (CARD_WIDTH + 10)
+            slot_y = 550
             rect = pygame.Rect(slot_x, slot_y, CARD_WIDTH, CARD_HEIGHT)
             pygame.draw.rect(SCREEN, TEXT_COLOR, rect, 2)
             if card is not None:
                 SCREEN.blit(card_images[card], (slot_x, slot_y))
-        
+
         # --- Board Cards ---
-        board_label = FONT.render("Board Cards:", True, TEXT_COLOR)
-        SCREEN.blit(board_label, (450, 100))
         for i, card in enumerate(assignments["board"]):
-            slot_x = 450 + board_label.get_width() + 10 + i * (CARD_WIDTH + 10)
-            slot_y = 100
+            slot_x = 500 + i * (CARD_WIDTH + 10)
+            slot_y = 550
             rect = pygame.Rect(slot_x, slot_y, CARD_WIDTH, CARD_HEIGHT)
             pygame.draw.rect(SCREEN, TEXT_COLOR, rect, 2)
             if card is not None:
@@ -345,7 +343,7 @@ def run_poker_calculator(num_simulations=1000):
         calculate_button.draw(SCREEN)
         # Draw the simulation result.
         result_surface = FONT.render(result_text, True, TEXT_COLOR)
-        SCREEN.blit(result_surface, (50, calculate_button.rect.y + calculate_button.rect.height + 10))
+        SCREEN.blit(result_surface, (900, 550 - button_height + 30))
         
         # Draw the full grid of 52 card images with overlay based on group assignment.
         for item in card_grid:
@@ -363,6 +361,9 @@ def run_poker_calculator(num_simulations=1000):
                 overlay = pygame.Surface((CARD_WIDTH, CARD_HEIGHT), pygame.SRCALPHA)
                 overlay.fill(overlay_color)
                 SCREEN.blit(overlay, item["rect"].topleft)
+        
+        # Draw the back button.
+        back_button.draw(SCREEN)
         
         pygame.display.flip()
         clock.tick(30)

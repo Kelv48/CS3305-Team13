@@ -1,7 +1,7 @@
 import pygame, sys
 import math  
 from src.gui.button import Button
-from src.gui.constants import SCREEN, BG, get_font, play_button_click_sound, play_winner_sound
+from src.gui.constants import SCREEN, BG, screen_font, play_button_click_sound, play_winner_sound
 
 screen_width, screen_height = SCREEN.get_size()
 card_width = 70
@@ -115,7 +115,7 @@ def game_screen(mainMenu):
             user_name = f"Player {i+1}"
             user_money = "$1000"  # Update dynamically as needed.
             text_box = f"{user_name} | {user_money}"
-            text_surface = get_font(20).render(text_box, True, "White")
+            text_surface = screen_font(20).render(text_box, True, "White")
             # Position the text surface so that its center is the same as the label's center.
             text_rect = text_surface.get_rect(center=label_rect.center)
             SCREEN.blit(text_surface, text_rect)
@@ -157,7 +157,7 @@ def game_screen(mainMenu):
             button = Button(
                 pos=(button_x, button_y),
                 text_input=text,
-                font=get_font(30),
+                font=screen_font(30),
                 base_colour="White",
                 hovering_colour="Light Green",
                 image=button_image
@@ -198,7 +198,7 @@ def game_screen(mainMenu):
                             play_button_click_sound()
 
         # Draw game text at the top of the screen
-        GAME_TEXT = get_font(30).render("Poker game", True, "White")
+        GAME_TEXT = screen_font(30).render("Poker game", True, "White")
         GAME_RECT = GAME_TEXT.get_rect(center=(screen_width / 2, screen_height / 15))
         SCREEN.blit(GAME_TEXT, GAME_RECT)
 

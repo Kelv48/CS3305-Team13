@@ -1,6 +1,6 @@
 import pygame, sys
 from src.gui.button import Button
-from src.gui.constants import BG, get_font, SCREEN
+from src.gui.constants import BG, screen_font, SCREEN
 
 from src.gui.game_screen import game_screen
 from src.gui.menu import gameMenu
@@ -40,7 +40,7 @@ def singlePlayer(mainMenu):
 
         
         # Calculate positions based on current screen size
-        SINGLE_TEXT = get_font(50).render("Poker", True, "Dark Green")
+        SINGLE_TEXT = screen_font(50).render("Poker", True, "Dark Green")
         SINGLE_RECT = SINGLE_TEXT.get_rect(center=(screen_width / 2, screen_height / 9))
         SCREEN.blit(SINGLE_TEXT, SINGLE_RECT)
 
@@ -48,7 +48,7 @@ def singlePlayer(mainMenu):
         buttons = [
             ("BOT GAME", gameMenu),
             ("GAME SCREEN TEST", game_screen),
-            ("BACK", mainMenu)]
+            ("HOME", mainMenu)]
 
         # Calculate vertical spacing with closer spacing
         button_count = len(buttons)
@@ -61,7 +61,7 @@ def singlePlayer(mainMenu):
             button = Button(
                 pos=(screen_width / 2, button_y), 
                 text_input=text, 
-                font=get_font(30), 
+                font=screen_font(30), 
                 base_colour="White", 
                 hovering_colour="Light Green",
                 image=None)

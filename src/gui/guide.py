@@ -7,7 +7,7 @@ from pygame_gui.elements import UITextBox
 from pygame_gui.core import ObjectID
 
 from src.gui.button import Button
-from src.gui.constants import BG, get_font, SCREEN as INITIAL_SCREEN
+from src.gui.constants import BG, screen_font, SCREEN as INITIAL_SCREEN
 
 
 def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, intermediate_callback, advanced_callback):
@@ -38,8 +38,8 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
 
         back_button = Button(
             pos=(sw * 0.2, y_pos),
-            text_input="BACK",
-            font=get_font(30),
+            text_input="HOME",
+            font=screen_font(30),
             base_colour="White",
             hovering_colour="Light Green",
             image=None)
@@ -48,7 +48,7 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
         beginner_button = Button(
             pos=(sw * 0.4, y_pos),
             text_input="BEGINNER",
-            font=get_font(30),
+            font=screen_font(30),
             base_colour="White",
             hovering_colour="Light Green",
             image=None)
@@ -57,7 +57,7 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
         intermediate_button = Button(
             pos=(sw * 0.6, y_pos),
             text_input="INTERMEDIATE",
-            font=get_font(30),
+            font=screen_font(30),
             base_colour="White",
             hovering_colour="Light Green",
             image=None)
@@ -66,7 +66,7 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
         advanced_button = Button(
             pos=(sw * 0.8, y_pos),
             text_input="ADVANCED",
-            font=get_font(30),
+            font=screen_font(30),
             base_colour="White",
             hovering_colour="Light Green",
             image=None)
@@ -84,8 +84,8 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
 
         screen_width, screen_height = screen.get_size()
         # Transparent textbox with rounded edges
-        textbox_width = int(screen_width * 0.8)      # 20% of screen width
-        textbox_height = int(screen_height * 0.1)      # 70% of screen height
+        textbox_width = int(screen_width * 0.8)      # 80% of screen width
+        textbox_height = int(screen_height * 0.1)      # 10% of screen height
         textbox_x = int((screen_width - textbox_width) / 2)
         textbox_y = int(screen_height * 0.85)          # 80% down from the top
 
@@ -104,7 +104,7 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
         # Blit the textbox to the main screen.
         INITIAL_SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
-        title_surface = get_font(45).render(title, True, "White")
+        title_surface = screen_font(45).render(title, True, "White")
         title_rect = title_surface.get_rect(center=(sw / 2, sh / 15))
         screen.blit(title_surface, title_rect)
 

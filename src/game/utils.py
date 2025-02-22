@@ -1,44 +1,49 @@
 import pygame
 import pygame_widgets
-
+from src.gui.constants import game_font
 
 def showdown(common_cards):
     """
-    Function display showdown
-    :param common_cards: list of common cards
-    :return:
+    Displays the showdown by drawing the player's cards, all active opponents' cards, 
+    and the community cards (flop, turn, river) on the screen.
+
+    :param common_cards: List of common card identifiers.
+                         Expected order: [flop1, flop2, flop3, turn, river]
     """
-
-
-    # draw opponent card
     from src.game.player import Player
     from src.gui.constants import SCREEN
-    
-
 
     player_list_chair = Player.player_list_chair
-    cards = pygame.sprite.Group()
+    cards_group = pygame.sprite.Group()
 
-    # draw player cards
-    sub_card = giveCard('player', player_list_chair[0].cards)
-    [cards.add(card) for card in sub_card]
+    # Draw player cards if the player is active.
+    if player_list_chair[0].live or player_list_chair[0].alin:
+        for card in giveCard('player', player_list_chair[0].cards):
+            cards_group.add(card)
 
+    # Draw opponent cards for each opponent if they haven't folded.
+    # Assuming opponents are stored at indices 1 to 5:
+    for i in range(1, 6):
+        if player_list_chair[i].live or player_list_chair[i].alin:
+            opponent_type = f'opponent{i}'
+            for card in giveCard(opponent_type, player_list_chair[i].cards):
+                cards_group.add(card)
 
-    # draw opponent cards
-    sub_card = giveCard('opponent', player_list_chair[1].cards)
-    [cards.add(card) for card in sub_card]
+    # Draw community cards:
+    # Flop cards (first three common cards)
+    for card in giveCard('flop', common_cards[0:3]):
+        cards_group.add(card)
+    # Turn card (fourth common card)
+    for card in giveCard('turn', [common_cards[3]]):
+        cards_group.add(card)
+    # River card (fifth common card)
+    for card in giveCard('river', [common_cards[4]]):
+        cards_group.add(card)
 
-
-    # draw table cards
-    sub_card = giveCard('flop', common_cards[0:3])
-    [cards.add(card) for card in sub_card]
-    sub_card = giveCard('turn', [common_cards[3]])
-    [cards.add(card) for card in sub_card]
-    sub_card = giveCard('river', [common_cards[4]])
-
-    [cards.add(card) for card in sub_card]
-
-    cards.draw(SCREEN)
+    # Draw all card sprites on the screen and update the display.
+    cards_group.draw(SCREEN)
+    drawPlayer()
+    pygame.display.flip()
 
 
 
@@ -52,7 +57,7 @@ def recapRound(list_winner, common_cards=None):
 
 
     from src.gui.constants import SCREEN, WIDTH, HEIGHT, BEIGE, GAME_BG
-    font = pygame.font.SysFont('comicsans', 20)
+    font = game_font(20) 
 
 
 
@@ -64,7 +69,7 @@ def recapRound(list_winner, common_cards=None):
     SCREEN.blit(scaled_bg, (0, 0))
 
     poker_table_image = pygame.image.load("assets/images/Table.png")
-    poker_table_image = pygame.transform.scale(poker_table_image, (800, 500)) 
+    poker_table_image = pygame.transform.scale(poker_table_image, (700, 400)) 
     poker_table_rect = poker_table_image.get_rect(center=(screen_width / 2, screen_height / 1.9))
     SCREEN.blit(poker_table_image, poker_table_rect)
     drawPlayer()
@@ -104,7 +109,7 @@ def recapRound(list_winner, common_cards=None):
         pygame.display.flip()
         # Take a second pause
 
-        pygame.time.delay(10000) # Time between each round. Adjust higher if needed
+        pygame.time.delay(3000) # Time between each round. Adjust higher if needed
 
 
 def drawPlayer():
@@ -113,7 +118,6 @@ def drawPlayer():
     from src.gui.constants import SCREEN
     player_list_chair = Player.player_list_chair
     for player in player_list_chair:
-
 
         player.playerLabel(SCREEN)
         player.drawBet(SCREEN)
@@ -138,13 +142,20 @@ def giveCard(type_card, cards):
 
 
     dict_cards = {'player': ['first_card_player', 'second_card_player'],
-                  'opponent': ['first_card_opponent', 'second_card_opponent'],
+                  'opponent1': ['first_card_opponent1', 'second_card_opponent1'],
+                  'opponent2': ['first_card_opponent2', 'second_card_opponent2'],
+                  'opponent3': ['first_card_opponent3', 'second_card_opponent3'],
+                  'opponent4': ['first_card_opponent4', 'second_card_opponent4'],
+                  'opponent5': ['first_card_opponent5', 'second_card_opponent5'],
                   'flop': ['first_card_flop', 'second_card_flop', 'third_card_flop'],
                   'turn': ['turn_card'],
                   'river': ['river_card']}
 
     sub_cards = pygame.sprite.Group()
     list_cards = dict_cards[type_card]  # 'first_card_player', 'second_card_player'
+    
+
+
 
     for i in range(len(list_cards)):
         card_object = cards_object[cards[i]]
@@ -160,21 +171,39 @@ def giveCard(type_card, cards):
 #         exit()
 
 
-def coverUpCards():
-    # Function return cover up cards opponents
+
+def coverUpCards(player_list):
+    """
+    Returns a sprite group of reverse (face-down) cards for opponents who have not folded.
+    
+    :param player_list: List of player objects. Opponents are assumed to be indices 1 and onward.
+    """
+    import pygame
     from src.gui.constants import cards_object
+    from src.gui.card import Card  # Adjust the import path if needed
+
     reverse_cards = pygame.sprite.Group()
-    reverse_card_1 = cards_object['reverse_1']
-    reverse_card_2 = cards_object['reverse_2']
-    reverse_card_1.type_card = 'first_card_opponent'    
+    base_reverse_card_1 = cards_object['reverse_1']
+    base_reverse_card_2 = cards_object['reverse_2']
 
+    # Iterate over opponents (assumed indices 1..n)
+    for i in range(1, len(player_list)):
+        # Only add reverse cards if the opponent is active (has not folded)
+        if player_list[i].live or player_list[i].alin:
+            new_reverse_card_1 = Card(base_reverse_card_1.original_image)
+            new_reverse_card_2 = Card(base_reverse_card_2.original_image)
 
-    reverse_card_2.type_card = 'second_card_opponent'
-    reverse_card_1.putInPlace()
-    reverse_card_2.putInPlace()
-    reverse_cards.add(reverse_card_1)
-    reverse_cards.add(reverse_card_2)
+            new_reverse_card_1.type_card = f'first_card_opponent{i}'
+            new_reverse_card_2.type_card = f'second_card_opponent{i}'
+
+            new_reverse_card_1.putInPlace()
+            new_reverse_card_2.putInPlace()
+
+            reverse_cards.add(new_reverse_card_1)
+            reverse_cards.add(new_reverse_card_2)
     return reverse_cards
+
+
 
 
 
@@ -188,65 +217,65 @@ def drawButtons(buttons):
 
 
 def arrangeRoom(common_cards=None):
-    # Function draw background and cards
+    """
+    Draws the game room background and cards.
+    Only active players (not folded) have their cards displayed.
+    """
+    import pygame
     from src.gui.constants import SCREEN, GAME_BG
-
     from src.game.player import Player
+
     player_list_chair = Player.player_list_chair
-
-
-
     screen_width, screen_height = SCREEN.get_size()
-    # SCREEN.fill("black")
 
-    # Draw background
+    # Draw background and table.
     scaled_bg = pygame.transform.scale(GAME_BG, (screen_width, screen_height))
     SCREEN.blit(scaled_bg, (0, 0))
-
     poker_table_image = pygame.image.load("assets/images/Table.png")
-    poker_table_image = pygame.transform.scale(poker_table_image, (800, 500)) 
+    poker_table_image = pygame.transform.scale(poker_table_image, (700, 400))
     poker_table_rect = poker_table_image.get_rect(center=(screen_width / 2, screen_height / 1.9))
     SCREEN.blit(poker_table_image, poker_table_rect)
 
     cards = pygame.sprite.Group()
-    # draw player cards
-    sub_card = giveCard('player', player_list_chair[0].cards)
-    [cards.add(card) for card in sub_card]
 
+    # Draw player's cards if active.
+    if player_list_chair[0].live or player_list_chair[0].alin:
+        sub_card = giveCard('player', player_list_chair[0].cards)
+        for card in sub_card:
+            cards.add(card)
 
-    # draw opponent cards
-    sub_card = giveCard('opponent', player_list_chair[1].cards)
-    [cards.add(card) for card in sub_card]
-    reverse_cards = coverUpCards()
-    [cards.add(card) for card in reverse_cards]
+    # Draw opponent cards for indices 1 to 4.
+    for i, opponent_type in enumerate(['opponent1', 'opponent2', 'opponent3', 'opponent4'], start=1):
+        if player_list_chair[i].live or player_list_chair[i].alin:
+            sub_card = giveCard(opponent_type, player_list_chair[i].cards)
+            for card in sub_card:
+                cards.add(card)
+
+    # Add reverse (face-down) cards only for active opponents.
+    reverse_cards = coverUpCards(player_list_chair)
+    for card in reverse_cards:
+        cards.add(card)
+    
+    # Draw all card sprites.
     cards.draw(SCREEN)
 
-
-
-    # draw flop cards
+    # Draw community cards (if provided) and update the display.
     if common_cards is not None:
-        # draw pot table
+        from src.game.player import Player
         Player.drawPot(SCREEN)
-
-
-
-        # draw flop
         sub_card = giveCard('flop', common_cards[0:3])
-        [cards.add(card) for card in sub_card]
+        for card in sub_card:
+            cards.add(card)
         cards.draw(SCREEN)
         if len(common_cards) >= 4:
-
-            # draw turn
-
             sub_card = giveCard('turn', [common_cards[3]])
-            [cards.add(card) for card in sub_card]
+            for card in sub_card:
+                cards.add(card)
             cards.draw(SCREEN)
-
         if len(common_cards) == 5:
-            # draw river
-
             sub_card = giveCard('river', [common_cards[4]])
-            [cards.add(card) for card in sub_card]
+            for card in sub_card:
+                cards.add(card)
             cards.draw(SCREEN)
 
 
@@ -265,8 +294,8 @@ def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=Non
     and if the button raise has been pressed then information about how much is the raise
     """
 
-    from src.gui.constants import SCREEN, BEIGE
-    from src.game.button import x_buttons, y_button, width_button
+    from src.gui.constants import SCREEN, BEIGE, GREEN
+    from src.game.game_button import x_buttons, y_button, width_button
     from pygame_widgets.slider import Slider
     from pygame_widgets.textbox import TextBox
     # from PlayerClass import Player
@@ -274,12 +303,22 @@ def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=Non
 
 
 
-    # make a slider for the raise button
-    slider = Slider(SCREEN, x_buttons, y_button[4] + 30, width_button * 2, 40, min=0, max=max_raise - min_raise, initial=0,
-                    step=1, colour=(94, 151, 82), handleColour=BEIGE, handleRadius=19)
+    # Fixed position for the slider (independent from x_buttons)
+    x_slider = 1070  # Fixed x position for the slider
+    y_slider = 650  # Fixed y position (adjust based on layout)
 
-    font = pygame.font.SysFont('comicsans', 40)
-    output = TextBox(SCREEN, 220, y_button[3], 150, 100, fontSize=40, colour=(94, 151, 82), textColour=BEIGE, font=font)
+    # Slider setup (decoupled from button positions)
+    slider = Slider(SCREEN, x_slider, y_slider, width_button * 2, 40, 
+                    min=0, max=max_raise - min_raise, initial=0, step=1, 
+                    colour=(94, 151, 82), handleColour=BEIGE, handleRadius=19)
+
+    # Fixed position for the output text box
+    x_output = 1060  # Fixed x position for the output box
+    y_output = 590   # Fixed y position (adjust as needed)
+
+    font = game_font(20)
+    output = TextBox(SCREEN, x_output, y_output, 100, 50, fontSize=20, 
+                    colour=GREEN, textColour=BEIGE, font=font)
     output.setText('1')
     output.disable()
 

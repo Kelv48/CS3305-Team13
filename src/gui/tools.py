@@ -1,7 +1,7 @@
 
 import pygame, sys
 from src.gui.button import Button
-from src.gui.constants import BG, get_font, SCREEN
+from src.gui.constants import BG, screen_font, SCREEN, screen_font
 from src.gui.hand_visual import poker_hand_visualizer
 from src.gui.calculator import run_poker_calculator
 
@@ -43,7 +43,7 @@ def tools(mainMenu):
 
         
         # Calculate positions based on current screen size
-        TOOLS_TEXT = get_font(50).render("Tools", True, "Dark Green")
+        TOOLS_TEXT = screen_font(50).render("Tools", True, "Dark Green")
         TOOLS_RECT = TOOLS_TEXT.get_rect(center=(screen_width / 2, screen_height / 9))
         SCREEN.blit(TOOLS_TEXT, TOOLS_RECT)
 
@@ -51,7 +51,7 @@ def tools(mainMenu):
         buttons = [
             ("HAND VISUALIZER", poker_hand_visualizer),
             ("CALCULATOR", run_poker_calculator),
-            ("BACK", mainMenu)]
+            ("HOME", mainMenu)]
 
         # Calculate vertical spacing with closer spacing
         button_count = len(buttons)
@@ -64,7 +64,7 @@ def tools(mainMenu):
             button = Button(
                 pos=(screen_width / 2, button_y), 
                 text_input=text, 
-                font=get_font(30), 
+                font=screen_font(30), 
                 base_colour="White", 
                 hovering_colour="Light Green",
                 image=None)
@@ -85,9 +85,9 @@ def tools(mainMenu):
                             pygame.quit()
                             sys.exit()
                         elif action == poker_hand_visualizer:
-                            poker_hand_visualizer()
+                            poker_hand_visualizer(mainMenu)
                         elif action == run_poker_calculator:
-                            run_poker_calculator()
+                            run_poker_calculator(mainMenu)
                         else:
                             mainMenu()
 
