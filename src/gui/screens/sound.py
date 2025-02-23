@@ -1,6 +1,6 @@
 import pygame, sys
-from src.gui.button import Button
-from src.gui.constants import BG, screen_font, SCREEN, screen_font, scaled_cursor
+from src.gui.utils.button import Button
+from src.gui.utils.constants import BG, screen_font, SCREEN, screen_font, scaled_cursor
 
 class Slider:
     def __init__(self, pos, width, initial_value=0.5):

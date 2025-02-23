@@ -1,14 +1,14 @@
 import pygame, sys
-from src.gui.button import Button
-from src.gui.constants import BG, screen_font, SCREEN, scaled_cursor
-from src.gui.singleplayer import singlePlayer
-from src.gui.settings import settings
-from src.gui.multiplayer import multiPlayer
-from src.gui.guide import guide_beginner
-from src.gui.leaderboard import leaderboard
-from src.gui.register import register
-from src.gui.user_page import user_page
-from src.gui.tools import tools
+from src.gui.utils.button import Button
+from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor
+from src.gui.screens.singleplayer import singlePlayer
+from src.gui.screens.settings import settings
+from src.gui.screens.multiplayer import multiPlayer
+from src.gui.screens.guide import guide_beginner
+from src.gui.screens.leaderboard import leaderboard
+from src.gui.screens.register import register
+from src.gui.screens.user_page import user_page
+from src.gui.screens.tools import tools
 
 
 

@@ -1,6 +1,6 @@
 import pygame, sys
-from src.gui.button import Button
-from src.gui.constants import BG, screen_font, SCREEN, scaled_cursor
+from src.gui.utils.button import Button
+from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor
 
 def render_screen(title, username, password, active_input, button_actions):
     screen_width, screen_height = SCREEN.get_size()

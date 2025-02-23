@@ -1,10 +1,10 @@
 import pygame, sys, json, os
-from src.gui.button import Button
-from src.gui.constants import BG, screen_font, SCREEN, scaled_cursor
-from src.gui.user_page import user_page
+from src.gui.utils.button import Button
+from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor
+from src.gui.screens.user_page import user_page
 
 # Define the temporary JSON file for the leaderboard.
-LEADERBOARD_FILE = "temp_leaderboard.json"
+LEADERBOARD_FILE = "assets/temp_leaderboard.json"
 
 def load_leaderboard():
     """
