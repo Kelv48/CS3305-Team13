@@ -4,7 +4,7 @@ from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor
 
 
 from src.singleplayer_game.game_menu import gameMenu
-from src.EV_game.game_menu import gameMenuEV
+from src.EV_game.game_menu import expectedValueGame
 
 
 def singlePlayer(mainMenu):
@@ -48,7 +48,7 @@ def singlePlayer(mainMenu):
         # Define button labels and functions
         buttons = [
             ("BOT GAME", gameMenu),
-            ("EV GAME", gameMenuEV),
+            ("EV GAME", expectedValueGame),
             # ("HAND RANKING", handRanking),
             # ("BEST CARDS", bestCards),
             # ("POT ODDS", potOdds),
@@ -87,8 +87,8 @@ def singlePlayer(mainMenu):
                             sys.exit()
                         elif action == gameMenu:
                             gameMenu(mainMenu)
-                        elif action == gameMenuEV:
-                            gameMenuEV(mainMenu)
+                        elif action == expectedValueGame:
+                            expectedValueGame(mainMenu)
                         else:
                             action()
 
