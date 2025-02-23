@@ -1,9 +1,9 @@
 import pygame, sys, json, os
-from src.gui.button import Button
-from src.gui.constants import BG, screen_font, SCREEN, scaled_cursor
+from src.gui.utils.button import Button
+from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor
 
 # Define the temporary JSON file for user data.
-USER_DATA_FILE = "temp_user_data.json"
+USER_DATA_FILE = "assets/   temp_user_data.json"
 
 def load_user_data():
     """

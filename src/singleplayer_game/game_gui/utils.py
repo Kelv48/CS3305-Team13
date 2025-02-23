@@ -1,6 +1,6 @@
 import pygame
 import pygame_widgets
-from src.gui.constants import game_font
+from src.gui.utils.constants import game_font
 
 def showdown(common_cards):
     """
@@ -11,7 +11,7 @@ def showdown(common_cards):
                          Expected order: [flop1, flop2, flop3, turn, river]
     """
     from src.singleplayer_game.game_gui.player import Player
-    from src.gui.constants import SCREEN
+    from src.gui.utils.constants import SCREEN
 
     player_list_chair = Player.player_list_chair
     cards_group = pygame.sprite.Group()
@@ -57,7 +57,7 @@ def recapRound(list_winner, common_cards=None):
     """
 
 
-    from src.gui.constants import SCREEN, WIDTH, HEIGHT, BEIGE, GAME_BG
+    from src.gui.utils.constants import SCREEN, WIDTH, HEIGHT, BEIGE, GAME_BG
     font = game_font(20) 
 
 
@@ -116,7 +116,7 @@ def recapRound(list_winner, common_cards=None):
 def drawPlayer():
     # Function displays player labels and bet information
     from src.singleplayer_game.game_gui.player import Player
-    from src.gui.constants import SCREEN
+    from src.gui.utils.constants import SCREEN
     player_list_chair = Player.player_list_chair
     for player in player_list_chair:
 
@@ -139,7 +139,7 @@ def giveCard(type_card, cards):
     """
 
     import pygame
-    from src.gui.constants import cards_object
+    from src.gui.utils.constants import cards_object
 
 
     dict_cards = {'player': ['first_card_player', 'second_card_player'],
@@ -180,7 +180,7 @@ def coverUpCards(player_list):
     :param player_list: List of player objects. Opponents are assumed to be indices 1 and onward.
     """
     import pygame
-    from src.gui.constants import cards_object
+    from src.gui.utils.constants import cards_object
     from src.singleplayer_game.game_gui.card import Card  # Adjust the import path if needed
 
     reverse_cards = pygame.sprite.Group()
@@ -210,7 +210,7 @@ def coverUpCards(player_list):
 
 def drawButtons(buttons):
     # Function displays buttons
-    from src.gui.constants import SCREEN
+    from src.gui.utils.constants import SCREEN
 
 
     [button.draw(SCREEN) for button in buttons if button.active]
@@ -223,7 +223,7 @@ def arrangeRoom(mainMenu, common_cards=None):
     Only active players (not folded) have their cards displayed.
     """
     import pygame
-    from src.gui.constants import SCREEN, GAME_BG
+    from src.gui.utils.constants import SCREEN, GAME_BG
     from src.singleplayer_game.game_gui.player import Player
 
     player_list_chair = Player.player_list_chair
@@ -298,7 +298,7 @@ def arrangeRoom(mainMenu, common_cards=None):
 
 
 import time
-from src.gui.constants import SCREEN, BEIGE, GREEN
+from src.gui.utils.constants import SCREEN, BEIGE, GREEN
 from src.singleplayer_game.game_gui.game_button import x_buttons, y_button, width_button
 from pygame_widgets.slider import Slider
 from pygame_widgets.textbox import TextBox

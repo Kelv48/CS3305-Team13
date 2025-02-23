@@ -1,15 +1,15 @@
-
 import pygame, sys
-from src.gui.button import Button
-from src.gui.constants import BG, screen_font, SCREEN, screen_font, scaled_cursor
-from src.gui.hand_visual import poker_hand_visualizer
-from src.gui.calculator import run_poker_calculator
+from src.gui.utils.button import Button
+from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor
 
 
+from src.singleplayer_game.game_menu import gameMenu
+from src.EV_game.game_menu import expectedValueGame
 
-def tools(mainMenu):
+
+def singlePlayer(mainMenu):
     while True:
-        TOOLS_MOUSE_POS = pygame.mouse.get_pos()
+        SINGLE_MOUSE_POS = pygame.mouse.get_pos()
 
         # Calculate positions based on current screen size    # Scale the background to fit the screen
         screen_width, screen_height = SCREEN.get_size()
@@ -39,18 +39,19 @@ def tools(mainMenu):
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
 
-
-
         
         # Calculate positions based on current screen size
-        TOOLS_TEXT = screen_font(50).render("Tools", True, "Dark Green")
-        TOOLS_RECT = TOOLS_TEXT.get_rect(center=(screen_width / 2, screen_height / 9))
-        SCREEN.blit(TOOLS_TEXT, TOOLS_RECT)
+        SINGLE_TEXT = screen_font(50).render("Poker", True, "Dark Green")
+        SINGLE_RECT = SINGLE_TEXT.get_rect(center=(screen_width / 2, screen_height / 9))
+        SCREEN.blit(SINGLE_TEXT, SINGLE_RECT)
 
         # Define button labels and functions
         buttons = [
-            ("HAND VISUALIZER", poker_hand_visualizer),
-            ("CALCULATOR", run_poker_calculator),
+            ("BOT GAME", gameMenu),
+            ("EV GAME", expectedValueGame),
+            # ("HAND RANKING", handRanking),
+            # ("BEST CARDS", bestCards),
+            # ("POT ODDS", potOdds),
             ("HOME", mainMenu)]
 
         # Calculate vertical spacing with closer spacing
@@ -60,7 +61,7 @@ def tools(mainMenu):
         # Create and position buttons
         button_objects = []
         for index, (text, action) in enumerate(buttons):
-            button_y = (index + 2.5) * button_height        # Change number bigger to make buttons go down on y axis
+            button_y = (index + 1.5) * button_height        # Change number bigger to make buttons go down on y axis
             button = Button(
                 pos=(screen_width / 2, button_y), 
                 text_input=text, 
@@ -69,7 +70,7 @@ def tools(mainMenu):
                 hovering_colour="Light Green",
                 image=None)
             
-            button.changecolour(TOOLS_MOUSE_POS)
+            button.changecolour(SINGLE_MOUSE_POS)
             button.update(SCREEN)
             button_objects.append((button, action))
 
@@ -80,20 +81,19 @@ def tools(mainMenu):
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for button, action in button_objects:
-                    if button.checkForInput(TOOLS_MOUSE_POS):
+                    if button.checkForInput(SINGLE_MOUSE_POS):
                         if action == sys.exit:
                             pygame.quit()
                             sys.exit()
-                        elif action == poker_hand_visualizer:
-                            poker_hand_visualizer(mainMenu)
-                        elif action == run_poker_calculator:
-                            run_poker_calculator(mainMenu)
+                        elif action == gameMenu:
+                            gameMenu(mainMenu)
+                        elif action == expectedValueGame:
+                            expectedValueGame(mainMenu)
                         else:
-                            mainMenu()
+                            action()
 
         # Draw the scaled cursor image at the mouse position
-        SCREEN.blit(scaled_cursor, (TOOLS_MOUSE_POS[0], TOOLS_MOUSE_POS[1]))
+        SCREEN.blit(scaled_cursor, (SINGLE_MOUSE_POS[0], SINGLE_MOUSE_POS[1]))
 
         # Update the display
         pygame.display.update()
-

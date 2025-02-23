@@ -3,7 +3,7 @@ import sys
 import random
 import itertools
 from collections import Counter
-from src.gui.constants import screen_font, BG, SCREEN, scaled_cursor
+from src.gui.utils.constants import screen_font, BG, SCREEN, scaled_cursor
 pygame.init()
 
 # ----- Global Constants & Settings -----

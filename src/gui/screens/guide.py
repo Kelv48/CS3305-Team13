@@ -6,8 +6,8 @@ import pygame_gui
 from pygame_gui.elements import UITextBox
 from pygame_gui.core import ObjectID
 
-from src.gui.button import Button
-from src.gui.constants import BG, screen_font, SCREEN as INITIAL_SCREEN
+from src.gui.utils.button import Button
+from src.gui.utils.constants import BG, screen_font, SCREEN as INITIAL_SCREEN
 
 
 def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, intermediate_callback, advanced_callback):

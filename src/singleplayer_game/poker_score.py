@@ -10,100 +10,100 @@ def hand(composition):
     """
 
     # Split colors and figures cards
-    handfigure = [card[0] for card in composition]
-    handcolor = [card[1] for card in composition]
+    handFigure = [card[0] for card in composition]
+    handColor = [card[1] for card in composition]
 
     # Change card figures to a numbers
     dict_figure = {'T': '10', 'J': '11', 'Q': '12', 'K': '13', 'A': '14'}
-    handfigure = [dict_figure.get(handfigure[i], handfigure[i]) for i in range(5)]
+    handFigure = [dict_figure.get(handFigure[i], handFigure[i]) for i in range(5)]
 
     # Sort the cards
-    handfigure = sorted([int(handfigure[i]) for i in range(5)])
+    handFigure = sorted([int(handFigure[i]) for i in range(5)])
 
     # Check straight
-    if [handfigure[i] - handfigure[0] for i in range(5)] == [0, 1, 2, 3, 4] or handfigure == [2, 3, 4, 5, 14]:
+    if [handFigure[i] - handFigure[0] for i in range(5)] == [0, 1, 2, 3, 4] or handFigure == [2, 3, 4, 5, 14]:
         straight = True
     else:
         straight = False
 
     # Condition for Royal Flush
-    if handfigure == [10, 11, 12, 13, 14] and len(set(handcolor)) == 1:
+    if handFigure == [10, 11, 12, 13, 14] and len(set(handColor)) == 1:
         score = 180
         name_poker_hand = 'Royal flush'
 
     # Condition Straight Flush
     # score from 166 to 173
-    elif straight is True and len(set(handcolor)) == 1:
-        score = 160 + handfigure[4]
+    elif straight is True and len(set(handColor)) == 1:
+        score = 160 + handFigure[4]
         name_poker_hand = "Straight Flush"
 
     # Condition four of kind
     # score from 142.03 to 154.13
-    elif handfigure.count(handfigure[2]) == 4:
-        if handfigure.count(handfigure[0]) == 1:
-            score = 140 + handfigure[1] + handfigure[0] / 100
+    elif handFigure.count(handFigure[2]) == 4:
+        if handFigure.count(handFigure[0]) == 1:
+            score = 140 + handFigure[1] + handFigure[0] / 100
         else:
-            score = 140 + handfigure[0] + handfigure[4] / 100
+            score = 140 + handFigure[0] + handFigure[4] / 100
         name_poker_hand = 'Four of kind'
 
     # Condition full house
     # score from 122.02 to 134.13
-    elif len(set(handfigure)) == 2 and handfigure.count(handfigure[2]) != 4:
-        if handfigure.count(handfigure[0]) == 2:
-            score = 120 + handfigure[2] + handfigure[0] / 100 # jezeli słabsze sa 2 karty
+    elif len(set(handFigure)) == 2 and handFigure.count(handFigure[2]) != 4:
+        if handFigure.count(handFigure[0]) == 2:
+            score = 120 + handFigure[2] + handFigure[0] / 100 # jezeli słabsze sa 2 karty
         else:
-            score = 120 + handfigure[0] + handfigure[3] / 100 # jezeli słabsze sa 3 karty
+            score = 120 + handFigure[0] + handFigure[3] / 100 # jezeli słabsze sa 3 karty
         name_poker_hand = "Full house"
 
     # Condition for Flush
     # score from 100.75432 to 101.54319
-    elif len(set(handcolor)) == 1:
-        score = 100 + handfigure[4] / 10 + handfigure[3] / 100 + handfigure[2] / 1000 + handfigure[1] / 10000 + handfigure[0] / 100000
+    elif len(set(handColor)) == 1:
+        score = 100 + handFigure[4] / 10 + handFigure[3] / 100 + handFigure[2] / 1000 + handFigure[1] / 10000 + handFigure[0] / 100000
         name_poker_hand = "Flush"
 
     # Condition for Straight
     # score from 80 to 94
     elif straight is True:
-        if handfigure == [2, 3, 4, 5, 14]:
+        if handFigure == [2, 3, 4, 5, 14]:
             score = 80
         else:
-            score = 80 + handfigure[4]
+            score = 80 + handFigure[4]
         name_poker_hand = "Straight"
 
     # Condition for three of kind
     # score from 62.043 to 74.142
-    elif handfigure.count(handfigure[2]) == 3 and len(set(handfigure)) == 3:
-        handfigure_set = list(set(handfigure))
-        handfigure_set.remove(handfigure[2])
-        score = 60 + handfigure[2] + handfigure_set[1] / 100 + handfigure_set[0] / 1000
+    elif handFigure.count(handFigure[2]) == 3 and len(set(handFigure)) == 3:
+        handFigure_set = list(set(handFigure))
+        handFigure_set.remove(handFigure[2])
+        score = 60 + handFigure[2] + handFigure_set[1] / 100 + handFigure_set[0] / 1000
         name_poker_hand = 'Three of kind'
 
     # Condition for two pair
     # score from 43.24 to 55.419999999999995
-    elif handfigure.count(handfigure[1]) == 2 and handfigure.count(handfigure[3]) == 2:
-        handfigure_set = list(set(handfigure))
-        handfigure_set.remove(handfigure[1])
-        handfigure_set.remove(handfigure[3])
-        score = 40 + handfigure[3] + handfigure[1] / 10 + handfigure_set[0] / 100
+    elif handFigure.count(handFigure[1]) == 2 and handFigure.count(handFigure[3]) == 2:
+        handFigure_set = list(set(handFigure))
+        handFigure_set.remove(handFigure[1])
+        handFigure_set.remove(handFigure[3])
+        score = 40 + handFigure[3] + handFigure[1] / 10 + handFigure_set[0] / 100
         name_poker_hand = "Two pair"
 
     # Condition for pair
     # score from 22.05043 to 34.13131
-    elif len(set(handfigure)) == 4:
-        if handfigure.count(handfigure[1]) == 2:
-            handfigure_set = list(set(handfigure))
-            handfigure_set.remove(handfigure[1])
-            score = 20 + handfigure[1] + handfigure_set[2] / 100 + handfigure_set[1] / 10000 + handfigure_set[0] / 100000
-        elif handfigure.count(handfigure[3]) == 2:
-            handfigure_set = list(set(handfigure))
-            handfigure_set.remove(handfigure[3])
-            score = 20 + handfigure[3] + handfigure_set[2] / 100 + handfigure_set[1] / 10000 + handfigure_set[0] / 100000
+    elif len(set(handFigure)) == 4:
+        if handFigure.count(handFigure[1]) == 2:
+            handFigure_set = list(set(handFigure))
+            handFigure_set.remove(handFigure[1])
+            score = 20 + handFigure[1] + handFigure_set[2] / 100 + handFigure_set[1] / 10000 + handFigure_set[0] / 100000
+        elif handFigure.count(handFigure[3]) == 2:
+            handFigure_set = list(set(handFigure))
+            handFigure_set.remove(handFigure[3])
+            score = 20 + handFigure[3] + handFigure_set[2] / 100 + handFigure_set[1] / 10000 + handFigure_set[0] / 100000
         name_poker_hand = "Pair"
 
     # Condition for high card
     # score from 7.543200000000001 to 15.431899999999999
-    elif len(set(handfigure)) == 5:
-        score = handfigure[4] + handfigure[3] / 10 + handfigure[2] / 100 + handfigure[1] / 1000 + handfigure[0] / 10000
+    elif len(set(handFigure)) == 5:
+        score = handFigure[4] + handFigure[3] / 10 + handFigure[2] / 100 + handFigure[1] / 1000 + handFigure[0] / 10000
         name_poker_hand = "High card"
 
     return score, name_poker_hand

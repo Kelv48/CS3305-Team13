@@ -3,7 +3,7 @@ from src.singleplayer_game.game_gui.player import Player
 from src.singleplayer_game.auction import auction
 from src.singleplayer_game.poker_score import players_score
 from src.singleplayer_game.game_gui.utils import recapRound as recap_round, splitPot, onePlayerWin, changePlayersPositions
-from src.gui.constants import SB, BB
+from src.gui.utils.constants import SB, BB
 
 def poker_round():
     """
