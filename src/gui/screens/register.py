@@ -214,7 +214,7 @@ def loginUser(username, password):
     if response.status_code == 200:
         userdata = response.json()
         if userdata["password"] == password:
-            save_user(username)
+            save_user(username, password)
             print(f"User {username} logged in successfully!")
         else:
             print("Incorrect password!")
