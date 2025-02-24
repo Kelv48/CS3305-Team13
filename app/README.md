@@ -22,7 +22,7 @@ routes, caching, and configuration.
 
 ### `app/cache.py`
 - Contains functions for interacting with Redis, primarily for caching user data.
-- When a user is fetched via `/login>`, the data is cached for 5 minutes to reduce database hits.
+- When a user is fetched via `/login`, the data is cached for 5 minutes to reduce database hits.
 
 ### `app/config.py`
 - This file holds configuration settings for the Flask app, such as database URI, Redis connection settings, and other configurations required by the app.
