@@ -340,8 +340,13 @@ def poker_hand_visualizer(mainMenu):
         )
         SCREEN.blit(stats_text, (container_x, container_y + GRID_HEIGHT + 15))
 
+        # *** Draw the custom cursor last so it’s always on top ***
+        current_mouse_pos = pygame.mouse.get_pos()
+        SCREEN.blit(scaled_cursor, current_mouse_pos)
+
         pygame.display.flip()
         clock.tick(30)
+
 
     pygame.quit()
     sys.exit()

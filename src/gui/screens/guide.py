@@ -7,7 +7,7 @@ from pygame_gui.elements import UITextBox
 from pygame_gui.core import ObjectID
 
 from src.gui.utils.button import Button
-from src.gui.utils.constants import BG, screen_font, SCREEN as INITIAL_SCREEN
+from src.gui.utils.constants import BG, screen_font, SCREEN as INITIAL_SCREEN, scaled_cursor
 
 
 def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, intermediate_callback, advanced_callback):
@@ -143,6 +143,11 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
 
         manager.update(time_delta)
         manager.draw_ui(screen)
+
+        # *** Draw the custom cursor last so it’s always on top ***
+        current_mouse_pos = pygame.mouse.get_pos()
+        INITIAL_SCREEN.blit(scaled_cursor, current_mouse_pos)
+
         pygame.display.update()
 
 

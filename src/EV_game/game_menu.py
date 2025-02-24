@@ -1,9 +1,11 @@
 # src/EV_game/game_menu.py
 import pygame, sys, pygame.transform, random
 from src.gui.utils.button import Button
-from src.gui.utils.constants import BG, screen_font, SCREEN
+from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor
 from src.singleplayer_game.game_gui.player import Player
 from src.EV_game.poker_round import ev_round
+# (Optionally, you can import drawCustomCursor once here if you prefer.)
+# from src.EV_game.game_gui.utils import drawCustomCursor
 
 def expectedValueGame(mainMenu):
     START_STACK = 5000
@@ -76,11 +78,11 @@ def menuEnd(mainMenu, ev_results=None, final_ev=None):
             y_offset = 200
             for i, ev in enumerate(ev_results, start=1):
                 color = (0, 255, 0) if ev >= 0 else (255, 0, 0)
-                ev_text = font_ev.render(f"Round {i} EV: {ev:+.2f}", True, color)
+                ev_text = screen_font(30).render(f"Round {i} EV: {ev:+.2f}", True, color)
                 SCREEN.blit(ev_text, (50, y_offset))
                 y_offset += ev_text.get_height() + 5
             total_color = (0, 255, 0) if final_ev >= 0 else (255, 0, 0)
-            total_text = font_ev.render(f"Final EV: {final_ev:+.2f}", True, total_color)
+            total_text = screen_font(30).render(f"Final EV: {final_ev:+.2f}", True, total_color)
             SCREEN.blit(total_text, (50, y_offset))
         button_new_game.changecolour(mouse_pos)
         button_new_game.update(SCREEN)
@@ -97,6 +99,10 @@ def menuEnd(mainMenu, ev_results=None, final_ev=None):
                 if button_exit.checkForInput(mouse_pos):
                     mainMenu()
                     return False
+        
+        # Draw the custom cursor using our dedicated function.
+        from src.EV_game.game_gui.utils import drawCustomCursor
+        drawCustomCursor()
         pygame.display.update()
     return restart
 
@@ -150,4 +156,7 @@ def menuStart(mainMenu):
                 for button_obj, action in button_objects:
                     if button_obj.checkForInput(mouse_pos):
                         return action
+                        
+        from src.EV_game.game_gui.utils import drawCustomCursor
+        drawCustomCursor()
         pygame.display.update()

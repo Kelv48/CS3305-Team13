@@ -25,8 +25,8 @@ SCREEN = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)    # Resizable
 cursor_image = pygame.image.load("assets/images/pointer_c.png").convert_alpha()
 scaled_cursor = pygame.transform.smoothscale(cursor_image, (32, 32))
 
-# # Hide the default cursor
-# pygame.mouse.set_visible(False)
+# Hide the default cursor
+pygame.mouse.set_visible(False)
 
 
 

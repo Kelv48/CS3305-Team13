@@ -61,6 +61,7 @@ def getPlayerDecision(player, options, min_raise, max_raise, common_cards, call_
         decision = bot.decision()
         print(player.name, decision)
     chips = int(decision[1]) if decision[0] == 'raise' else None
+    
     return decision[0], chips
 
 def processDecision(decision, chips, player, player_list):
