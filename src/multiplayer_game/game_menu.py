@@ -1,7 +1,7 @@
 import pygame, sys
 import pygame.transform
 from src.gui.utils.button import Button
-from src.gui.utils.constants import BG, screen_font, SCREEN, FPS
+from src.gui.utils.constants import BG, screen_font, SCREEN, FPS, scaled_cursor
 from src.singleplayer_game.game_gui.utils import changePlayersPositions
 from src.singleplayer_game.game_gui.player import Player
 from src.singleplayer_game.poker_round import poker_round
@@ -146,6 +146,11 @@ def menuStart(mainMenu):
                             return "quit"
                         else:
                             return action
+                        
+        # *** Draw the custom cursor last so it’s always on top ***
+        current_mouse_pos = pygame.mouse.get_pos()
+        SCREEN.blit(scaled_cursor, current_mouse_pos)
+
 
         pygame.display.update()
 
@@ -200,6 +205,12 @@ def menuEnd(mainMenu):
                 if button_exit.checkForInput(mouse_pos):
                     mainMenu()  # Call mainMenu if "Exit" is clicked
                     return False
+                
+
+        # *** Draw the custom cursor last so it’s always on top ***
+        current_mouse_pos = pygame.mouse.get_pos()
+        SCREEN.blit(scaled_cursor, current_mouse_pos)
+
         
         pygame.display.update()
     

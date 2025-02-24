@@ -182,7 +182,7 @@ def load_card_images(card_width, card_height):
 # ----- Main GUI Loop with Card Selection -----
 def run_poker_calculator(mainMenu, num_simulations=1000):
     clock = pygame.time.Clock()
-    
+
     # Dimensions for card images and grid layout.
     CARD_WIDTH, CARD_HEIGHT = 60, 90
     GRID_MARGIN_X, GRID_MARGIN_Y = 5, 5
@@ -364,13 +364,10 @@ def run_poker_calculator(mainMenu, num_simulations=1000):
         
         # Draw the back button.
         back_button.draw(SCREEN)
-
-        # # Draw the scaled cursor image at the mouse position
-        # SCREEN.blit(scaled_cursor, (MOUSE_POS[0], MOUSE_POS[1]))
+        
+        # *** Draw the custom cursor last so it’s always on top ***
+        current_mouse_pos = pygame.mouse.get_pos()
+        SCREEN.blit(scaled_cursor, current_mouse_pos)
         
         pygame.display.flip()
         clock.tick(30)
-
-# ----- Run the Application -----
-if __name__ == '__main__':
-    run_poker_calculator()

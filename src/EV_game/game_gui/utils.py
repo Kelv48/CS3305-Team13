@@ -1,6 +1,6 @@
 # src/EV_game/game_gui/utils.py
 import pygame
-from src.gui.utils.constants import SCREEN, BG, BEIGE, GREEN, game_font
+from src.gui.utils.constants import SCREEN, GAME_BG, BEIGE, GREEN, game_font
 from src.singleplayer_game.game_gui.player import Player
 
 def recapRoundEV(ev_change, round_number):
@@ -20,7 +20,7 @@ def drawButtons(buttons):
 
 def arrangeRoom(mainMenu, common_cards=None):
     screen_width, screen_height = SCREEN.get_size()
-    scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height))
+    scaled_bg = pygame.transform.scale(GAME_BG, (screen_width, screen_height))
     SCREEN.blit(scaled_bg, (0, 0))
     try:
         poker_table_image = pygame.image.load("assets/images/Table.png")
@@ -37,3 +37,13 @@ def drawPlayer():
         player.playerLabel(SCREEN)
         player.drawBet(SCREEN)
     pygame.display.flip()
+
+def drawCustomCursor():
+    """
+    Draws the custom cursor image at the current mouse position.
+    Call this function after all other drawing calls (i.e., at the end of your main loop)
+    so that it always appears on top.
+    """
+    from src.gui.utils.constants import SCREEN, scaled_cursor
+    current_mouse_pos = pygame.mouse.get_pos()
+    SCREEN.blit(scaled_cursor, current_mouse_pos)

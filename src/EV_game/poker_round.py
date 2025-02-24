@@ -1,7 +1,7 @@
 # src/EV_game/poker_round.py
 import random, time, pygame
 from src.singleplayer_game.game_gui.player import Player
-from src.EV_game.game_gui.utils import recapRoundEV, arrangeRoom, drawPlayer, drawButtons
+from src.EV_game.game_gui.utils import recapRoundEV, arrangeRoom, drawPlayer, drawButtons, drawCustomCursor
 from src.EV_game.game_gui.game_button import buttons
 from src.gui.utils.constants import SCREEN, BG
 
@@ -45,14 +45,31 @@ def ev_round(round_number):
 
 def wait_for_player_ev_decision(buttons, options, min_raise, max_raise):
     import time
+    import pygame
+    
     start = time.time()
     for button in buttons:
         button.active = True
+
+    # Capture the current static poker screen only once.
+    # This assumes that before calling this function, the poker screen has been drawn.
+    saved_background = pygame.Surface(SCREEN.get_size())
+    saved_background.blit(SCREEN, (0, 0))
+    
     while True:
+        # Restore the saved background, so the poker layout is not redrawn repeatedly.
+        SCREEN.blit(saved_background, (0, 0))
+        
+        # Draw any dynamic buttons on top
         drawButtons(buttons)
+        
+        # Draw the custom cursor once per frame.
+        drawCustomCursor()
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit(); quit()
+                pygame.quit()
+                quit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
                 for button in buttons:
@@ -60,8 +77,7 @@ def wait_for_player_ev_decision(buttons, options, min_raise, max_raise):
                         decision = button.name
                         amt = min_raise if decision == 'raise' else 0
                         return decision, amt
-        if time.time() - start > 20:
-            return 'fold', 0
+        
         pygame.display.update()
 
 def compute_ev_outcome(decision, position, num_raises, pot):

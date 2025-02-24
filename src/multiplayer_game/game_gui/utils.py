@@ -305,41 +305,30 @@ from pygame_widgets.textbox import TextBox
 
 def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=None):
     """
-    Display GUI for a player and return their action.
-    
-    :param buttons: buttons object
-    :param dict_options: dict with information about which buttons are active
-    :param min_raise: minimum raise value
-    :param max_raise: maximum raise value
-    :param common_cards: list of common cards (if any)
-    :return: a list with the decision; if 'raise' is chosen, also returns the raise amount.
-             If no action is made within 20 seconds, returns ['fold'].
+    Displays the GUI for a player's decision and returns their action.
+    If no action is received within a set time, auto-fold is returned.
     """
 
-    # Fixed position for the slider (independent from x_buttons)
-    x_slider = 1070  # Fixed x position for the slider
-    y_slider = 650   # Fixed y position (adjust based on layout)
-
-    # Slider setup (decoupled from button positions)
+    # Set up slider and output for raising.
+    x_slider = 1070
+    y_slider = 650
     slider = Slider(SCREEN, x_slider, y_slider, width_button * 2, 40,
                     min=0, max=max_raise - min_raise, initial=0, step=1,
                     colour=(94, 151, 82), handleColour=BEIGE, handleRadius=19)
 
-    # Fixed position for the output text box
-    x_output = 1060  # Fixed x position for the output box
-    y_output = 590   # Fixed y position (adjust as needed)
-
+    x_output = 1060
+    y_output = 590
     font = game_font(20)
     output = TextBox(SCREEN, x_output, y_output, 100, 50, fontSize=20,
                      colour=GREEN, textColour=BEIGE, font=font)
     output.setText('1')
     output.disable()
 
-    # Activate proper buttons based on options
+    # Set the active status for the buttons.
     for button in buttons:
         button.active = dict_options.get(button.name, False)
 
-    # Arrange common cards and update player display (assumes these functions are defined elsewhere)
+    # Draw the common background elements once before the loop.
     arrangeRoom(common_cards)
     drawPlayer()
 
@@ -348,21 +337,22 @@ def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=Non
     decision = None
 
     while pause_action:
-        # Check if 20 seconds have elapsed and auto-fold if so.
-        if time.time() - start_time >= 5:
-            decision = ['fold']
-            pause_action = False
-            break
-
+        # Clear the frame by redrawing the background and players.
+        # (Replace BG below with your background if needed)
+        # Draw background.
+        screen_width, screen_height = SCREEN.get_size()
+        scaled_bg = pygame.transform.scale(GAME_BG, (screen_width, screen_height))
+        SCREEN.blit(scaled_bg, (0, 0))
+        arrangeRoom(common_cards)
+        drawPlayer()
         drawButtons(buttons)
 
+        # Process events.
         for event in pygame.event.get():
             mouse_position = pygame.mouse.get_pos()
-
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for button in buttons:
                     if button.isOver(mouse_position) and button.active:
@@ -371,22 +361,32 @@ def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=Non
                         else:
                             decision = [button.name]
                         pause_action = False
-                        break  # Exit the inner loop once a decision is made
-
+                        break
             if event.type == pygame.MOUSEMOTION:
                 for button in buttons:
                     if button.active:
                         button.bigger(mouse_position)
-
-            # For the raise button, update the slider output display if active
+            # Update slider output if needed.
             for button in buttons:
                 if button.name == 'raise' and button.active:
                     output.setText('$' + str(slider.getValue() + min_raise))
                     pygame_widgets.update(event)
-                pygame.display.update()
+
+        # Draw slider and output text.
+        slider.draw()   # Ensure your Slider class has a draw method.
+        output.draw()   # And your TextBox class as well.
+
+        # Finally, draw the custom cursor once per frame.
+        drawCustomCursor()
+        # One display update per frame.
+        pygame.display.update()
+
+        # Check for timeout.
+        if time.time() - start_time >= 5:
+            decision = ['fold']
+            pause_action = False
 
     return decision
-
 
 def splitPot():
     """
@@ -484,3 +484,15 @@ def changePlayersPositions():
     from src.singleplayer_game.game_gui.player import Player
     num_players = len(Player.player_list)
     Player.dealer_index = (Player.dealer_index + 1) % num_players  
+
+
+def drawCustomCursor():
+    """
+    Draws the custom cursor image at the current mouse position.
+    Call this function after all other drawing calls (i.e., at the end of your main loop)
+    so that it always appears on top.
+    """
+    from src.gui.utils.constants import SCREEN, scaled_cursor
+    # *** Draw the custom cursor last so it’s always on top ***
+    current_mouse_pos = pygame.mouse.get_pos()
+    SCREEN.blit(scaled_cursor, current_mouse_pos)

@@ -35,7 +35,7 @@ def save_leaderboard(data):
 
 def leaderboard(mainMenu):
     while True:
-        SETTINGS_MOUSE_POS = pygame.mouse.get_pos()
+        MOUSE_POS = pygame.mouse.get_pos()
 
         # Scale the background to fit the current screen size.
         screen_width, screen_height = SCREEN.get_size()
@@ -97,7 +97,7 @@ def leaderboard(mainMenu):
                 hovering_colour="Light Green",
                 image=None
             )
-            button.changecolour(SETTINGS_MOUSE_POS)
+            button.changecolour(MOUSE_POS)
             button.update(SCREEN)
             button_objects.append((button, action))
 
@@ -108,7 +108,7 @@ def leaderboard(mainMenu):
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for button, action in button_objects:
-                    if button.checkForInput(SETTINGS_MOUSE_POS):
+                    if button.checkForInput(MOUSE_POS):
                         # Depending on the action associated with the button, call the function.
                         if action == sys.exit:
                             pygame.quit()
@@ -119,7 +119,7 @@ def leaderboard(mainMenu):
                             action(mainMenu)
 
         # Draw the scaled cursor image at the mouse position
-        SCREEN.blit(scaled_cursor, (SETTINGS_MOUSE_POS[0], SETTINGS_MOUSE_POS[1]))
+        SCREEN.blit(scaled_cursor, (MOUSE_POS[0], MOUSE_POS[1]))
 
         # Update the display.
         pygame.display.update()
