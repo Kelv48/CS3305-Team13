@@ -19,7 +19,7 @@ class User(db.Model):
     password = db.Column(db.String(120), nullable=False)
 
     # relationships
-    stats = db.relationship('Stats', backref='user', lazy=True)
+    stats = db.relationship('Stats', backref='user_statistics', lazy=True)
 
     def __repr__(self):
         return f'<User {self.name}>'
@@ -27,27 +27,34 @@ class User(db.Model):
 class Stats(db.Model):
     __tablename__ = 'stats'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
-    win_count = db.Column(db.Integer)
-    loss_count = db.Column(db.Integer)
-    win_loss_ratio = db.Column(db.Float)
-    earnings = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    win_count = db.Column(db.Integer, default=0, nullable=False, check=db.CheckConstraint('win_count >= 0'))
+    loss_count = db.Column(db.Integer, default=0, nullable=False, check=db.CheckConstraint('loss_count >= 0'))
+    earnings = db.Column(db.Integer, default=0, nullable=False, check=db.CheckConstraint('earnings >= 0'))
 
-    # relationships
-    leaderboard = db.relationship('Leaderboard', backref='stats', lazy=True)
+    # Relationships
+    leaderboard = db.relationship('Leaderboard', backref='leaderboards', lazy=True, cascade="all, delete")
+
+    @property
+    def win_loss_ratio(self):
+        if self.loss_count == 0 and self.win_count == 0:
+            return None  # Both win and loss are zero, undefined ratio
+        return self.win_count / self.loss_count if self.loss_count > 0 else float('inf')
 
     def __repr__(self):
         return f'<Stats {self.user_id}>'
     
 class Leaderboard(db.Model):
+    __tablename__ = 'leaderboard'
     id = db.Column(db.Integer, primary_key=True)
-    stats_id = db.Column(db.Integer, db.ForeignKey('stats.id', ondelete='CASCADE'))
-    rank = db.Column(db.Integer)
-    earnings = db.Column(db.Integer)
-    username = db.Column(db.String(80), db.ForeignKey('user.name'), nullable=False)
+    stats_id = db.Column(db.Integer, db.ForeignKey('stats.id', ondelete='CASCADE'), unique=True, nullable=False)
+    rank = db.Column(db.Integer, default=0, nullable=False)
+    earnings = db.Column(db.Integer, default=0, nullable=False)
+    
+    __table_args__ = (db.UniqueConstraint('stats_id', name='unique_stats_leaderboard'),)
 
     def __repr__(self):
-        return f'<Leaderboard {self.username}>'
+        return f'<Leaderboard {self.stats_id}>'
 
 
 def get_user_DBorCache(user_name):
