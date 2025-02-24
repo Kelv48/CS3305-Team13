@@ -1,0 +1,11 @@
+1. Add in the leaderboard route
+2. Add leaderboard to redis and an algorithm that reloads it on update or every 30 mins
+3. Add user to route
+4. Add user to redis
+5. Add search functionality
+  route/redis
+6. Add in admin functionality
+7. Login/Change db
+8. Html.
+9. Encrypt db info 
+10. Ensure security
