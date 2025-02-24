@@ -1,4 +1,10 @@
 __pycache__/
 *.pyc
 *.pyo
-
+.idea/
+.vscode/
+Online_RPS_temp/
+Yangs_Code/
+output.txt
+lobby.py
+.gitignore
