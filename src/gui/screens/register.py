@@ -232,8 +232,20 @@ def loginUser(username, password):
     else:
         print(f"Failed to login: {response.json()}")
 
-def save_user():
-    pass
+
+
+
+
+# Temp functions
+def save_user(username, password):
+    # to be updated to store a hash when security is implemented in db/redis
+    with open(local, 'w') as f:
+        json.dump({"username": username, "password": password}, f)
 
 def load_user():
-    pass
+    try:
+        with open(local, 'r') as f:
+            data = json.load(f)
+            return data["username"]  # Only return the username
+    except FileNotFoundError:
+        return None
