@@ -30,7 +30,7 @@
 1. Make sure Redis is running locally on port `6379` (default).
 2. Start the Flask app by running the following command in the project root:
     ```bash
-    python run.py**
+    python run.py
     ```
 3. The server for the duration of the project will be running at `http://84.8.144.77/5000`.
 
