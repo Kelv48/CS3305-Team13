@@ -7,6 +7,7 @@
 - Fetch a user by `name` with caching support using Redis.
 - In-memory cache for quick access of user data (with an expiry time of 5 minutes).
 - Stores user data in an SQLite database.
+- Implements multiple file structure with modular Flask app for easier maintainability.
 
 ## Requirements
 
@@ -27,13 +28,26 @@
 
 ### Running the Server
 1. Make sure Redis is running locally on port `6379` (default).
-2. Start the Flask app:
-3. The server will be running at `http://127.0.0.1:5000`.
+2. Start the Flask app by running the following command in the project root:
+    ```bash
+    python run.py**
+    ```
+3. The server for the duration of the project will be running at `http://84.8.144.77/5000`.
+
+### File Structure
+
+The project follows a modular file structure for better organization:
+- **`app/__init__.py`**: Initializes the Flask app and database (SQLAlchemy).
+- **`app/models.py`**: Defines the database models for `User` and related entities.
+- **`app/routes.py`**: Contains the API routes (endpoints) like `/register` and `/login`.
+- **`app/cache.py`**: Contains the logic for interacting with Redis for caching.
+- **`run.py`**: The script that starts the application by calling `create_app()` from the `app` package.
+
 
 ### Running the Client (Optional)
 You can use the `requests` library to test the API.
 
-```python
+```python **`This code is just an example`**
 import requests
 
 # Create a new user
