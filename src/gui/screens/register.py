@@ -115,7 +115,7 @@ def register(mainMenu):
             ("Enter", registerUser),
             ("Switch to Login Page", login),
             ("HOME", mainMenu)
-        ])
+        ], message)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -165,9 +165,13 @@ def registerUser(username, password):
 
 # Login Functionality
 def login(mainMenu):
+    username = load_user()
+    if username:
+        return mainMenu()
     username = ""
     password = ""
     active_input = None
+    message = ""
 
     while True:
         LOGIN_MOUSE_POS = pygame.mouse.get_pos()
@@ -175,7 +179,7 @@ def login(mainMenu):
             ("Enter", loginUser),
             ("Switch to Register Page", register),
             ("HOME", mainMenu)
-        ])
+        ], message)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -189,7 +193,7 @@ def login(mainMenu):
                         elif action == register:
                             register(mainMenu)
                         elif action == loginUser:  # Check for Enter button action
-                            print("Logging in user:", username)  # Placeholder action
+                            loginUser(username, password) 
                 if username_box.collidepoint(LOGIN_MOUSE_POS):
                     active_input = "username"
                 elif password_box.collidepoint(LOGIN_MOUSE_POS):
@@ -211,8 +215,22 @@ def login(mainMenu):
 
         pygame.display.update()
 
-def loginUser():
-    pass
+def loginUser(username, password):
+    url = f"{base_url}/login"
+    payload = {"username" : username, "password" : password}
+    headers = {"Content-Type": "application/json"}
+
+    response = requests.post(url, data=json.dumps(payload), headers=headers)
+
+    if response.status_code == 200:
+        userdata = response.json()
+        if userdata["password"] == password:
+            save_user(username)
+            print(f"User {username} logged in successfully!")
+        else:
+            print("Incorrect password!")
+    else:
+        print(f"Failed to login: {response.json()}")
 
 def save_user():
     pass
