@@ -26,6 +26,7 @@ class Protocols:
         CALL = 'protocol.call'
         CREATE_GAME = 'protocol.request_create_game'                    #Used by client to join a game
         JOIN_GAME = 'protocol.request_join_game'                        #Used by client to create a game 
+        START_GAME_EARLY_VOTE = 'protocol.request_start_game_early'
         AUTHENTICATION = 'protocol.request_authentication'              #Used to request of auth when client logs in 
         CREATE_ACCOUNT = 'protocol.request_create_account'              #Used to create an account, which is stored in DB 
         LOGOUT = 'protocol.request_logout'                              #Used by client to log out
