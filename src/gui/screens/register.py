@@ -1,6 +1,9 @@
-import pygame, sys
+import pygame, sys, requests, json
 from src.gui.utils.button import Button
 from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor
+
+base_url = 'http://84.8.144.77:5000'
+local = "local.json"
 
 def render_screen(title, username, password, active_input, button_actions):
     screen_width, screen_height = SCREEN.get_size()
@@ -99,11 +102,12 @@ def render_screen(title, username, password, active_input, button_actions):
     return username_box, password_box, button_objects
 
 
-
+# Register Functionality
 def register(mainMenu):
     username = ""
     password = ""
     active_input = None
+    message = ""
 
     while True:
         REGISTER_MOUSE_POS = pygame.mouse.get_pos()
@@ -125,7 +129,7 @@ def register(mainMenu):
                         elif action == login:
                             login(mainMenu)
                         elif action == registerUser:  # Check for Enter button action
-                            print("Registering user:", username)  # Placeholder action
+                            registerUser(username, password)
                 if username_box.collidepoint(REGISTER_MOUSE_POS):
                     active_input = "username"
                 elif password_box.collidepoint(REGISTER_MOUSE_POS):
@@ -147,6 +151,19 @@ def register(mainMenu):
 
         pygame.display.update()
 
+def registerUser(username, password):
+    url = f"{base_url}/register"
+    payload = {"username" : username, "password" : password}
+    headers = {"Content-Type": "application/json"}
+
+    response = requests.post(url, data=json.dumps(payload), headers=headers)
+
+    if response.status_code == 201:
+        print(f"User {username} registered successfully!")
+    else:
+        print(f"Failed to register: {response.json()}")
+
+# Login Functionality
 def login(mainMenu):
     username = ""
     password = ""
@@ -194,10 +211,11 @@ def login(mainMenu):
 
         pygame.display.update()
 
-
-def registerUser():
-    pass
-
 def loginUser():
     pass
 
+def save_user():
+    pass
+
+def load_user():
+    pass
