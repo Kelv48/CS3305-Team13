@@ -16,13 +16,13 @@ routes, caching, and configuration.
 
 ### `app/routes.py`
 - Contains the routes (API endpoints) for the application.
-    - `/create_user`: Endpoint to create a new user.
-    - `/user/<name>`: Endpoint to fetch user data by name, with caching support using Redis.
+    - `/register`: Endpoint to create a new user.
+    - `/login`: Endpoint to fetch user data by name, with caching support using Redis.
 - Each route handles HTTP requests and interacts with the models to perform necessary operations like creating users or fetching their information.
 
 ### `app/cache.py`
 - Contains functions for interacting with Redis, primarily for caching user data.
-- When a user is fetched via `/user/<name>`, the data is cached for 5 minutes to reduce database hits.
+- When a user is fetched via `/login>`, the data is cached for 5 minutes to reduce database hits.
 
 ### `app/config.py`
 - This file holds configuration settings for the Flask app, such as database URI, Redis connection settings, and other configurations required by the app.
@@ -62,5 +62,5 @@ routes, caching, and configuration.
       ```
 
 4. **Access the API**:
-    - The API will be available at `http://127.0.0.1:5000`.
+    - The API will be available at `http://127.0.0.1:5000` if you run it locally.
     - You can test the API using any API client (Postman, Curl, etc.) or with Python's `requests` library.
