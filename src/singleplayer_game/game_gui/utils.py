@@ -308,10 +308,10 @@ def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=Non
         # One display update per frame.
         pygame.display.update()
 
-        # Check for timeout.
-        if time.time() - start_time >= 5:
-            decision = ['fold']
-            pause_action = False
+        # # Check for timeout.
+        # if time.time() - start_time >= 5:
+        #     decision = ['fold']
+        #     pause_action = False
 
     return decision
 
