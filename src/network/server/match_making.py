@@ -16,9 +16,10 @@ import json
 import logging
 #from game import game_class
 from string import Template
+from json import JSONDecodeError
 from random import randint, randbytes
 from protocol import Protocols
-from websockets.exceptions import ConnectionClosed, ConnectionClosedError
+from websockets.exceptions import ConnectionClosed, ConnectionClosedError, ConnectionClosedOK
 from  websockets.asyncio.server import serve, ServerConnection
 
 # Server attributes
@@ -48,7 +49,7 @@ async def createGame(websocket:ServerConnection, maxPlayer:int):
         'clients': {websocket}, 
         'gameObj': None,    #Can get rid of this
         'maxPlayer': maxPlayer, 
-        'forceStart': {}, 
+        'forceStart': set(), 
         'numPlayer': 1, 
         'ready': False
     }
@@ -59,6 +60,7 @@ async def createGame(websocket:ServerConnection, maxPlayer:int):
 
 
 #TODO: Figure out how to get a player to join game that is already running
+#TODO: Need to disconnect ServerConnections properly
 async def joinGame(websocket: ServerConnection, sessionID):
     logger.info(f"adding {websocket.remote_address} to session:{sessionID}")
 
@@ -97,7 +99,7 @@ async def joinGame(websocket: ServerConnection, sessionID):
                     await serverConnection.send(redirectMessage)
 
                 #Publish relevant info to redis server
-                data = {'sessionID':sessionID, 'clients':[], 'gameObj':activeSessions[sessionID]['gameObj']}
+                data = {'sessionID':sessionID, 'clients':{}, 'gameObj':activeSessions[sessionID]['gameObj']}
                 r.publish(channel, json.dumps(data))
 
                 return  #Exit out of function
@@ -123,33 +125,34 @@ async def joinGame(websocket: ServerConnection, sessionID):
         
         
 
-#TODO: figure out how to link vote to a specific client because they could leave but there vote to start remains 
+
 async def voteStart(websocket: ServerConnection, sessionID):
     logger.info("vote to start has been counted")
     try:
         activeSessions[sessionID]['forceStart'].add(websocket)
-        logger.info(f"Votes: {activeSessions[sessionID]['numPlayer']}")
+        logger.info(f"Votes: {len(activeSessions[sessionID]['forceStart'])}")
         if len(activeSessions[sessionID]['forceStart']) >= activeSessions[sessionID]['numPlayer']:
             activeSessions[sessionID]['ready'] = True
 
             #Create game object 
 
             #Redirect each client in lobby to game server 
-            redirectMessage = template.substitute(m_type=Protocols.Response.REDIRECT, data={'host':'localhost', 'port':443})
+            redirectMessage = json.dumps({"m_type": Protocols.Response.REDIRECT, "data": {"host": "localhost", "port": 443}})
             for serverConnection in activeSessions[sessionID]['clients']:
                 await serverConnection.send(redirectMessage)
+                
 
 
             #Publish relevant info to redis server
-            data = {sessionID:{'clients':[], 'gameObj':activeSessions[sessionID]['gameObj']}}
-            r.publish(channel, data)
+            data = {'sessionID':sessionID, 'clients':{}, 'gameObj':activeSessions[sessionID]['gameObj']}
+            r.publish(channel, json.dumps(data))
 
             return  #Exit function 
         
     
         #Broadcast new info to other clients in lobby 
         logger.debug("Broadcasting vote to start game")  
-        message = template.substitute(m_type=Protocols.Response.FORCE_START, data=activeSessions[sessionID]['forceStart'])
+        message = template.substitute(m_type=Protocols.Response.FORCE_START, data=len(activeSessions[sessionID]['forceStart']))
         for serverConnection in activeSessions[sessionID]['clients']:
             if serverConnection != websocket:
                 await serverConnection.send(message)
@@ -163,7 +166,7 @@ async def voteStart(websocket: ServerConnection, sessionID):
         
 
 
-async def leaveGame(websocket: ServerConnection, sessionID):
+async def leaveGame(websocket: ServerConnection, sessionID, redirect=False):
     #This method removes a player if they choose to leave the game 
     logger.info(f"{websocket.remote_address} is leaving the game")
     try:
@@ -179,33 +182,33 @@ async def leaveGame(websocket: ServerConnection, sessionID):
             del activeSessions[sessionID]
             return
         
+        if not redirect:
+            message = template.substitute(m_type=Protocols.Response.LOBBY_UPDATE, data=activeSessions[sessionID])
+            logger.info(f"broadcasting {websocket.remote_address} has left game")
+            #Broadcasting new player count in lobby to other clients 
+            for serverConnection in  activeSessions[sessionID]['clients']:
+                if serverConnection != websocket:
+                    await serverConnection.send(message)
 
-        message = template.substitute(m_type=Protocols.Response.LOBBY_UPDATE, data=activeSessions[sessionID])
+            logger.info(f"{websocket.remote_address} has been closed")
+            await websocket.close()
 
-        logger.info(f"broadcasting {websocket.remote_address} has left game")
-        #Broadcasting new player count in lobby to other clients 
-        for serverConnection in  activeSessions[sessionID]['clients']:
-            #if serverConnection != websocket:
-            await serverConnection.send(message)
-
-        logger.info(f"{websocket.remote_address} has been closed")
-        await websocket.close()
+        logger.debug(f"active sessions left: {activeSessions}")
 
     except KeyError as e:
         error_message = template.substitute(m_type=Protocols.Response.ERROR, data="The game that you are trying to leave does not exist")
         await websocket.send(error_message)
 
     except ConnectionClosed as e:
-        
         print("Error occurred trying to send message to client")        
 
 
-async def closeClient(websocket: ServerConnection, sessionID=None):
+async def closeClient(websocket: ServerConnection, sessionID=None, redirect=False):
     #If client is in a game then invoke leaveGame()
     #else disconnect the bastard
     try:
         if sessionID in activeSessions:
-            await leaveGame(websocket, sessionID)
+            await leaveGame(websocket, sessionID, redirect)
         else:
             logger.info(f"{websocket.remote_address} has been closed")
             await websocket.close()
@@ -215,6 +218,9 @@ async def closeClient(websocket: ServerConnection, sessionID=None):
 
     except ConnectionClosedError as e:
         print(f"Issue sending data to client {e}")
+
+    except KeyError as e:
+        return
 
  
 async def handleClient(websocket: ServerConnection):
@@ -232,7 +238,7 @@ async def handleClient(websocket: ServerConnection):
                 await closeClient(websocket, currentSessionID)
                 break
 
-            message = json.loads(data.decode())
+            message = json.loads(data)
             currentSessionID = message['sessionID']
             logger.info(f"message received: {message}")
 
@@ -244,8 +250,11 @@ async def handleClient(websocket: ServerConnection):
                 case Protocols.Request.JOIN_GAME:
                     await joinGame(websocket, message['data'])
 
+                case Protocols.Request.START_GAME_EARLY_VOTE:
+                    await voteStart(websocket, message['sessionID'])
+
                 case Protocols.Request.LEAVE:
-                    await leaveGame(websocket, message['sessionID'])
+                    await closeClient(websocket, message['sessionID'])
 
         except ConnectionError as e:
             print(f"Whoops\n{e}")
@@ -253,6 +262,16 @@ async def handleClient(websocket: ServerConnection):
             break
 
         except ConnectionClosedError as e:
+            await websocket.close()
+            break
+
+        except JSONDecodeError as e:
+            #This error an occur if json.loads() is given an empty string
+            #This may as occur after closing ServerConnection
+            await closeClient(websocket, currentSessionID, True)
+            break
+
+        except ConnectionClosedOK as e: #Connection has been closed properly on client side
             await websocket.close()
             break
 
