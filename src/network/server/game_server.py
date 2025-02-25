@@ -218,7 +218,6 @@ async def closeClient(websocket: ServerConnection, sessionID=None, redirect=Fals
         return
     
 #TODO: Add code that sends relevant player info to DB i.e. player wallet 
-#TODO: Fix errors that occur when client leaves game 
 async def clientLeave(websocket: ServerConnection, userID, sessionID):
     try:
         logger.info(f"Current active sessions {activeSessions}")

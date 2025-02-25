@@ -37,11 +37,13 @@ class Client(object):
             message = {
                 'm_type':m_type, 
                 'data': data,
-                'sessionID': self.sessionID,  
-                'signature': self.id
+                'sessionID': self.getSessionID(),  
+                'userID': self.id
             }
             await self.client.send(json.dumps(message).encode())
-            #TODO: write better error handling 
+            print(f"{self.id} is sending {message}")
+        
+        #TODO: write better error handling 
         except ConnectionError as e:
             print(e)
     
@@ -49,9 +51,10 @@ class Client(object):
     async def receive(self):
         #receives JSON message from server
         try:
+            print(f"{self.id} is waiting for a message")
             message = await self.client.recv(True)
+            print(f"{self.id} received message: {message}")
             der = json.loads(message)
-            print(der['m_type'])
 
             #This code should be in the game script displaying game info
             match der['m_type']:
@@ -70,7 +73,7 @@ class Client(object):
         except ConnectionClosed as e:
             print("whoops")
        
-    #TODO: Test code
+ 
     async def redirect(self, host, port):
         #This method is for creating a new websocket to connect to the appropriate server script/port 
         await self.disconnect()
@@ -94,10 +97,10 @@ class Client(object):
 
     #Getters/Setters
     def getSessionID(self):
-        return self.gameCode
+        return self.sessionID
     
     def setSessionID(self, code):
-        self.gameCode = code
+        self.sessionID = code
 
     def getID(self):
         return self.id 
@@ -131,7 +134,10 @@ async def main():
         c2  = await Client.connect("localhost", 80)
         await asyncio.sleep(2)
 
-        await c1.send(Protocols.Request.CREATE_GAME, 2)
+        c1.setID("c1")
+        c2.setID("c2")
+
+        await c1.send(Protocols.Request.CREATE_GAME, 3)
         await c1.receive()
         await asyncio.sleep(5)
 
@@ -139,11 +145,22 @@ async def main():
         await c2.receive()
         await asyncio.sleep(2)
 
+        await c1.send(Protocols.Request.START_GAME_EARLY_VOTE)
+        await c2.send(Protocols.Request.START_GAME_EARLY_VOTE)
+
+        await c1.receive()
+        await c2.receive()
+
+        
         await c1.receive()
         await c2.receive()
 
         await c1.send(Protocols.Request.CALL)
-        await c2.send(Protocols.Request.CALL)
+
+        await c2.send(Protocols.Request.FOLD)
+        await asyncio.sleep(2)
+        while True:
+            pass
 
     except KeyboardInterrupt:
        
