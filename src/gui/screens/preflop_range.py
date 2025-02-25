@@ -7,179 +7,249 @@ from src.gui.utils.constants import SCREEN, BG, screen_font, scaled_cursor
 def preflop_range_visualizer(mainMenu):
     pygame.init()
 
-    #
+    
 # Example of a “full” 6-max strategy data structure in Python.
 # Replace these sets with your real solver outputs or personal strategy.
 #
 
-    strat_data = {
-        # ------------------
-        # 1) OPEN RANGES
-        # ------------------
-        #
-        # Open from UTG vs BB
-        ("Open", "UTG", "BB"): {
-            "raise": {
-                # Pairs
-                "AA","KK","QQ","JJ","TT","99","88","77",
-                # Suited Broadways
-                "AKs","AQs","AJs","KQs",
-                # Offsuit Broadways
-                "AKo","AQo",
-                # Suited Connectors / Others
-                "A5s","A4s","KJs","QJs","JTs","T9s","98s","87s"
-            },
-            "call": set()  # Usually no limp/call range preflop when open-raising
-        },
+    # 6-max preflop strategy ranges based on recent online GTO solver outputs.
+# These ranges are approximate and meant for educational purposes.
+# Adjust them as needed for your specific game and solver outputs.
 
-        # Open from LJ vs BB
-        ("Open", "LJ", "BB"): {
+    # Define the available radio button options.
+    scenarios = ["Open", "vs raise", "vs 3bet", "vs 4bet", "vs 5bet"]
+    players    = ["LJ", "HJ", "CO", "BTN", "SB"]
+    opponents  = ["HJ", "CO", "BTN", "SB", "BB"]
+
+    strat_data = {}
+
+    # 1) For the "Open" scenario, use your original ranges per player.
+    open_ranges = {
+        "LJ": {
             "raise": {
-                # Slightly wider than UTG
-                "AA","KK","QQ","JJ","TT","99","88","77","66","55",
-                "AKs","AQs","AJs","ATs","KQs","KJs","QJs","JTs","T9s","98s",
-                "AKo","AQo","KQo","A5s","A4s"
+                "AA", "KK", "QQ", "JJ", "TT", "99", "88", "77",
+                "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s", "A2s",
+                "KQs", "KJs", "KTs", "K9s", "K8s", "K7s", "K6s", "K5s",
+                "QJs", "QTs", "Q9s",
+                "JTs",
+
+                "AKo", "AQo", "AJo", "ATo", 
+                "KQo", "KJo",
+                "QJo"
             },
             "call": set()
         },
-
-        # Open from HJ vs BB
-        ("Open", "HJ", "BB"): {
+        "HJ": {
             "raise": {
-                # Wider still than LJ
-                "AA","KK","QQ","JJ","TT","99","88","77","66","55","44",
-                "AKs","AQs","AJs","ATs","KQs","KJs","QJs","JTs","T9s","98s","87s",
-                "AKo","AQo","AJo","KQo","KJo","A5s","A4s","A3s"
+                "AA", "KK", "QQ", "JJ", "TT", "99", "88", "77", "66",
+                "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s", "A2s",
+                "KQs", "KJs", "KTs", "K9s", "K8s", "K7s", "K6s", "K5s",
+                "QJs", "QTs", "Q9s", "Q8s",
+                "JTs",
+
+                "AKo", "AQo", "AJo", "ATo", "A9o",
+                "KQo", "KJo", "KTo",
+                "QJo", "QTo"
             },
             "call": set()
         },
-
-        # Open from CO vs BB
-        ("Open", "CO", "BB"): {
+        "CO": {
             "raise": {
-                "AA","KK","QQ","JJ","TT","99","88","77","66","55","44","33",
-                "AKs","AQs","AJs","ATs","A9s","KQs","KJs","QJs","JTs","T9s","98s",
-                "87s","76s","A5s","A4s","A3s","A2s",
-                "AKo","AQo","AJo","KQo","KJo","QJo","JTo"
+                "AA", "KK", "QQ", "JJ", "TT", "99", "88", "77", "66", "55", "44", "33", "22",
+                "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s", "A2s",
+                "KQs", "KJs", "KTs", "K9s", "K8s", "K7s", "K6s", "K5s", "K4s", "K3s",
+                "QJs", "QTs", "Q9s", "Q8s", "Q7s", "Q6s", "Q5s",
+                "JTs", "J9s", "J8s", "J7s",
+                "T9s", "T8s", 
+                "98s", 
+
+                "AKo", "AQo", "AJo", "ATo", "A9o", "A8o",
+                "KQo", "KJo", "KTo", "K9o",
+                "QJo", "QTo",
+                "JTo"
             },
             "call": set()
         },
-
-        # Open from BTN vs BB
-        ("Open", "BTN", "BB"): {
+        "BTN": {
             "raise": {
-                # Very wide; typical BTN opening range
-                "AA","KK","QQ","JJ","TT","99","88","77","66","55","44","33","22",
-                "AKs","AQs","AJs","ATs","A9s","A8s","A5s","A4s","A3s","A2s",
-                "KQs","KJs","KTs","K9s",
-                "QJs","QTs","Q9s","JTs","J9s","T9s","98s","87s","76s","65s",
-                "AKo","AQo","AJo","KQo","KJo","QJo","JTo","T9o","98o"
+                "AA", "KK", "QQ", "JJ", "TT", "99", "88", "77", "66", "55", "44", "33", "22",
+                "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s", "A2s",
+                "KQs", "KJs", "KTs", "K9s", "K8s", "K7s", "K6s", "K5s", "K4s", "K3s", "K2s",
+                "QJs", "QTs", "Q9s", "Q8s", "Q7s", "Q6s", "Q5s", "Q4s", "Q3s", "Q2s",
+                "JTs", "J9s", "J8s", "J7s", "J6s", "J5s", "J4s",
+                "T9s", "T8s", "T7s", "T6s",
+                "98s", "97s", "96s",
+                "87s", "86s",
+                "76s", "75s",
+                "65s",
+                "54s",
+                
+
+
+                "AKo", "AQo", "AJo", "ATo", "A9o", "A8o", "A7o", "A6o", "A5o", "A4o", "A3o",
+                "KQo", "KJo", "KTo", "K9o", "K8o",
+                "QJo", "QTo", "Q9o",
+                "JTo", "J9o", 
+                "T9o",
             },
             "call": set()
         },
-
-        # Open from SB vs BB
-        ("Open", "SB", "BB"): {
+        "SB": {
             "raise": {
-                # The SB open-raise range can be very wide in modern strategy
-                "AA","KK","QQ","JJ","TT","99","88","77","66","55","44","33","22",
-                "AKs","AQs","AJs","ATs","A9s","A8s","A7s","A6s","A5s","A4s","A3s","A2s",
-                "KQs","KJs","KTs","K9s","K8s","K7s","K6s","K5s","K4s","K3s","K2s",
-                "QJs","QTs","Q9s","Q8s","Q7s","JTs","J9s","J8s","T9s","T8s","98s","87s",
-                "76s","65s","54s",
-                "AKo","AQo","AJo","KQo","KJo","KTo","QJo","QTo","JTo","T9o","98o","87o"
+                "AA", "KK", "QQ", "JJ", "TT", "99", "88", "77", "66", "55", "44", "33", "22",
+                "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s", "A2s",
+                "KQs", "KJs", "KTs", "K9s", "K8s", "K7s", "K6s", "K5s", "K4s", "K3s", "K2s",
+                "QJs", "QTs", "Q9s", "Q8s", "Q7s", "Q6s", "Q5s", "Q4s", "Q3s", "Q2s",
+                "JTs", "J9s", "J8s", "J7s", "J6s", "J5s", "J4s",
+                "T9s", "T8s", "T7s", "T6s",
+                "98s", "97s", "96s",
+                "87s", "86s",
+                "76s", "75s",
+                "65s",
+                "54s",
+                
+
+
+                "AKo", "AQo", "AJo", "ATo", "A9o", "A8o", "A7o", "A6o", "A5o", "A4o", "A3o",
+                "KQo", "KJo", "KTo", "K9o", "K8o",
+                "QJo", "QTo", "Q9o",
+                "JTo", "J9o", 
+                "T9o",
             },
             "call": set()
-        },
-
-        # ------------------------------------------------
-        # 2) VS 3BET (Facing a 3bet after we open-raised)
-        # ------------------------------------------------
-        #
-        # UTG vs 3bet from BB
-        ("vs 3bet", "UTG", "BB"): {
-            "raise": {
-                # Typical 4-bet (value + a few semi-bluffs)
-                "AA","KK","QQ","AKs","A5s"
-            },
-            "call": {
-                # Hands that continue by calling
-                "JJ","TT","99","AQs","AJs","KQs","AKo","AQo"
-            }
-        },
-
-        # LJ vs 3bet from BB
-        ("vs 3bet", "LJ", "BB"): {
-            "raise": {
-                # This matches your snippet example but you can adjust
-                "AA","KK","QQ","AKs","AQs","AJs"
-            },
-            "call": {
-                "JJ","TT","99","88","77","AQo","AJo","KQs","QJs","JTs"
-            }
-        },
-
-        # HJ vs 3bet from BB
-        ("vs 3bet", "HJ", "BB"): {
-            "raise": {
-                "AA","KK","QQ","AKs","AQs","A5s","A4s"
-            },
-            "call": {
-                "JJ","TT","99","88","77","AQo","AJo","AJs","KQs","QJs","JTs","T9s"
-            }
-        },
-
-        # CO vs 3bet from BB
-        ("vs 3bet", "CO", "BB"): {
-            "raise": {
-                "AA","KK","QQ","JJ","AKs","AQs","A5s"
-            },
-            "call": {
-                "TT","99","88","77","AQo","AJo","AJs","KQs","KJs","QJs","JTs","T9s","98s"
-            }
-        },
-
-        # BTN vs 3bet from SB (from your snippet)
-        ("vs 3bet", "BTN", "SB"): {
-            "raise": {
-                "AA","KK","QQ","JJ","AKs","AQs","AJs","KQs","A5s"
-            },
-            "call": {
-                "TT","99","88","77","AQo","AJo","KJs","QJs","JTs","T9s"
-            }
-        },
-
-        # (Example) BTN vs 3bet from BB
-        ("vs 3bet", "BTN", "BB"): {
-            "raise": {
-                "AA","KK","QQ","JJ","AKs","A5s","AQs"
-            },
-            "call": {
-                "TT","99","88","77","AQo","AJo","AJs","KQs","KJs","QJs",
-                "JTs","T9s","98s","87s"
-            }
-        },
-
-        # ------------------------------------------------
-        # 3) VS 5BET (Facing a 5bet after we 4-bet)
-        # ------------------------------------------------
-        #
-        # SB vs 5bet from BB (from your snippet)
-        ("vs 5bet", "SB", "BB"): {
-            "raise": {"AA","KK","AKs","A5s"},
-            "call":  {"QQ","JJ"} 
-        },
-
-        # (Example) BTN vs 5bet from BB
-        ("vs 5bet", "BTN", "BB"): {
-            "raise": {"AA","KK","AKs","A5s"},   # Shove (or 6-bet)
-            "call":  {"QQ","JJ","AKo","AQs"}    # Might flat or go with it depending on stack sizes
         }
     }
 
+    # For "Open", the opponent position typically doesn't affect your range,
+    # so assign the same open_ranges for every opponent.
+    for player in players:
+        for opponent in opponents:
+            strat_data[("Open", player, opponent)] = open_ranges[player]
 
 
-    #
+
+   # Template for "vs raise"
+    vs_raise_data = {
+        "LJ": {
+            "raise": {
+                "AA", "KK", "QQ", "JJ",
+                "AKs", "AQs", "AJs", "ATs", "A9s", "A5s", "A4s",
+                "KQs", "KJs", "KTs",
+                "QJs",
+
+                "AKo", "AQo",
+                "KQo", "KJo"
+                },
+            "call":  {"<LJ_vs_raise_call_hand1>", "<LJ_vs_raise_call_hand2>", "..."}
+        },
+        "HJ": {
+            "raise": {"<HJ_vs_raise_raise_hand1>", "<Hj_vs_raise_raise_hand2>", "..."},
+            "call":  {"<HJ_vs_raise_call_hand1>", "<HJ_vs_raise_call_hand2>", "..."}
+        },
+        "CO": {
+            "raise": {"<CO_vs_raise_raise_hand1>", "<CO_vs_raise_raise_hand2>", "..."},
+            "call":  {"<CO_vs_raise_call_hand1>", "<CO_vs_raise_call_hand2>", "..."}
+        },
+        "BTN": {
+            "raise": {"<BTN_vs_raise_raise_hand1>", "<BTN_vs_raise_raise_hand2>", "..."},
+            "call":  {"<BTN_vs_raise_call_hand1>", "<BTN_vs_raise_call_hand2>", "..."}
+        },
+        "SB": {
+            "raise": {"<SB_vs_raise_raise_hand1>", "<SB_vs_raise_raise_hand2>", "..."},
+            "call":  {"<SB_vs_raise_call_hand1>", "<SB_vs_raise_call_hand2>", "..."}
+        }
+    }
+
+    # Template for "vs 3bet"
+    vs_3bet_data = {
+        "LJ": {
+            "raise": {"<LJ_vs_3bet_raise_hand1>", "<LJ_vs_3bet_raise_hand2>", "..."},
+            "call":  {"<LJ_vs_3bet_call_hand1>", "<LJ_vs_3bet_call_hand2>", "..."}
+        },
+        "HJ": {
+            "raise": {"<HJ_vs_3bet_raise_hand1>", "<HJ_vs_3bet_raise_hand2>", "..."},
+            "call":  {"<HJ_vs_3bet_call_hand1>", "<HJ_vs_3bet_call_hand2>", "..."}
+        },
+        "CO": {
+            "raise": {"<CO_vs_3bet_raise_hand1>", "<CO_vs_3bet_raise_hand2>", "..."},
+            "call":  {"<CO_vs_3bet_call_hand1>", "<CO_vs_3bet_call_hand2>", "..."}
+        },
+        "BTN": {
+            "raise": {"<BTN_vs_3bet_raise_hand1>", "<BTN_vs_3bet_raise_hand2>", "..."},
+            "call":  {"<BTN_vs_3bet_call_hand1>", "<BTN_vs_3bet_call_hand2>", "..."}
+        },
+        "SB": {
+            "raise": {"<SB_vs_3bet_raise_hand1>", "<SB_vs_3bet_raise_hand2>", "..."},
+            "call":  {"<SB_vs_3bet_call_hand1>", "<SB_vs_3bet_call_hand2>", "..."}
+        }
+    }
+
+    # Template for "vs 4bet"
+    vs_4bet_data = {
+        "LJ": {
+            "raise": {"<LJ_vs_4bet_raise_hand1>", "<LJ_vs_4bet_raise_hand2>", "..."},
+            "call":  {"<LJ_vs_4bet_call_hand1>", "<LJ_vs_4bet_call_hand2>", "..."}
+        },
+        "HJ": {
+            "raise": {"<HJ_vs_4bet_raise_hand1>", "<HJ_vs_4bet_raise_hand2>", "..."},
+            "call":  {"<HJ_vs_4bet_call_hand1>", "<HJ_vs_4bet_call_hand2>", "..."}
+        },
+        "CO": {
+            "raise": {"<CO_vs_4bet_raise_hand1>", "<CO_vs_4bet_raise_hand2>", "..."},
+            "call":  {"<CO_vs_4bet_call_hand1>", "<CO_vs_4bet_call_hand2>", "..."}
+        },
+        "BTN": {
+            "raise": {"<BTN_vs_4bet_raise_hand1>", "<BTN_vs_4bet_raise_hand2>", "..."},
+            "call":  {"<BTN_vs_4bet_call_hand1>", "<BTN_vs_4bet_call_hand2>", "..."}
+        },
+        "SB": {
+            "raise": {"<SB_vs_4bet_raise_hand1>", "<SB_vs_4bet_raise_hand2>", "..."},
+            "call":  {"<SB_vs_4bet_call_hand1>", "<SB_vs_4bet_call_hand2>", "..."}
+        }
+    }
+
+    # Template for "vs 5bet"
+    vs_5bet_data = {
+        "LJ": {
+            "raise": {"<LJ_vs_5bet_raise_hand1>", "<LJ_vs_5bet_raise_hand2>", "..."},
+            "call":  {"<LJ_vs_5bet_call_hand1>", "<LJ_vs_5bet_call_hand2>", "..."}
+        },
+        "HJ": {
+            "raise": {"<HJ_vs_5bet_raise_hand1>", "<HJ_vs_5bet_raise_hand2>", "..."},
+            "call":  {"<HJ_vs_5bet_call_hand1>", "<HJ_vs_5bet_call_hand2>", "..."}
+        },
+        "CO": {
+            "raise": {"<CO_vs_5bet_raise_hand1>", "<CO_vs_5bet_raise_hand2>", "..."},
+            "call":  {"<CO_vs_5bet_call_hand1>", "<CO_vs_5bet_call_hand2>", "..."}
+        },
+        "BTN": {
+            "raise": {"<BTN_vs_5bet_raise_hand1>", "<BTN_vs_5bet_raise_hand2>", "..."},
+            "call":  {"<BTN_vs_5bet_call_hand1>", "<BTN_vs_5bet_call_hand2>", "..."}
+        },
+        "SB": {
+            "raise": {"<SB_vs_5bet_raise_hand1>", "<SB_vs_5bet_raise_hand2>", "..."},
+            "call":  {"<SB_vs_5bet_call_hand1>", "<SB_vs_5bet_call_hand2>", "..."}
+        }
+    }
+
+    # -------------------------------------
+    # 3) Assign the custom ranges to strat_data for every player and opponent.
+    # -------------------------------------
+    for scenario, data in [
+        ("vs raise", vs_raise_data),
+        ("vs 3bet", vs_3bet_data),
+        ("vs 4bet", vs_4bet_data),
+        ("vs 5bet", vs_5bet_data)
+    ]:
+        for player in players:
+            for opponent in opponents:
+                strat_data[(scenario, player, opponent)] = data[player]
+
+    # Now strat_data contains an entry for every combination:
+    #  - "Open" (using open_ranges) for all player/opponent pairs.
+    #  - "vs raise", "vs 3bet", "vs 4bet", and "vs 5bet" with your custom data for each player.
+
+        #
     # 3. Window Setup and Overlay
     #
     screen_width, screen_height = SCREEN.get_size()
@@ -221,18 +291,18 @@ def preflop_range_visualizer(mainMenu):
     font = screen_font(20)
 
     #
-    # 5. Radio Buttons for Side Panel (Scenario, Hero, Villain)
+    # 5. Radio Buttons for Side Panel (Scenario, player, opponent)
     #
     options_data = {
         "Scenario": {
             "options": ["Open", "vs raise", "vs 3bet", "vs 4bet", "vs 5bet"],
             "selected": "Open"
         },
-        "Hero": {
+        "player": {
             "options": ["LJ", "HJ", "CO", "BTN", "SB"],
             "selected": "LJ"
         },
-        "Villain": {
+        "opponent": {
             "options": ["HJ", "CO", "BTN", "SB", "BB"],
             "selected": "BB"
         }
@@ -262,9 +332,9 @@ def preflop_range_visualizer(mainMenu):
         side_panel_buttons.clear()
         panel_x = container_x + GRID_WIDTH + 50
         panel_y = container_y
-        visible_categories = ["Scenario", "Hero", "Villain"]
+        visible_categories = ["Scenario", "player", "opponent"]
         if options_data["Scenario"]["selected"] == "Open":
-            visible_categories.remove("Villain")
+            visible_categories.remove("opponent")
         offset_y = 0
         for cat in visible_categories:
             cat_rects = draw_radio_buttons(
@@ -325,10 +395,10 @@ def preflop_range_visualizer(mainMenu):
 
         # Retrieve current selections.
         scenario_sel = options_data["Scenario"]["selected"]
-        hero_sel     = options_data["Hero"]["selected"]
-        villain_sel  = options_data["Villain"]["selected"] if "Villain" in [cat for (cat, _) in side_panel_buttons] else "BB"
+        player_sel     = options_data["player"]["selected"]
+        opponent_sel  = options_data["opponent"]["selected"] if "opponent" in [cat for (cat, _) in side_panel_buttons] else "BB"
 
-        strategy_key = (scenario_sel, hero_sel, villain_sel)
+        strategy_key = (scenario_sel, player_sel, opponent_sel)
         if strategy_key in strat_data:
             raise_set = strat_data[strategy_key]["raise"]
             call_set = strat_data[strategy_key]["call"]
