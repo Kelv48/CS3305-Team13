@@ -1,6 +1,6 @@
 # app/routes.py
 from flask import Blueprint, request, jsonify
-from .models import User
+from .models import User, db, Stats, Leaderboard
 from .cache import get_user_DBorCache
 from . import db
 
@@ -28,3 +28,31 @@ def create_user():
     db.session.commit()
 
     return jsonify({"message": f"User {data['username']} created successfully!", "id": new_user.id}), 201
+
+@main.route("/leaderboard", methods=['GET'])
+def leaderboard():
+    leaderboard_data = (
+        db.session.query(
+            User.name.label("username"),
+            Leaderboard.rank,
+            Stats.win_count,
+            Stats.loss_count,
+            Stats.earnings
+        )
+        .join(Stats, User.id == Stats.user_id)  # Join User with Stats
+        .join(Leaderboard, Stats.id == Leaderboard.stats_id)  # Join Stats with Leaderboard
+        .order_by(Leaderboard.rank.asc())  # Sort by rank
+        .all()
+    )
+
+    leaderboard_data = [
+        {
+            "username" : row.username,
+            "rank" : row.rank,
+            "wins" : row.win_count,
+            "losses" : row.loss_count,
+            "earnings" : row.earnings
+        }
+        for row in leaderboard_data
+    ]
+    return jsonify(leaderboard_data), 200
