@@ -1,6 +1,11 @@
 import random
 from src.gui.utils.constants import BB
 
+class BettingRound:
+    def __init__(self):
+        self.raise_occurred = False
+
+
 class Bot:
     def __init__(self):
         self.cards = ''
@@ -8,7 +13,8 @@ class Bot:
         self.hand = ''
 
 class AI:
-    def __init__(self, own_cards, dict_options, call_value, min_raise, max_raise, pot, n_players, common_cards=None, risk_tolerance=1.0, position="other"):
+    def __init__(self, own_cards, dict_options, call_value, min_raise, max_raise, pot, n_players,
+                 common_cards=None, risk_tolerance=1.0, position="other"):
         """
         risk_tolerance: Higher values make the bot more aggressive.
         position: Should be "SB", "BB", or "other". Bots not in the blinds will call more often.
@@ -85,10 +91,15 @@ class AI:
         """
         return p_win * (self.pot + self.call_value) + p_tie * ((self.pot + self.call_value) / 2) - self.call_value
 
-    def decision(self):
+    def decision(self, betting_round):
         """
         Returns a decision based on win probability, tie probability, pot odds, and expected value.
         The decision is returned as a list: [action (str), amount (int)].
+        Enforces that once any bot raises (or goes all-in) in the betting round,
+        no subsequent bot is allowed to raise.
+        
+        The `betting_round` parameter is an instance of BettingRound (or a similar mutable object)
+        that tracks whether a raise has already occurred in the current round.
         """
         p_win, p_tie = self.probabilityWin()
         print('Win probability:', p_win, 'Tie probability:', p_tie)
@@ -100,17 +111,29 @@ class AI:
         # Adjust based on the number of opponents and risk tolerance.
         adjusted_threshold = pot_odds_threshold * (1 + (self.n_players - 2) * 0.05) / self.risk_tolerance
 
-        # If win probability is clearly high, use strong-hand logic.
+        # Use strong-hand logic if win probability is clearly high.
         if p_win > adjusted_threshold + 0.1:
-            return self._strong_hand_decision(p_win, ev)
+            decision = self._strong_hand_decision(p_win, ev)
         else:
-            return self._weak_hand_decision(p_win, p_tie, ev)
+            decision = self._weak_hand_decision(p_win, p_tie, ev)
+        
+        # Enforce that no further raises occur after one raise has been made.
+        if decision[0] in ['raise', 'all-in']:
+            if betting_round.raise_occurred:
+                decision = ['call', 0]
+            else:
+                betting_round.raise_occurred = True
+        return decision
 
     def _strong_hand_decision(self, p_win, ev):
         """
-        Strong-hand logic: calculates an aggressive raise based on win probability and EV.
+        Strong-hand logic: with a good hand, the bot usually raises—but sometimes chooses
+        to slow-play by calling, to mix in variability.
         """
         base_factor = max(BB, self.pot / 8)
+        # Sometimes slow-play even with a very good hand.
+        if p_win > 0.8 and random.random() < 0.5:
+            return ['call', 0]
         if p_win > 0.75:
             aggression = (p_win - 0.75) * 2  # More aggressive when p_win is very high.
         else:
@@ -119,20 +142,30 @@ class AI:
         if raise_amount < self.min_raise:
             raise_amount = self.min_raise
         if raise_amount > self.max_raise:
-            return ['all-in', self.max_raise]
-        return ['raise', raise_amount]
+            decision = ['all-in', self.max_raise]
+        else:
+            decision = ['raise', raise_amount]
+        # Additional variability: if the expected edge is moderate, consider slow-playing.
+        if ev < 0.2 * self.call_value and random.random() < 0.3:
+            return ['call', 0]
+        # Occasionally, mix in a smaller raise (bluff-like action).
+        if random.random() < 0.1:
+            bluff_raise = int(self.min_raise + 0.5 * base_factor)
+            decision = ['raise', min(bluff_raise, self.max_raise)]
+        return decision
 
     def _weak_hand_decision(self, p_win, p_tie, ev):
         """
-        Weak-hand logic: uses a tolerance factor to decide whether to call, raise, check, or fold.
-        The tolerance factor is increased if the bot is not in the blinds.
+        Weak-hand logic: calculates an acceptable call amount using a tolerance factor that is
+        increased if the bot is not in the blinds. If EV is negative but win probability is moderate,
+        the bot may semi-bluff.
         """
         max_call = int(p_win * self.pot + (p_tie * self.pot) / self.n_players)
         # Use a higher tolerance factor for non-SB/BB positions.
         if self.position in ["SB", "BB"]:
             tolerance_factor = 1.2  # Standard tolerance for blinds.
         else:
-            tolerance_factor = 2.5  # Looser criteria for other positions.
+            tolerance_factor = 2  # Looser criteria for other positions.
         
         if self.dict_options.get('check', False):
             # Occasionally try to raise even when checking is allowed.
@@ -142,12 +175,16 @@ class AI:
         
         # If even with tolerance the acceptable call is below the call_value...
         if max_call * tolerance_factor < self.call_value:
-            # ...if the EV is still positive, we might risk a call.
+            # If EV is positive, it's profitable to call.
             if ev > 0:
                 return ['call', 0]
-            return ['fold', 0]
+            else:
+                # If EV is negative but p_win is moderately high, consider a semi-bluff.
+                if p_win > 0.35 and random.random() < 0.2:
+                    return ['raise', min(max_call, self.max_raise)]
+                return ['fold', 0]
         
-        # Occasionally try to raise instead of simply calling.
+        # Occasionally, even with a weak hand, try to raise to mix in some aggression.
         if random.randint(1, 10) > 8 and self.min_raise < max_call:
             return ['raise', min(max_call, self.max_raise)]
         
