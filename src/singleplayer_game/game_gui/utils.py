@@ -94,7 +94,9 @@ def drawPlayer():
     for player in player_list_chair:
         player.playerLabel(SCREEN)
         player.drawBet(SCREEN)
-    pygame.display.flip()
+    # Remove this flip so we don't update mid-frame:
+    # pygame.display.flip()
+
 
 def giveCard(type_card, cards):
     """
@@ -225,6 +227,7 @@ def arrangeRoom(mainMenu, common_cards=None):
     return button_rect
 
 import time
+import pygame
 from src.gui.utils.constants import SCREEN, BEIGE, GREEN
 from src.singleplayer_game.game_gui.game_button import x_buttons, y_button, width_button
 from pygame_widgets.slider import Slider
@@ -235,7 +238,6 @@ def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=Non
     Displays the GUI for a player's decision and returns their action.
     If no action is received within a set time, auto-fold is returned.
     """
-
     # Set up slider and output for raising.
     x_slider = 1070
     y_slider = 650
@@ -255,7 +257,7 @@ def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=Non
     for button in buttons:
         button.active = dict_options.get(button.name, False)
 
-    # Draw the common background elements once before the loop.
+    # Draw common background elements once.
     arrangeRoom(common_cards)
     drawPlayer()
 
@@ -263,24 +265,19 @@ def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=Non
     start_time = time.time()
     decision = None
 
-    while pause_action:
-        # Clear the frame by redrawing the background and players.
-        # (Replace BG below with your background if needed)
-        # Draw background.
-        screen_width, screen_height = SCREEN.get_size()
-        scaled_bg = pygame.transform.scale(GAME_BG, (screen_width, screen_height))
-        SCREEN.blit(scaled_bg, (0, 0))
-        arrangeRoom(common_cards)
-        drawPlayer()
-        drawButtons(buttons)
+    # Create a clock object to control the frame rate.
+    clock = pygame.time.Clock()
 
-        # Process events.
-        for event in pygame.event.get():
-            mouse_position = pygame.mouse.get_pos()
+    while pause_action:
+        # Get all events once per frame.
+        events = pygame.event.get()
+        for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+
             if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_position = pygame.mouse.get_pos()
                 for button in buttons:
                     if button.isOver(mouse_position) and button.active:
                         if button.name == 'raise':
@@ -289,26 +286,36 @@ def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=Non
                             decision = [button.name]
                         pause_action = False
                         break
+
             if event.type == pygame.MOUSEMOTION:
+                mouse_position = pygame.mouse.get_pos()
                 for button in buttons:
                     if button.active:
                         button.bigger(mouse_position)
-            # Update slider output if needed.
-            for button in buttons:
-                if button.name == 'raise' and button.active:
-                    output.setText('$' + str(slider.getValue() + min_raise))
-                    pygame_widgets.update(event)
 
-        # Draw slider and output text.
-        slider.draw()   # Ensure your Slider class has a draw method.
-        output.draw()   # And your TextBox class as well.
+        # Update widgets once per frame with all events.
+        pygame_widgets.update(events)
 
-        # Finally, draw the custom cursor once per frame.
+        # Redraw the background and static elements.
+        screen_width, screen_height = SCREEN.get_size()
+        scaled_bg = pygame.transform.scale(GAME_BG, (screen_width, screen_height))
+        SCREEN.blit(scaled_bg, (0, 0))
+        arrangeRoom(common_cards)
+        drawPlayer()
+        drawButtons(buttons)
+
+        # Update the slider output.
+        output.setText('$' + str(slider.getValue() + min_raise))
+        slider.draw()
+        output.draw()
+
         drawCustomCursor()
-        # One display update per frame.
         pygame.display.update()
 
-        # # Check for timeout.
+        # Limit the frame rate (adjust FPS as needed, e.g., 30 or 20)
+        clock.tick(30)
+        
+        # Timeout logic (if desired)
         # if time.time() - start_time >= 5:
         #     decision = ['fold']
         #     pause_action = False
