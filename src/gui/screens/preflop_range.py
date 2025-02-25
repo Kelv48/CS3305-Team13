@@ -4,140 +4,180 @@ from src.gui.utils.constants import SCREEN, BG, screen_font, scaled_cursor
 
 
 
-def poker_hand_visualizer(mainMenu):
+def preflop_range_visualizer(mainMenu):
     pygame.init()
 
     #
-    # 1. Strategy Data (Replace with your real solver outputs or strategy)
-    #
+# Example of a “full” 6-max strategy data structure in Python.
+# Replace these sets with your real solver outputs or personal strategy.
+#
+
     strat_data = {
+        # ------------------
+        # 1) OPEN RANGES
+        # ------------------
+        #
+        # Open from UTG vs BB
+        ("Open", "UTG", "BB"): {
+            "raise": {
+                # Pairs
+                "AA","KK","QQ","JJ","TT","99","88","77",
+                # Suited Broadways
+                "AKs","AQs","AJs","KQs",
+                # Offsuit Broadways
+                "AKo","AQo",
+                # Suited Connectors / Others
+                "A5s","A4s","KJs","QJs","JTs","T9s","98s","87s"
+            },
+            "call": set()  # Usually no limp/call range preflop when open-raising
+        },
+
+        # Open from LJ vs BB
         ("Open", "LJ", "BB"): {
             "raise": {
-                "AA","KK","QQ","JJ","TT","99","88","77","66",
-                "AKs","AQs","AJs","ATs","KQs","KJs","QJs","JTs","T9s","98s"
+                # Slightly wider than UTG
+                "AA","KK","QQ","JJ","TT","99","88","77","66","55",
+                "AKs","AQs","AJs","ATs","KQs","KJs","QJs","JTs","T9s","98s",
+                "AKo","AQo","KQo","A5s","A4s"
             },
             "call": set()
         },
+
+        # Open from HJ vs BB
         ("Open", "HJ", "BB"): {
             "raise": {
-                "AA","KK","QQ","JJ","TT","99","88","77","66",
-                "AKs","AQs","AJs","ATs","KQs","KJs","QJs","JTs","T9s","98s"
+                # Wider still than LJ
+                "AA","KK","QQ","JJ","TT","99","88","77","66","55","44",
+                "AKs","AQs","AJs","ATs","KQs","KJs","QJs","JTs","T9s","98s","87s",
+                "AKo","AQo","AJo","KQo","KJo","A5s","A4s","A3s"
             },
             "call": set()
         },
+
+        # Open from CO vs BB
+        ("Open", "CO", "BB"): {
+            "raise": {
+                "AA","KK","QQ","JJ","TT","99","88","77","66","55","44","33",
+                "AKs","AQs","AJs","ATs","A9s","KQs","KJs","QJs","JTs","T9s","98s",
+                "87s","76s","A5s","A4s","A3s","A2s",
+                "AKo","AQo","AJo","KQo","KJo","QJo","JTo"
+            },
+            "call": set()
+        },
+
+        # Open from BTN vs BB
+        ("Open", "BTN", "BB"): {
+            "raise": {
+                # Very wide; typical BTN opening range
+                "AA","KK","QQ","JJ","TT","99","88","77","66","55","44","33","22",
+                "AKs","AQs","AJs","ATs","A9s","A8s","A5s","A4s","A3s","A2s",
+                "KQs","KJs","KTs","K9s",
+                "QJs","QTs","Q9s","JTs","J9s","T9s","98s","87s","76s","65s",
+                "AKo","AQo","AJo","KQo","KJo","QJo","JTo","T9o","98o"
+            },
+            "call": set()
+        },
+
+        # Open from SB vs BB
+        ("Open", "SB", "BB"): {
+            "raise": {
+                # The SB open-raise range can be very wide in modern strategy
+                "AA","KK","QQ","JJ","TT","99","88","77","66","55","44","33","22",
+                "AKs","AQs","AJs","ATs","A9s","A8s","A7s","A6s","A5s","A4s","A3s","A2s",
+                "KQs","KJs","KTs","K9s","K8s","K7s","K6s","K5s","K4s","K3s","K2s",
+                "QJs","QTs","Q9s","Q8s","Q7s","JTs","J9s","J8s","T9s","T8s","98s","87s",
+                "76s","65s","54s",
+                "AKo","AQo","AJo","KQo","KJo","KTo","QJo","QTo","JTo","T9o","98o","87o"
+            },
+            "call": set()
+        },
+
+        # ------------------------------------------------
+        # 2) VS 3BET (Facing a 3bet after we open-raised)
+        # ------------------------------------------------
+        #
+        # UTG vs 3bet from BB
+        ("vs 3bet", "UTG", "BB"): {
+            "raise": {
+                # Typical 4-bet (value + a few semi-bluffs)
+                "AA","KK","QQ","AKs","A5s"
+            },
+            "call": {
+                # Hands that continue by calling
+                "JJ","TT","99","AQs","AJs","KQs","AKo","AQo"
+            }
+        },
+
+        # LJ vs 3bet from BB
         ("vs 3bet", "LJ", "BB"): {
-            "raise": {"AA","KK","QQ","AKs","AQs","AJs"},
-            "call": {"JJ","TT","99","88","77","AQo","AJo","KQs","QJs","JTs"}
+            "raise": {
+                # This matches your snippet example but you can adjust
+                "AA","KK","QQ","AKs","AQs","AJs"
+            },
+            "call": {
+                "JJ","TT","99","88","77","AQo","AJo","KQs","QJs","JTs"
+            }
         },
+
+        # HJ vs 3bet from BB
+        ("vs 3bet", "HJ", "BB"): {
+            "raise": {
+                "AA","KK","QQ","AKs","AQs","A5s","A4s"
+            },
+            "call": {
+                "JJ","TT","99","88","77","AQo","AJo","AJs","KQs","QJs","JTs","T9s"
+            }
+        },
+
+        # CO vs 3bet from BB
+        ("vs 3bet", "CO", "BB"): {
+            "raise": {
+                "AA","KK","QQ","JJ","AKs","AQs","A5s"
+            },
+            "call": {
+                "TT","99","88","77","AQo","AJo","AJs","KQs","KJs","QJs","JTs","T9s","98s"
+            }
+        },
+
+        # BTN vs 3bet from SB (from your snippet)
         ("vs 3bet", "BTN", "SB"): {
-            "raise": {"AA","KK","QQ","JJ","AKs","AQs","AJs","KQs","A5s"},
-            "call": {"TT","99","88","77","AQo","AJo","KJs","QJs","JTs","T9s"}
+            "raise": {
+                "AA","KK","QQ","JJ","AKs","AQs","AJs","KQs","A5s"
+            },
+            "call": {
+                "TT","99","88","77","AQo","AJo","KJs","QJs","JTs","T9s"
+            }
         },
+
+        # (Example) BTN vs 3bet from BB
+        ("vs 3bet", "BTN", "BB"): {
+            "raise": {
+                "AA","KK","QQ","JJ","AKs","A5s","AQs"
+            },
+            "call": {
+                "TT","99","88","77","AQo","AJo","AJs","KQs","KJs","QJs",
+                "JTs","T9s","98s","87s"
+            }
+        },
+
+        # ------------------------------------------------
+        # 3) VS 5BET (Facing a 5bet after we 4-bet)
+        # ------------------------------------------------
+        #
+        # SB vs 5bet from BB (from your snippet)
         ("vs 5bet", "SB", "BB"): {
             "raise": {"AA","KK","AKs","A5s"},
-            "call": {"QQ","JJ"}
+            "call":  {"QQ","JJ"} 
         },
+
+        # (Example) BTN vs 5bet from BB
+        ("vs 5bet", "BTN", "BB"): {
+            "raise": {"AA","KK","AKs","A5s"},   # Shove (or 6-bet)
+            "call":  {"QQ","JJ","AKo","AQs"}    # Might flat or go with it depending on stack sizes
+        }
     }
 
-    #
-    # 2. Equity Dictionary (for reference; not used in strategy lookup)
-    #
-    hand_equities = {
-        # Pairs
-        "AA": 85.2, "KK": 82.1, "QQ": 79.9, "JJ": 77.5, "TT": 75.2,
-        "99": 71.9, "88": 68.5, "77": 65.2, "66": 61.7, "55": 58.3,
-        "44": 54.9, "33": 51.3, "22": 47.9,
-        # A-combos
-        "AKs": 66.2, "AKo": 65.3,
-        "AQs": 65.0, "AQo": 64.1,
-        "AJs": 63.0, "AJo": 62.0,
-        "ATs": 61.0, "ATo": 60.1,
-        "A9s": 59.0, "A9o": 57.9,
-        "A8s": 58.2, "A8o": 56.9,
-        "A7s": 57.3, "A7o": 55.9,
-        "A6s": 56.2, "A6o": 54.7,
-        "A5s": 55.0, "A5o": 53.5,
-        "A4s": 54.0, "A4o": 52.5,
-        "A3s": 53.2, "A3o": 51.7,
-        "A2s": 52.5, "A2o": 51.0,
-        # K-combos
-        "KQs": 59.0, "KQo": 57.5,
-        "KJs": 57.9, "KJo": 56.4,
-        "KTs": 56.8, "KTo": 55.2,
-        "K9s": 55.3, "K9o": 53.8,
-        "K8s": 54.2, "K8o": 52.6,
-        "K7s": 53.1, "K7o": 51.4,
-        "K6s": 52.0, "K6o": 50.3,
-        "K5s": 51.0, "K5o": 49.3,
-        "K4s": 50.2, "K4o": 48.5,
-        "K3s": 49.6, "K3o": 47.8,
-        "K2s": 48.9, "K2o": 47.0,
-        # Q-combos
-        "QJs": 56.2, "QJo": 54.7,
-        "QTs": 55.1, "QTo": 53.5,
-        "Q9s": 53.7, "Q9o": 52.1,
-        "Q8s": 52.6, "Q8o": 50.9,
-        "Q7s": 51.5, "Q7o": 49.8,
-        "Q6s": 50.4, "Q6o": 48.6,
-        "Q5s": 49.3, "Q5o": 47.4,
-        "Q4s": 48.2, "Q4o": 46.3,
-        "Q3s": 47.2, "Q3o": 45.3,
-        "Q2s": 46.3, "Q2o": 44.4,
-        # J-combos
-        "JTs": 54.1, "JTo": 52.5,
-        "J9s": 52.7, "J9o": 51.0,
-        "J8s": 51.4, "J8o": 49.6,
-        "J7s": 50.1, "J7o": 48.2,
-        "J6s": 48.8, "J6o": 47.0,
-        "J5s": 47.5, "J5o": 45.6,
-        "J4s": 46.2, "J4o": 44.2,
-        "J3s": 45.0, "J3o": 43.0,
-        "J2s": 44.0, "J2o": 42.0,
-        # T-combos
-        "T9s": 51.6, "T9o": 50.0,
-        "T8s": 50.3, "T8o": 48.6,
-        "T7s": 49.0, "T7o": 47.2,
-        "T6s": 47.7, "T6o": 45.8,
-        "T5s": 46.3, "T5o": 44.4,
-        "T4s": 45.0, "T4o": 43.1,
-        "T3s": 43.7, "T3o": 41.7,
-        "T2s": 42.4, "T2o": 40.4,
-        # 9-combos
-        "98s": 49.0, "98o": 47.1,
-        "97s": 47.6, "97o": 45.6,
-        "96s": 46.2, "96o": 44.2,
-        "95s": 44.8, "95o": 42.8,
-        "94s": 43.4, "94o": 41.3,
-        "93s": 42.0, "93o": 40.0,
-        "92s": 40.7, "92o": 38.6,
-        # 8-combos
-        "87s": 46.3, "87o": 44.3,
-        "86s": 44.8, "86o": 42.7,
-        "85s": 43.4, "85o": 41.2,
-        "84s": 42.0, "84o": 39.8,
-        "83s": 40.7, "83o": 38.4,
-        "82s": 39.4, "82o": 37.1,
-        # 7-combos
-        "76s": 43.8, "76o": 41.5,
-        "75s": 42.4, "75o": 40.1,
-        "74s": 41.0, "74o": 38.7,
-        "73s": 39.7, "73o": 37.3,
-        "72s": 38.3, "72o": 35.9,
-        # 6-combos
-        "65s": 41.3, "65o": 38.9,
-        "64s": 39.9, "64o": 37.5,
-        "63s": 38.5, "63o": 36.1,
-        "62s": 37.2, "62o": 34.7,
-        # 5-combos
-        "54s": 39.0, "54o": 36.5,
-        "53s": 37.6, "53o": 35.1,
-        "52s": 36.3, "52o": 33.7,
-        # 4-combos
-        "43s": 35.0, "43o": 32.4,
-        "42s": 33.7, "42o": 31.0,
-        # 3-combos
-        "32s": 32.4, "32o": 29.6
-    }
+
 
     #
     # 3. Window Setup and Overlay
@@ -154,7 +194,7 @@ def poker_hand_visualizer(mainMenu):
     pygame.draw.rect(textbox_surface, (0, 0, 0, 100), (0, 0, textbox_width, textbox_height), border_radius=50)
     SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
-    header_text = "This is the HAND VISUALIZER screen."
+    header_text = "This is the PREFLOP RANGE screen."
     HAND_VISUALIZER_TEXT = screen_font(45).render(header_text, True, "White")
     header_y = textbox_y - 20
     HAND_VISUALIZER_RECT = HAND_VISUALIZER_TEXT.get_rect(center=(textbox_x + textbox_width // 2, header_y))
@@ -256,10 +296,10 @@ def poker_hand_visualizer(mainMenu):
                 running = False
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                mx, my = event.pos
+                mouse_x, mouse_y = event.pos
 
                 # Check if the back button was clicked.
-                if back_button_rect.collidepoint(mx, my):
+                if back_button_rect.collidepoint(mouse_x, mouse_y):
                     mainMenu()
                     running = False
                     
@@ -267,7 +307,7 @@ def poker_hand_visualizer(mainMenu):
                 # Check clicks on visible side-panel buttons.
                 for category, rect_list in side_panel_buttons:
                     for (rect, opt) in rect_list:
-                        if rect.collidepoint(mx, my):
+                        if rect.collidepoint(mouse_x, mouse_y):
                             options_data[category]["selected"] = opt
 
         # Redraw background and overlay.
@@ -351,5 +391,3 @@ def poker_hand_visualizer(mainMenu):
     pygame.quit()
     sys.exit()
 
-if __name__ == "__main__":
-    poker_hand_visualizer()

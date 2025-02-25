@@ -2,7 +2,8 @@
 import pygame, sys
 from src.gui.utils.button import Button
 from src.gui.utils.constants import BG, screen_font, SCREEN, screen_font, scaled_cursor
-from src.gui.screens.hand_visual import poker_hand_visualizer
+from src.gui.screens.hand_equity import hand_equity_visualizer
+from src.gui.screens.preflop_range import preflop_range_visualizer
 from src.gui.screens.calculator import run_poker_calculator
 
 
@@ -49,7 +50,8 @@ def tools(mainMenu):
 
         # Define button labels and functions
         buttons = [
-            ("HAND VISUALIZER", poker_hand_visualizer),
+            ("HAND EQUITY", hand_equity_visualizer),
+            ("PREFLOP RANGE", preflop_range_visualizer),
             ("CALCULATOR", run_poker_calculator),
             ("HOME", mainMenu)]
 
@@ -84,8 +86,10 @@ def tools(mainMenu):
                         if action == sys.exit:
                             pygame.quit()
                             sys.exit()
-                        elif action == poker_hand_visualizer:
-                            poker_hand_visualizer(mainMenu)
+                        elif action == hand_equity_visualizer:
+                            hand_equity_visualizer(mainMenu)
+                        elif action == preflop_range_visualizer:
+                            preflop_range_visualizer(mainMenu)
                         elif action == run_poker_calculator:
                             run_poker_calculator(mainMenu)
                         else:
