@@ -174,14 +174,16 @@ async def leaveGame(websocket: ServerConnection, sessionID, redirect=False):
         logger.info("client has left lobby")
         activeSessions[sessionID]['numPlayer'] -=1 
         activeSessions[sessionID]['clients'].remove(websocket)
-        
+        await websocket.close()
 
-        if len( activeSessions[sessionID]['clients'])==0:
+        if len(activeSessions[sessionID]['clients'])==0:
             logger.info(f"{sessionID} has been deleted")
             #Need to remove any involvement that this player has had on the lobby
             del activeSessions[sessionID]
+            logger.info(f"Active sessions left {activeSessions}")
             return
         
+        #If lobby isn't being redirected then update other clients in the lobby
         if not redirect:
             message = template.substitute(m_type=Protocols.Response.LOBBY_UPDATE, data=activeSessions[sessionID])
             logger.info(f"broadcasting {websocket.remote_address} has left game")
@@ -191,7 +193,6 @@ async def leaveGame(websocket: ServerConnection, sessionID, redirect=False):
                     await serverConnection.send(message)
 
             logger.info(f"{websocket.remote_address} has been closed")
-            await websocket.close()
 
         logger.debug(f"active sessions left: {activeSessions}")
 
