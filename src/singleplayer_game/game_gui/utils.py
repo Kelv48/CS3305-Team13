@@ -2,6 +2,108 @@ import pygame
 import pygame_widgets
 from src.gui.utils.constants import game_font, scaled_cursor, GAME_BG
 
+import time
+import pygame
+from src.gui.utils.constants import SCREEN, BEIGE, GREEN
+from src.singleplayer_game.game_gui.game_button import x_buttons, y_button, width_button
+from pygame_widgets.slider import Slider
+from pygame_widgets.textbox import TextBox
+
+
+def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=None):
+    """
+    Displays the GUI for a player's decision and returns their action.
+    If no action is received within a set time, auto-fold is returned.
+    """
+    # Set up slider and output for raising.
+    x_slider = 1070
+    y_slider = 650
+    slider = Slider(SCREEN, x_slider, y_slider, width_button * 2, 40,
+                    min=0, max=max_raise - min_raise, initial=0, step=1,
+                    colour=(94, 151, 82), handleColour=BEIGE, handleRadius=19)
+
+    x_output = 1060
+    y_output = 590
+    font = game_font(20)
+    output = TextBox(SCREEN, x_output, y_output, 100, 50, fontSize=20,
+                     colour=GREEN, textColour=BEIGE, font=font)
+    output.setText('1')
+    output.disable()
+
+    # Set the active status for the buttons.
+    for button in buttons:
+        button.active = dict_options.get(button.name, False)
+
+    # Draw common background elements once.
+    arrangeRoom(common_cards)
+    drawPlayer()
+
+    pause_action = True
+    start_time = time.time()
+    decision = None
+
+    # Create a clock object to control the frame rate.
+    clock = pygame.time.Clock()
+
+    while pause_action:
+        # Get all events once per frame.
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_position = pygame.mouse.get_pos()
+                for button in buttons:
+                    if button.isOver(mouse_position) and button.active:
+                        if button.name == 'raise':
+                            decision = [button.name, slider.getValue() + min_raise]
+                        else:
+                            decision = [button.name]
+                        pause_action = False
+                        break
+
+            if event.type == pygame.MOUSEMOTION:
+                mouse_position = pygame.mouse.get_pos()
+                for button in buttons:
+                    if button.active:
+                        button.bigger(mouse_position)
+
+        # Update widgets once per frame with all events.
+        pygame_widgets.update(events)
+
+        # Redraw the background and static elements.
+        screen_width, screen_height = SCREEN.get_size()
+        scaled_bg = pygame.transform.scale(GAME_BG, (screen_width, screen_height))
+        SCREEN.blit(scaled_bg, (0, 0))
+        arrangeRoom(common_cards)
+        drawPlayer()
+        drawButtons(buttons)
+
+        # Update the slider output.
+        output.setText('$' + str(slider.getValue() + min_raise))
+        slider.draw()
+        output.draw()
+
+        drawCustomCursor()
+        pygame.display.update()
+
+        # Limit the frame rate (adjust FPS as needed, e.g., 30 or 20)
+        clock.tick(30)
+        
+        # Timeout logic (if desired)
+        # if time.time() - start_time >= 5:
+        #     decision = ['fold']
+        #     pause_action = False
+
+    return decision
+
+
+
+
+
+
 def showdown(common_cards):
     """
     Displays the showdown by drawing the player's cards, all active opponents' cards, 
@@ -36,6 +138,76 @@ def showdown(common_cards):
     cards_group.draw(SCREEN)
     drawPlayer()
     pygame.display.flip()
+
+
+def arrangeRoom(common_cards=None):
+    """
+    Draws the game room background, table, cards, and a Main Menu button.
+    """
+    import pygame
+    from src.gui.utils.constants import SCREEN, GAME_BG
+    from src.singleplayer_game.game_gui.player import Player
+
+    player_list_chair = Player.player_list_chair
+    screen_width, screen_height = SCREEN.get_size()
+
+    # Draw background and table.
+    scaled_bg = pygame.transform.scale(GAME_BG, (screen_width, screen_height))
+    SCREEN.blit(scaled_bg, (0, 0))
+    poker_table_image = pygame.image.load("assets/images/Table.png")
+    poker_table_image = pygame.transform.scale(poker_table_image, (700, 400))
+    poker_table_rect = poker_table_image.get_rect(center=(screen_width / 2, screen_height / 1.9))
+    SCREEN.blit(poker_table_image, poker_table_rect)
+
+    cards = pygame.sprite.Group()
+
+    if player_list_chair[0].live or player_list_chair[0].alin:
+        sub_card = giveCard('player', player_list_chair[0].cards)
+        for card in sub_card:
+            cards.add(card)
+
+    for i, opponent_type in enumerate(['opponent1'], start=1):
+        if player_list_chair[i].live or player_list_chair[i].alin:
+            sub_card = giveCard(opponent_type, player_list_chair[i].cards)
+            for card in sub_card:
+                cards.add(card)
+
+    reverse_cards = coverUpCards(player_list_chair)
+    for card in reverse_cards:
+        cards.add(card)
+    
+    cards.draw(SCREEN)
+
+    if common_cards is not None:
+        from src.singleplayer_game.game_gui.player import Player
+        Player.drawPot(SCREEN)
+        sub_card = giveCard('flop', common_cards[0:3])
+        for card in sub_card:
+            cards.add(card)
+        cards.draw(SCREEN)
+        if len(common_cards) >= 4:
+            sub_card = giveCard('turn', [common_cards[3]])
+            for card in sub_card:
+                cards.add(card)
+            cards.draw(SCREEN)
+        if len(common_cards) == 5:
+            sub_card = giveCard('river', [common_cards[4]])
+            for card in sub_card:
+                cards.add(card)
+            cards.draw(SCREEN)
+
+    # Draw Main Menu Button.
+    button_rect = pygame.Rect(10, 10, 150, 50)
+    pygame.draw.rect(SCREEN, (200, 0, 0), button_rect)
+    font = pygame.font.Font(None, 36)
+    text = font.render("Main Menu", True, (255, 255, 255))
+    text_rect = text.get_rect(center=button_rect.center)
+    SCREEN.blit(text, text_rect)
+    return button_rect
+
+
+
+
 
 def recapRound(list_winner, common_cards=None):
     """
@@ -161,166 +333,10 @@ def drawButtons(buttons):
     from src.gui.utils.constants import SCREEN
     [button.draw(SCREEN) for button in buttons if button.active]
 
-def arrangeRoom(mainMenu, common_cards=None):
-    """
-    Draws the game room background, table, cards, and a Main Menu button.
-    """
-    import pygame
-    from src.gui.utils.constants import SCREEN, GAME_BG
-    from src.singleplayer_game.game_gui.player import Player
 
-    player_list_chair = Player.player_list_chair
-    screen_width, screen_height = SCREEN.get_size()
 
-    # Draw background and table.
-    scaled_bg = pygame.transform.scale(GAME_BG, (screen_width, screen_height))
-    SCREEN.blit(scaled_bg, (0, 0))
-    poker_table_image = pygame.image.load("assets/images/Table.png")
-    poker_table_image = pygame.transform.scale(poker_table_image, (700, 400))
-    poker_table_rect = poker_table_image.get_rect(center=(screen_width / 2, screen_height / 1.9))
-    SCREEN.blit(poker_table_image, poker_table_rect)
 
-    cards = pygame.sprite.Group()
 
-    if player_list_chair[0].live or player_list_chair[0].alin:
-        sub_card = giveCard('player', player_list_chair[0].cards)
-        for card in sub_card:
-            cards.add(card)
-
-    for i, opponent_type in enumerate(['opponent1'], start=1):
-        if player_list_chair[i].live or player_list_chair[i].alin:
-            sub_card = giveCard(opponent_type, player_list_chair[i].cards)
-            for card in sub_card:
-                cards.add(card)
-
-    reverse_cards = coverUpCards(player_list_chair)
-    for card in reverse_cards:
-        cards.add(card)
-    
-    cards.draw(SCREEN)
-
-    if common_cards is not None:
-        from src.singleplayer_game.game_gui.player import Player
-        Player.drawPot(SCREEN)
-        sub_card = giveCard('flop', common_cards[0:3])
-        for card in sub_card:
-            cards.add(card)
-        cards.draw(SCREEN)
-        if len(common_cards) >= 4:
-            sub_card = giveCard('turn', [common_cards[3]])
-            for card in sub_card:
-                cards.add(card)
-            cards.draw(SCREEN)
-        if len(common_cards) == 5:
-            sub_card = giveCard('river', [common_cards[4]])
-            for card in sub_card:
-                cards.add(card)
-            cards.draw(SCREEN)
-
-    # Draw Main Menu Button.
-    button_rect = pygame.Rect(10, 10, 150, 50)
-    pygame.draw.rect(SCREEN, (200, 0, 0), button_rect)
-    font = pygame.font.Font(None, 36)
-    text = font.render("Main Menu", True, (255, 255, 255))
-    text_rect = text.get_rect(center=button_rect.center)
-    SCREEN.blit(text, text_rect)
-    return button_rect
-
-import time
-import pygame
-from src.gui.utils.constants import SCREEN, BEIGE, GREEN
-from src.singleplayer_game.game_gui.game_button import x_buttons, y_button, width_button
-from pygame_widgets.slider import Slider
-from pygame_widgets.textbox import TextBox
-
-def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=None):
-    """
-    Displays the GUI for a player's decision and returns their action.
-    If no action is received within a set time, auto-fold is returned.
-    """
-    # Set up slider and output for raising.
-    x_slider = 1070
-    y_slider = 650
-    slider = Slider(SCREEN, x_slider, y_slider, width_button * 2, 40,
-                    min=0, max=max_raise - min_raise, initial=0, step=1,
-                    colour=(94, 151, 82), handleColour=BEIGE, handleRadius=19)
-
-    x_output = 1060
-    y_output = 590
-    font = game_font(20)
-    output = TextBox(SCREEN, x_output, y_output, 100, 50, fontSize=20,
-                     colour=GREEN, textColour=BEIGE, font=font)
-    output.setText('1')
-    output.disable()
-
-    # Set the active status for the buttons.
-    for button in buttons:
-        button.active = dict_options.get(button.name, False)
-
-    # Draw common background elements once.
-    arrangeRoom(common_cards)
-    drawPlayer()
-
-    pause_action = True
-    start_time = time.time()
-    decision = None
-
-    # Create a clock object to control the frame rate.
-    clock = pygame.time.Clock()
-
-    while pause_action:
-        # Get all events once per frame.
-        events = pygame.event.get()
-        for event in events:
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_position = pygame.mouse.get_pos()
-                for button in buttons:
-                    if button.isOver(mouse_position) and button.active:
-                        if button.name == 'raise':
-                            decision = [button.name, slider.getValue() + min_raise]
-                        else:
-                            decision = [button.name]
-                        pause_action = False
-                        break
-
-            if event.type == pygame.MOUSEMOTION:
-                mouse_position = pygame.mouse.get_pos()
-                for button in buttons:
-                    if button.active:
-                        button.bigger(mouse_position)
-
-        # Update widgets once per frame with all events.
-        pygame_widgets.update(events)
-
-        # Redraw the background and static elements.
-        screen_width, screen_height = SCREEN.get_size()
-        scaled_bg = pygame.transform.scale(GAME_BG, (screen_width, screen_height))
-        SCREEN.blit(scaled_bg, (0, 0))
-        arrangeRoom(common_cards)
-        drawPlayer()
-        drawButtons(buttons)
-
-        # Update the slider output.
-        output.setText('$' + str(slider.getValue() + min_raise))
-        slider.draw()
-        output.draw()
-
-        drawCustomCursor()
-        pygame.display.update()
-
-        # Limit the frame rate (adjust FPS as needed, e.g., 30 or 20)
-        clock.tick(30)
-        
-        # Timeout logic (if desired)
-        # if time.time() - start_time >= 5:
-        #     decision = ['fold']
-        #     pause_action = False
-
-    return decision
 
 def splitPot():
     """
