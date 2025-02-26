@@ -5,7 +5,7 @@ from src.gui.utils.constants import game_font, scaled_cursor, GAME_BG
 import time
 import pygame
 from src.gui.utils.constants import SCREEN, BEIGE, GREEN
-from src.singleplayer_game.game_gui.game_button import x_buttons, y_button, width_button
+from src.multiplayer_game.game_gui.game_button import x_buttons, y_button, width_button
 from pygame_widgets.slider import Slider
 from pygame_widgets.textbox import TextBox
 
@@ -109,7 +109,7 @@ def showdown(common_cards):
     Displays the showdown by drawing the player's cards, all active opponents' cards, 
     and the community cards (flop, turn, river).
     """
-    from src.singleplayer_game.game_gui.player import Player
+    from src.multiplayer_game.game_gui.player import Player
     from src.gui.utils.constants import SCREEN
 
     player_list_chair = Player.player_list_chair
@@ -146,7 +146,7 @@ def arrangeRoom(common_cards=None):
     """
     import pygame
     from src.gui.utils.constants import SCREEN, GAME_BG
-    from src.singleplayer_game.game_gui.player import Player
+    from src.multiplayer_game.game_gui.player import Player
 
     player_list_chair = Player.player_list_chair
     screen_width, screen_height = SCREEN.get_size()
@@ -179,7 +179,7 @@ def arrangeRoom(common_cards=None):
     cards.draw(SCREEN)
 
     if common_cards is not None:
-        from src.singleplayer_game.game_gui.player import Player
+        from src.multiplayer_game.game_gui.player import Player
         Player.drawPot(SCREEN)
         sub_card = giveCard('flop', common_cards[0:3])
         for card in sub_card:
@@ -260,7 +260,7 @@ def drawPlayer():
     """
     Displays player labels and their bet information.
     """
-    from src.singleplayer_game.game_gui.player import Player
+    from src.multiplayer_game.game_gui.player import Player
     from src.gui.utils.constants import SCREEN
     player_list_chair = Player.player_list_chair
     for player in player_list_chair:
@@ -305,7 +305,7 @@ def coverUpCards(player_list):
     """
     import pygame
     from src.gui.utils.constants import cards_object
-    from src.singleplayer_game.game_gui.card import Card
+    from src.multiplayer_game.game_gui.card import Card
 
     reverse_cards = pygame.sprite.Group()
     base_reverse_card_1 = cards_object['reverse_1']
@@ -344,7 +344,7 @@ def splitPot():
     with the player and the chips they win for the round.
     """
     from itertools import groupby
-    from src.singleplayer_game.game_gui.player import Player
+    from src.multiplayer_game.game_gui.player import Player
 
     players = [p for p in Player.player_list_chair if p.live or p.alin]
     if not players:
@@ -401,7 +401,7 @@ def onePlayerWin():
     """
     Processes a round where a single player wins by taking all chips.
     """
-    from src.singleplayer_game.game_gui.player import Player
+    from src.multiplayer_game.game_gui.player import Player
     player_list = Player.player_list_chair.copy()
     list_winner = []
     for player in player_list:
@@ -415,7 +415,7 @@ def changePlayersPositions():
     """
     Advances the dealer index by one seat clockwise.
     """
-    from src.singleplayer_game.game_gui.player import Player
+    from src.multiplayer_game.game_gui.player import Player
     num_players = len(Player.player_list)
     Player.dealer_index = (Player.dealer_index + 1) % num_players  
     
