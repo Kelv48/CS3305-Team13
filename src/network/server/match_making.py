@@ -131,7 +131,7 @@ async def voteStart(websocket: ServerConnection, sessionID):
     try:
         activeSessions[sessionID]['forceStart'].add(websocket)
         logger.info(f"Votes: {len(activeSessions[sessionID]['forceStart'])}")
-        if len(activeSessions[sessionID]['forceStart']) >= activeSessions[sessionID]['numPlayer']:
+        if len(activeSessions[sessionID]['forceStart']) >= activeSessions[sessionID]['numPlayer'] and activeSessions[sessionID]['numPlayer'] > 1:
             activeSessions[sessionID]['ready'] = True
 
             #Create game object 
