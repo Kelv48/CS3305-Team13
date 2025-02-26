@@ -141,7 +141,7 @@ def hand_equity_visualizer(mainMenu):
 
     # Place header text near the top of the textbox
     header_text = "This is the HAND EQUITY screen."
-    HAND_VISUALIZER_TEXT = screen_font(45).render(header_text, True, "White")
+    HAND_VISUALIZER_TEXT = screen_font(45).render(header_text, True, "Gold")
     header_y = textbox_y - 20
     HAND_VISUALIZER_RECT = HAND_VISUALIZER_TEXT.get_rect(center=(textbox_x + textbox_width // 2, header_y))
     SCREEN.blit(HAND_VISUALIZER_TEXT, HAND_VISUALIZER_RECT)

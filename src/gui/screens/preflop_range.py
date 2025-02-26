@@ -85,7 +85,6 @@ def preflop_range_visualizer(mainMenu):
                 "54s",
                 
 
-
                 "AKo", "AQo", "AJo", "ATo", "A9o", "A8o", "A7o", "A6o", "A5o", "A4o", "A3o",
                 "KQo", "KJo", "KTo", "K9o", "K8o",
                 "QJo", "QTo", "Q9o",
@@ -265,7 +264,7 @@ def preflop_range_visualizer(mainMenu):
     SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
     header_text = "This is the PREFLOP RANGE screen."
-    HAND_VISUALIZER_TEXT = screen_font(45).render(header_text, True, "White")
+    HAND_VISUALIZER_TEXT = screen_font(45).render(header_text, True, "Gold")
     header_y = textbox_y - 20
     HAND_VISUALIZER_RECT = HAND_VISUALIZER_TEXT.get_rect(center=(textbox_x + textbox_width // 2, header_y))
     SCREEN.blit(HAND_VISUALIZER_TEXT, HAND_VISUALIZER_RECT)

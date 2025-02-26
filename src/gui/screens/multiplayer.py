@@ -2,6 +2,9 @@ import pygame, sys
 from src.gui.utils.button import Button
 from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor
 
+from src.multiplayer_game.game_menu import gameMenu
+from src.multiplayer_game.lobby_screen import lobbyScreen
+
 def multiPlayer(mainMenu):
     while True:
         MULTI_MOUSE_POS = pygame.mouse.get_pos()
@@ -36,13 +39,13 @@ def multiPlayer(mainMenu):
 
         
         # Calculate positions based on current screen size
-        SINGLE_TEXT = screen_font(50).render("Poker", True, "Dark Green")
+        SINGLE_TEXT = screen_font(50).render("Poker", True, "Gold")
         SINGLE_RECT = SINGLE_TEXT.get_rect(center=(screen_width / 2, screen_height / 9))
         SCREEN.blit(SINGLE_TEXT, SINGLE_RECT)
 
         # Define button labels and functions
         buttons = [
-            ("CREATE GAME", "CREATE GAME"),
+            ("CREATE GAME", lobbyScreen),
             ("JOIN GAME", "JOIN GAME"),
             ("HOME", mainMenu)]
 
@@ -77,10 +80,8 @@ def multiPlayer(mainMenu):
                         if action == sys.exit:
                             pygame.quit()
                             sys.exit()
-                        elif action == "CREATE GAME":
-                            print("CREATE GAME")
-                        elif action == "JOIN GAME":
-                            print("JOIN GAME")
+                        elif action == lobbyScreen:
+                            lobbyScreen(mainMenu)
                         else:
                             action()
 

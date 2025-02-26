@@ -36,7 +36,7 @@ def leaderboard(mainMenu):
 
         # Leaderboard Box
         textbox_width = int(screen_width * 0.9)
-        textbox_height = int(screen_height * 0.8)
+        textbox_height = int(screen_height * 0.85)
         textbox_x = (screen_width - textbox_width) // 2
         textbox_y = int(screen_height * 0.10)
         textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
@@ -44,7 +44,7 @@ def leaderboard(mainMenu):
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
         # Title
-        title_text = screen_font(50).render("Top Earners", True, "Dark Green")
+        title_text = screen_font(50).render("Top Earners", True, "Gold")
         title_rect = title_text.get_rect(center=(screen_width / 2, screen_height / 15))
         SCREEN.blit(title_text, title_rect)
 
@@ -55,7 +55,7 @@ def leaderboard(mainMenu):
         start_y = textbox_y + 60
         headers = ["Rank", "Username", "Wins", "Losses", "Earnings"]
         for i, header in enumerate(headers):
-            header_surface = entry_font.render(header, True, "Yellow")
+            header_surface = entry_font.render(header, True, "Gold")
             SCREEN.blit(header_surface, (start_x + i * column_spacing, start_y))
 
         # Display leaderboard entries (Only top 10)

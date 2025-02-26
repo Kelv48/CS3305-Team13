@@ -40,7 +40,7 @@ def settings(mainMenu):
 
         
         # Calculate positions based on current screen size
-        SETTINGS_TEXT = screen_font(50).render("Poker", True, "Dark Green")
+        SETTINGS_TEXT = screen_font(50).render("Poker", True, "Gold")
         SETTINGS_RECT = SETTINGS_TEXT.get_rect(center=(screen_width / 2, screen_height / 9))
         SCREEN.blit(SETTINGS_TEXT, SETTINGS_RECT)
 

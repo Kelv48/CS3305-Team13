@@ -24,7 +24,7 @@ def render_screen(title, username, password, active_input, button_actions, messa
     )
     SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
     
-    title_text = screen_font(45).render(title, True, "White")
+    title_text = screen_font(45).render(title, True, "Gold")
     title_rect = title_text.get_rect(center=(screen_width / 2, screen_height / 9))
     SCREEN.blit(title_text, title_rect)
 
