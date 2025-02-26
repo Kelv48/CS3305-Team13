@@ -42,7 +42,7 @@ def generateSessionCode():
     return base64.b64encode(hash).decode('utf-8')[0:6]
 
 async def createGame(websocket:ServerConnection, maxPlayer:int):
-    print(type(maxPlayer))
+    
     logger.info("Creating new session")
     sessionID = generateSessionCode() #ID of the game 
     activeSessions[sessionID] = {
@@ -59,7 +59,6 @@ async def createGame(websocket:ServerConnection, maxPlayer:int):
     await websocket.send(message.encode())
 
 
-#TODO: Figure out how to get a player to join game that is already running
 #TODO: Need to disconnect ServerConnections properly
 async def joinGame(websocket: ServerConnection, sessionID):
     logger.info(f"adding {websocket.remote_address} to session:{sessionID}")
@@ -137,7 +136,7 @@ async def redirect(sessionID):
                 
 
 
-         #Publish relevant info to redis server
+    #Publish relevant info to redis server
     data = {'sessionID':sessionID, 'clients':{}, 'gameObj':activeSessions[sessionID]['gameObj']}
     r.publish(channel, json.dumps(data))
 
