@@ -77,18 +77,7 @@ async def joinGame(websocket: ServerConnection, sessionID):
             #If lobby is filled up then launch the game. How do join a client to a game in progress. Maybe we redirect them and send them game instance 
             if activeSessions[sessionID]['numPlayer'] >= activeSessions[sessionID]['maxPlayer']:
                 logger.debug(f"session: {sessionID} is ready to be played")
-                # Create game instance and store in active sessions
-
-
-                #Redirect each client in lobby to game server 
-                redirectMessage = template.substitute(m_type=Protocols.Response.REDIRECT, data=json.dumps({"host":"localhost", "port":443}))
-                for serverConnection in activeSessions[sessionID]['clients']:
-                    await serverConnection.send(redirectMessage)
-
-                #Publish relevant info to redis server
-                data = {'sessionID':sessionID, 'clients':{}, 'gameObj':activeSessions[sessionID]['gameObj']}
-                r.publish(channel, json.dumps(data))
-
+                await redirect(sessionID)
                 return  #Exit out of function
                 
 
