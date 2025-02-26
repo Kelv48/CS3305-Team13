@@ -51,3 +51,16 @@ def leaderboard():
         return jsonify(json.loads(leaderboard_data)), 200
     else:
         return jsonify({"error": "Leaderboard data not found"}), 404
+
+@main.route("/logout", methods=['POST'])
+def logout():
+    data = request.get_json()
+    username = data.get("username")
+
+    if not username:
+        return jsonify({"error": "Please provide a username"}), 400
+    user_session_key = f"user:{username}"
+    if redis_client.exists(user_session_key):
+        redis_client.delete(user_session_key)
+        return jsonify({"message": f"User {username} logged out"}), 200
+    

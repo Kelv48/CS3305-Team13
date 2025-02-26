@@ -21,6 +21,6 @@ def get_user_DBorCache(user_name):
             'password' : user.password
         }
 
-        redis_client.setex(cache_key, 300, json.dumps(user_data)) # Using setex to set an expiry time
+        redis_client.set(cache_key, json.dumps(user_data)) # Using setex to set an expiry time
         return user_data
     return None
