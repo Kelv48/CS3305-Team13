@@ -9,7 +9,7 @@ class Player(object):
     player_list = []
     player_list_chair = []
     _position = 0
-    dealer_index = -1  # For role assignment; see explanation below.
+    dealer_index = 0  # For role assignment; see explanation below.
 
     def __init__(self, name, stack, kind='human'):
         self.__class__.player_list.append(self)
@@ -102,7 +102,7 @@ class Player(object):
         Also draws:
         - The role text (for all six positions) to the left of the player's label.
         - For roles with icons (BTN/SB/BTN, SB, BB), the corresponding icon is drawn
-            at the original (icon) position.
+        at the original (icon) position.
         """
         font = game_font(20)
         text1 = font.render(str(self.name), True, BLACK)
@@ -146,17 +146,28 @@ class Player(object):
         win.blit(role_text, (text_offset_x, text_offset_y))
         # ------------------------
         
-        # For roles that have icons, also draw the icon at the original designated position.
+        # Determine the icon position.
         role_icon_x = x + width - 30  # position remains unchanged
         role_icon_y = y - 35
-        if role in ["BTN", "SB/BTN"]:
-            win.blit(dealer_icon, (role_icon_x, role_icon_y))
-        elif role == "SB":
-            win.blit(sb_icon, (role_icon_x, role_icon_y))
-        elif role == "BB":
-            win.blit(bb_icon, (role_icon_x, role_icon_y))
+        
+        # If there are only 2 players, only draw the SB and BB icons.
+        if len(self.player_list_chair) == 2:
+            if role == "SB/BTN":
+                win.blit(sb_icon, (role_icon_x, role_icon_y))
+            elif role == "BB":
+                win.blit(bb_icon, (role_icon_x, role_icon_y))
+        else:
+            # Normal behavior for more than 2 players.
+            if role in ["BTN", "SB/BTN"]:
+                win.blit(dealer_icon, (role_icon_x, role_icon_y))
+            elif role == "SB":
+                win.blit(sb_icon, (role_icon_x, role_icon_y))
+            elif role == "BB":
+                win.blit(bb_icon, (role_icon_x, role_icon_y))
 
-                
+
+
+                    
     
     def drawBet(self, win):
         """

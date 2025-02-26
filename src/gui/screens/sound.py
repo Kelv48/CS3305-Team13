@@ -1,6 +1,6 @@
 import pygame, sys
 from src.gui.utils.button import Button
-from src.gui.utils.constants import BG, screen_font, SCREEN, screen_font, scaled_cursor
+from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor
 
 class Slider:
     def __init__(self, pos, width, initial_value=0.5):
@@ -10,7 +10,11 @@ class Slider:
 
     def draw(self, screen):
         pygame.draw.rect(screen, "White", self.rect)
-        pygame.draw.rect(screen, "Light Green", (self.rect.x + self.value * self.rect.width - 5, self.rect.y - 5, 10, 20))
+        pygame.draw.rect(
+            screen, 
+            "Light Green", 
+            (self.rect.x + self.value * self.rect.width - 5, self.rect.y - 5, 10, 20)
+        )
 
     def update(self, mouse_pos):
         if self.dragging:
@@ -25,9 +29,10 @@ class Slider:
             self.dragging = False
 
 class Dropdown:
-    def __init__(self, x, y, w, h, options, font, main_color, hover_color, text_color):
+    def __init__(self, x, y, w, h, options, font, main_color, hover_color, text_color, visible_options=5):
         """
         options: list of dictionaries, each with keys 'name' and 'path'
+        visible_options: number of options to show at once when expanded
         """
         self.rect = pygame.Rect(x, y, w, h)
         self.options = options
@@ -37,12 +42,13 @@ class Dropdown:
         self.text_color = text_color
         self.active = False  # Is the dropdown expanded?
         self.selected_index = 0  # Index of the current selection
+        self.visible_options = visible_options  # How many options to display at once
+        self.start_index = 0  # Scrolling offset
 
-        # Pre-create rects for each option (positioned below the main rectangle)
-        self.option_rects = []
-        for i in range(len(options)):
-            option_rect = pygame.Rect(x, y + (i + 1) * h, w, h)
-            self.option_rects.append(option_rect)
+        # For middle mouse dragging scrolling
+        self.middle_dragging = False
+        self.middle_drag_start_y = 0
+        self.initial_start_index = 0
 
     def draw(self, screen):
         # Draw the main dropdown box (always visible)
@@ -51,34 +57,78 @@ class Dropdown:
         text_rect = selected_text.get_rect(center=self.rect.center)
         screen.blit(selected_text, text_rect)
 
-        # If active, draw all options below
+        # If active, draw only the visible subset of options below the main box
         if self.active:
-            for i, option_rect in enumerate(self.option_rects):
+            for i in range(self.visible_options):
+                option_index = self.start_index + i
+                if option_index >= len(self.options):
+                    break
+                option_rect = pygame.Rect(
+                    self.rect.x,
+                    self.rect.bottom + i * self.rect.height,
+                    self.rect.width,
+                    self.rect.height
+                )
                 # Change color on hover
                 if option_rect.collidepoint(pygame.mouse.get_pos()):
                     color = self.hover_color
                 else:
                     color = self.main_color
                 pygame.draw.rect(screen, color, option_rect)
-                option_text = self.font.render(self.options[i]["name"], True, self.text_color)
+                option_text = self.font.render(self.options[option_index]["name"], True, self.text_color)
                 option_text_rect = option_text.get_rect(center=option_rect.center)
                 screen.blit(option_text, option_text_rect)
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            # If clicking the main box, toggle the dropdown
-            if self.rect.collidepoint(event.pos):
-                self.active = not self.active
-            elif self.active:
-                # Check if any option was clicked
-                clicked_option = False
-                for i, option_rect in enumerate(self.option_rects):
-                    if option_rect.collidepoint(event.pos):
-                        self.selected_index = i
-                        clicked_option = True
-                        break
-                # Close the dropdown whether or not an option was clicked
-                self.active = False
+            # Left click for toggling or selecting options
+            if event.button == 1:
+                if self.rect.collidepoint(event.pos):
+                    self.active = not self.active
+                elif self.active:
+                    # Check if any visible option was clicked with left button
+                    for i in range(self.visible_options):
+                        option_index = self.start_index + i
+                        if option_index >= len(self.options):
+                            break
+                        option_rect = pygame.Rect(
+                            self.rect.x,
+                            self.rect.bottom + i * self.rect.height,
+                            self.rect.width,
+                            self.rect.height
+                        )
+                        if option_rect.collidepoint(event.pos):
+                            self.selected_index = option_index
+                            break
+                    # Close the dropdown regardless of click outcome
+                    self.active = False
+
+            # Middle mouse button pressed starts dragging for scrolling
+            elif event.button == 2:
+                if self.active:
+                    self.middle_dragging = True
+                    self.middle_drag_start_y = event.pos[1]
+                    self.initial_start_index = self.start_index
+
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 2:
+                self.middle_dragging = False
+
+        elif event.type == pygame.MOUSEMOTION:
+            if self.middle_dragging and self.active:
+                # Calculate vertical movement to adjust start_index.
+                # Each option's height is self.rect.height; moving that many pixels shifts one option.
+                dy = event.pos[1] - self.middle_drag_start_y
+                shift = int(dy / self.rect.height)
+                new_index = self.initial_start_index - shift
+                max_start = max(0, len(self.options) - self.visible_options)
+                self.start_index = max(0, min(new_index, max_start))
+
+        elif event.type == pygame.MOUSEWHEEL and self.active:
+            # Use mouse wheel to scroll the options as well.
+            self.start_index -= event.y  # event.y > 0 scrolls up, < 0 scrolls down.
+            max_start = max(0, len(self.options) - self.visible_options)
+            self.start_index = max(0, min(self.start_index, max_start))
 
     def get_selected_option(self):
         return self.options[self.selected_index]
@@ -91,12 +141,30 @@ def sound(mainMenu):
     music_volume_slider = Slider(pos=(0, 0), width=250)
     sfx_volume_slider = Slider(pos=(0, 0), width=250)
 
-    # Define the playlist with song names and file paths
+    # Define the playlist with 20 songs for the dropdown playlist
     playlist = [
-        {"name": "Song 1", "path": "assets/music/Los Santos.mp3"},
-        {"name": "Song 2", "path": "assets/music/poker_face.wav"},
-        {"name": "Song 3", "path": "assets/music/Los Santos.mp3"},
-    ]
+    {"name": "The Gambler", "path": "assets/music/the_gambler.mp3"},
+    {"name": "Luck Be a Lady", "path": "assets/music/luck_be_a_lady.mp3"},
+    {"name": "Poker Face", "path": "assets/music/poker_face.mp3"},
+    {"name": "Ace of Spades", "path": "assets/music/ace_of_spades.mp3"},
+    {"name": "Viva Las Vegas", "path": "assets/music/viva_las_vegas.mp3"},
+    {"name": "Waking Up in Vegas", "path": "assets/music/waking_up_in_vegas.mp3"},
+    {"name": "House of the Rising Sun", "path": "assets/music/house_of_the_rising_sun.mp3"},
+    {"name": "Money", "path": "assets/music/money.mp3"},
+    {"name": "Two of a Kind, Workin' on a Full House", "path": "assets/music/two_of_a_kind.mp3"},
+    {"name": "Big Money", "path": "assets/music/big_money.mp3"},
+    {"name": "Sharp Dressed Man", "path": "assets/music/sharp_dressed_man.mp3"},
+    {"name": "Deal", "path": "assets/music/deal.mp3"},
+    {"name": "Easy Money", "path": "assets/music/easy_money.mp3"},
+    {"name": "Black Betty", "path": "assets/music/black_betty.mp3"},
+    {"name": "When the Levee Breaks", "path": "assets/music/when_the_levee_breaks.mp3"},
+    {"name": "All In", "path": "assets/music/all_in.mp3"},
+    {"name": "Queen of Hearts", "path": "assets/music/queen_of_hearts.mp3"},
+    {"name": "High Roller", "path": "assets/music/high_roller.mp3"},
+    {"name": "House of Cards", "path": "assets/music/house_of_cards.mp3"},
+    {"name": "Gambler's Blues", "path": "assets/music/gamblers_blues.mp3"}
+]
+
 
     # Create the dropdown menu for songs
     dropdown_font = screen_font(25)
@@ -107,7 +175,8 @@ def sound(mainMenu):
     dropdown_y = SCREEN.get_height() / 2 + 80  
     song_dropdown = Dropdown(
         dropdown_x, dropdown_y, dropdown_width, dropdown_height,
-        playlist, dropdown_font, pygame.Color("White"), pygame.Color("LightGreen"), pygame.Color("Black")
+        playlist, dropdown_font, pygame.Color("White"), pygame.Color("LightGreen"), pygame.Color("Black"),
+        visible_options=5  # Adjust this to how many options you want visible at once
     )
 
     while True:
@@ -186,8 +255,8 @@ def sound(mainMenu):
         sfx_volume = sfx_volume_slider.value
         pygame.mixer.music.set_volume(music_volume)
 
-        # # Draw the dropdown for song selection
-        # song_dropdown.draw(SCREEN)
+        # Draw the dropdown for song selection
+        song_dropdown.draw(SCREEN)
 
         # Event handling
         for event in pygame.event.get():
@@ -204,10 +273,10 @@ def sound(mainMenu):
             music_volume_slider.handle_event(event)
             sfx_volume_slider.handle_event(event)
 
-            # Handle dropdown events
+            # Handle dropdown events (with updated middle mouse behavior)
             song_dropdown.handle_event(event)
-            # When the mouse button is released, load the newly selected song
-            if event.type == pygame.MOUSEBUTTONUP:
+            # When the left mouse button is released, load the newly selected song
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 selected_song = song_dropdown.get_selected_option()
                 try:
                     pygame.mixer.music.load(selected_song["path"])

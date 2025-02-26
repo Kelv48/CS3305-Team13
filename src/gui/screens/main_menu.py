@@ -15,7 +15,6 @@ from src.gui.screens.tools import tools
 def mainMenu():
     while True:
         MAIN_MOUSE_POS = pygame.mouse.get_pos()
-        
         # Calculate positions based on current screen size
         screen_width, screen_height = SCREEN.get_size() 
         scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height))

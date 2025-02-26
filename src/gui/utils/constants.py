@@ -20,7 +20,6 @@ HEIGHT = 720
 SCREEN = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)    # Resizable
 
 
-
 # Load and scale the cursor image to 32x32
 cursor_image = pygame.image.load("assets/images/pointer_c.png").convert_alpha()
 scaled_cursor = pygame.transform.smoothscale(cursor_image, (32, 32))
@@ -54,12 +53,9 @@ bb_icon = pygame.transform.scale(bb_icon, (70, 70))
 BG = pygame.image.load("assets/images/Background.jpg").convert_alpha()
 BG.set_colorkey(WHITE)
 
-# Icon
-icon = pygame.image.load("assets/images/poker_cards_icon.png").convert_alpha()
-icon.set_colorkey(WHITE)
 
 # Button
-button_image = pygame.image.load("assets/buttons/button.png").convert_alpha()
+button_image = pygame.image.load("assets/buttons/action_button.png").convert_alpha()
 button_image.set_colorkey(WHITE)
 
 # Label player
@@ -95,7 +91,6 @@ def game_font(size):
 
 def play_button_click_sound():
     button_click_sound.play()  # Play sound effect when button is clicked
-
 
 
 def play_winner_sound():

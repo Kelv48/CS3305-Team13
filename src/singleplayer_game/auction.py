@@ -3,6 +3,7 @@ from src.singleplayer_game.game_gui.game_button import buttons
 from src.singleplayer_game.bot import AI
 from src.singleplayer_game.game_gui.utils import playerDecision, arrangeRoom, drawPlayer
 from src.gui.utils.constants import BB
+from src.singleplayer_game.bot import BettingRound
 
 
 def auction(common_cards=None):
@@ -79,13 +80,14 @@ def getPlayerDecision(player, options, min_raise, max_raise, common_cards, call_
 
     :return: (decision, chips)
     """
+    betting_round = BettingRound()
     if player.kind == 'human':
         decision = playerDecision(buttons, options, min_raise, max_raise, common_cards)
     elif player.kind == 'AI':
         n_fold = sum(1 for p in player_list if not p.live and not p.allin)
         n_player_in_round = number_player - n_fold
         bot = AI(player.cards, options, call_value, min_raise, max_raise, pot, n_player_in_round, common_cards)
-        decision = bot.decision()
+        decision = bot.decision(betting_round)
         print(player.name, decision)
 
     # decision is expected to be a two-element sequence; extract chips if needed
