@@ -9,7 +9,7 @@ class User(db.Model):
     password = db.Column(db.String(120), nullable=False)
 
     # relationships
-    stats = db.relationship('Stats', backref='user_statistics', lazy=True)
+    stats = db.relationship('Stats', backref='user', lazy=True)
 
     def __repr__(self):
         return f'<User {self.name}>'
@@ -31,16 +31,16 @@ class Stats(db.Model):
     )
 
     # Relationships
-    leaderboard = db.relationship('Leaderboard', backref='leaderboards', lazy=True, cascade="all, delete")
+    leaderboard = db.relationship('Leaderboard', backref='stats', lazy=True, cascade="all, delete")
 
-    @property
-    def win_loss_ratio(self):
-        if self.loss_count == 0 and self.win_count == 0:
-            return None  # Both win and loss are zero, undefined ratio
-        return self.win_count / self.loss_count if self.loss_count > 0 else float('inf')
+    # @property
+    # def win_loss_ratio(self):
+    #     if self.loss_count == 0 and self.win_count == 0:
+    #         return None  # Both win and loss are zero, undefined ratio
+    #     return self.win_count / self.loss_count if self.loss_count > 0 else float('inf')
 
     def __repr__(self):
-        return f'<Stats {self.user_id}>'
+        return f'<Stats User: {self.user_id}, Wins: {self.win_count}, Losses: {self.loss_count}, Earnings: {self.earnings}>'
     
 class Leaderboard(db.Model):
     __tablename__ = 'leaderboard'

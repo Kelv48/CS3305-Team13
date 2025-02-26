@@ -2,6 +2,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import redis
+from flask_migrate import Migrate
 
 db = SQLAlchemy()
 
@@ -13,6 +14,7 @@ def create_app():
     
     # Initialize the database and Redis client
     db.init_app(app)
+    migrate = Migrate(app, db)
     
     from .routes import main
     app.register_blueprint(main)

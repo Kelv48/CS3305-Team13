@@ -1,6 +1,6 @@
 # app/routes.py
 from flask import Blueprint, request, jsonify
-from .models import User
+from .models import User, Stats, Leaderboard
 from .cache import get_user_DBorCache
 from . import db
 import json, redis
@@ -26,8 +26,17 @@ def create_user():
     check = get_user_DBorCache(data['username'])
     if check:
         return jsonify({'error': 'User already exists'}), 400
+    
     new_user = User(name=data['username'], password=data['password'])
     db.session.add(new_user)
+    db.session.commit()
+
+    new_stats = Stats(user_id=new_user.id, win_count=0, loss_count=0, earnings=0)
+    db.session.add(new_stats)
+    db.session.commit()
+
+    new_leaderboard = Leaderboard(stats_id=new_stats.id, rank=0, earnings=0)
+    db.session.add(new_leaderboard)
     db.session.commit()
 
     return jsonify({"message": f"User {data['username']} created successfully!", "id": new_user.id}), 201
