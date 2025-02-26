@@ -226,7 +226,6 @@ async def clientLeave(websocket: ServerConnection, userID, sessionID):
         with lock:
             #removed closed client from session
             activeSessions[sessionID]['clients'].pop(userID)
-            print(len(activeSessions[sessionID]['clients']))
             logger.info(f"Current active sessions {activeSessions}")
             if len(activeSessions[sessionID]['clients']) == 0:    #Deletes session if no WebSockets are left
                     del activeSessions[sessionID]
