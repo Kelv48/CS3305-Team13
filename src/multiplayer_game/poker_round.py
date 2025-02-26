@@ -1,8 +1,8 @@
 import random
-from src.singleplayer_game.game_gui.player import Player
-from src.singleplayer_game.auction import auction
-from src.singleplayer_game.poker_score import players_score
-from src.singleplayer_game.game_gui.utils import recapRound as recap_round, splitPot, onePlayerWin, changePlayersPositions
+from src.multiplayer_game.game_gui.player import Player
+from src.multiplayer_game.auction import auction
+from src.multiplayer_game.poker_score import players_score
+from src.multiplayer_game.game_gui.utils import recapRound as recap_round, splitPot, onePlayerWin, changePlayersPositions
 from src.gui.utils.constants import SB, BB
 
 def poker_round():

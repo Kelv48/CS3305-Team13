@@ -1,10 +1,9 @@
-import pygame, sys
+import pygame
 import pygame.transform
 from src.gui.utils.button import Button
 from src.gui.utils.constants import BG, screen_font, SCREEN, FPS, scaled_cursor
-from src.singleplayer_game.game_gui.utils import changePlayersPositions
-from src.singleplayer_game.game_gui.player import Player
-from src.singleplayer_game.poker_round import poker_round
+from src.multiplayer_game.game_gui.player import Player
+from src.multiplayer_game.poker_round import poker_round
 
 screen_width = 1280
 screen_height = 720
@@ -12,8 +11,6 @@ START_STACK = 5000
 
 def gameMenu(mainMenu):
     """Starts the game loop and keeps it running consistently."""
-    import pygame
-    from src.singleplayer_game.game_gui.player import Player
     pygame.init()
     clock = pygame.time.Clock()
 
