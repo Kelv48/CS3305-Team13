@@ -57,6 +57,7 @@ def mainMenu():
         textbox_center_x = textbox_x + textbox_width / 2
 
         button_objects = []
+        #For loop draws buttons
         for index, (text, action) in enumerate(buttons):
             button_y = textbox_y + (index + 1) * button_spacing
             button = Button(
