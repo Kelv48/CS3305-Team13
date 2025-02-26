@@ -20,7 +20,8 @@ class Stats(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     win_count = db.Column(db.Integer, default=0, nullable=False)
     loss_count = db.Column(db.Integer, default=0, nullable=False)
-    earnings = db.Column(db.Integer, default=0, nullable=False)
+    # bailout ???
+    earnings = db.Column(db.Integer, default=0, nullable=False) 
 
     # Define the CheckConstraint here under __table_args__
     __table_args__ = (
