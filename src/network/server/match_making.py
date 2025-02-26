@@ -65,21 +65,8 @@ async def joinGame(websocket: ServerConnection, sessionID):
     logger.info(f"adding {websocket.remote_address} to session:{sessionID}")
 
     try:
-        if activeSessions[sessionID]['numPlayer'] < activeSessions[sessionID]['maxPlayer'] and activeSessions[sessionID]['ready']:
-            #If there is room in the game to join but the game is in play add the new client to a queue which will be accessed by game server at the end of round
-            logger.debug("Player is joining a game already being played")
-            activeSessions[sessionID]['numPlayer']+=1
 
-            #Assigns sessionID to client
-            message = template.substitute(m_type=Protocols.Response.SESSION_ID, data=json.dumps(sessionID))
-            await websocket.send(message.encode())
-
-            #Redirects client to the game server
-            redirect_message = template.substitute(m_type=Protocols.Response.REDIRECT, data=json.dumps({"host":"localhost", "port":443}))
-            await websocket.send(redirect_message.encode())
-        
-
-        elif activeSessions[sessionID]['numPlayer'] < activeSessions[sessionID]['maxPlayer']: 
+        if activeSessions[sessionID]['numPlayer'] < activeSessions[sessionID]['maxPlayer']: 
 
             activeSessions[sessionID]['numPlayer']+=1
             activeSessions[sessionID]['clients'].add(websocket)
@@ -131,22 +118,8 @@ async def voteStart(websocket: ServerConnection, sessionID):
     try:
         activeSessions[sessionID]['forceStart'].add(websocket)
         logger.info(f"Votes: {len(activeSessions[sessionID]['forceStart'])}")
-        if len(activeSessions[sessionID]['forceStart']) >= activeSessions[sessionID]['numPlayer']:
-            activeSessions[sessionID]['ready'] = True
-
-            #Create game object 
-
-            #Redirect each client in lobby to game server 
-            redirectMessage = json.dumps({"m_type": Protocols.Response.REDIRECT, "data": {"host": "localhost", "port": 443}})
-            for serverConnection in activeSessions[sessionID]['clients']:
-                await serverConnection.send(redirectMessage)
-                
-
-
-            #Publish relevant info to redis server
-            data = {'sessionID':sessionID, 'clients':{}, 'gameObj':activeSessions[sessionID]['gameObj']}
-            r.publish(channel, json.dumps(data))
-
+        if len(activeSessions[sessionID]['forceStart']) >= activeSessions[sessionID]['numPlayer'] and activeSessions[sessionID]['numPlayer'] > 1:
+            await redirect(sessionID) 
             return  #Exit function 
         
     
@@ -163,8 +136,21 @@ async def voteStart(websocket: ServerConnection, sessionID):
 
     except ConnectionClosed as e:
         print("Error occurred trying to send message to client")
-        
+      
+async def redirect(sessionID):
+    activeSessions[sessionID]['ready'] = True
+    #Create game object 
 
+    #Redirect each client in lobby to game server 
+    redirectMessage = json.dumps({"m_type": Protocols.Response.REDIRECT, "data": {"host": "localhost", "port": 443}})
+    for serverConnection in activeSessions[sessionID]['clients']:                
+        await serverConnection.send(redirectMessage)
+                
+
+
+         #Publish relevant info to redis server
+    data = {'sessionID':sessionID, 'clients':{}, 'gameObj':activeSessions[sessionID]['gameObj']}
+    r.publish(channel, json.dumps(data))
 
 async def leaveGame(websocket: ServerConnection, sessionID, redirect=False):
     #This method removes a player if they choose to leave the game 
