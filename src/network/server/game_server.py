@@ -104,7 +104,7 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
 
                 case Protocols.Request.LEAVE:
                     #TODO:redo this so that message and update is broadcast to all players in the current game
-                    await clientLeave(websocket, message['sessionID'])
+                    await clientLeave(websocket, message['userID'], message['sessionID'])
                     print("Client has disconnected: ")
                     break
                 
@@ -220,14 +220,14 @@ async def closeClient(websocket: ServerConnection, sessionID=None, redirect=Fals
 #TODO: Add code that sends relevant player info to DB i.e. player wallet 
 async def clientLeave(websocket: ServerConnection, userID, sessionID):
     try:
-        logger.info(f"Current active sessions {activeSessions}")
+        logger.info(f"user leaving: {userID}")
         await websocket.close()
         #Update game object to reflect new players 
         with lock:
             #removed closed client from session
             activeSessions[sessionID]['clients'].pop(userID)
             print(len(activeSessions[sessionID]['clients']))
-
+            logger.info(f"Current active sessions {activeSessions}")
             if len(activeSessions[sessionID]['clients']) == 0:    #Deletes session if no WebSockets are left
                     del activeSessions[sessionID]
                     logger.info(f"session {sessionID} is deleted")
