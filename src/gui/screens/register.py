@@ -1,5 +1,5 @@
 import pygame
-import sys
+import sys, os
 import requests
 import json
 from src.gui.utils.button import Button
@@ -90,7 +90,6 @@ def render_screen(title, username, password, active_input, button_actions, messa
 
     return username_box, password_box, button_objects
 
-
 # Register Functionality
 def register(mainMenu):
     username = ""
@@ -157,6 +156,7 @@ def login(mainMenu):
     username = load_user()
     if username:
         return mainMenu()
+    
     username = ""
     password = ""
     active_input = None
@@ -164,11 +164,15 @@ def login(mainMenu):
 
     while True:
         LOGIN_MOUSE_POS = pygame.mouse.get_pos()
-        username_box, password_box, button_objects = render_screen("Login", username, password, active_input, [
+        button_actions = [
             ("Enter", loginUser),
             ("Switch to Register Page", register),
             ("HOME", mainMenu)
-        ], message)
+        ]
+
+        username_box, password_box, button_objects = render_screen(
+            "Login", username, password, active_input, button_actions, message
+        )
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -181,8 +185,10 @@ def login(mainMenu):
                             mainMenu()
                         elif action == register:
                             register(mainMenu)
-                        elif action == loginUser:  # Check for Enter button action
-                            loginUser(username, password) 
+                        elif action == loginUser:
+                            loginUser(username, password)
+                        elif action == logout:
+                            logout(mainMenu)
                 if username_box.collidepoint(LOGIN_MOUSE_POS):
                     active_input = "username"
                 elif password_box.collidepoint(LOGIN_MOUSE_POS):
@@ -198,10 +204,8 @@ def login(mainMenu):
                         password = password[:-1]
                     elif len(password) < 12 and event.unicode.isalnum():
                         password += event.unicode
-        
-        # Draw the scaled cursor image at the mouse position
-        SCREEN.blit(scaled_cursor, (LOGIN_MOUSE_POS[0], LOGIN_MOUSE_POS[1]))
 
+        SCREEN.blit(scaled_cursor, (LOGIN_MOUSE_POS[0], LOGIN_MOUSE_POS[1]))
         pygame.display.update()
 
 def loginUser(username, password):
@@ -221,9 +225,41 @@ def loginUser(username, password):
     else:
         print(f"Failed to login: {response.json()}")
 
+def logout(mainMenu):
+    username = load_user()
+    if not username:
+        print("No user logged in.")
+        return mainMenu()
 
+    url = f"{BASE_URL}/logout"
+    payload = {"username": username}  # Ensure username is being sent as part of the payload
+    headers = {"Content-Type": "application/json"}  # Ensure correct content type
 
+    try:
+        # Send a POST request with JSON data
+        response = requests.post(url, json=payload, headers=headers)  # Use json=payload instead of data=json.dumps(payload)
 
+        print(f"Raw server response: {response.text}")  # Debugging: Print response before parsing
+
+        if response.status_code == 200:
+            try:
+                response_data = response.json()  # Try parsing JSON
+                print(f"Logout successful: {response_data}")
+                delete_user()  # Delete the local user file
+            except json.JSONDecodeError:
+                print("Logout successful but server returned an empty response.")
+                delete_user()
+        else:
+            try:
+                error_message = response.json()
+            except json.JSONDecodeError:
+                error_message = f"Server error: {response.status_code}, Response: {response.text}"
+            print(f"Failed to log out: {error_message}")
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error during logout: {e}")
+
+    mainMenu()
 
 # Temp functions
 def save_user(username, password):
@@ -233,8 +269,17 @@ def save_user(username, password):
 
 def load_user():
     try:
-        with open(LOCAL_FILE, 'r') as f:
-            data = json.load(f)
-            return data["username"]  # Only return the username
+        # Assuming you're loading from a JSON file or something similar
+        with open('local.json', 'r') as file:  # Adjust path if necessary
+            data = json.load(file)
+            return data.get("username")  # Use .get() to avoid KeyError if 'username' is not found
     except FileNotFoundError:
-        return None
+        return None  # If the file is not found, return None
+    except json.JSONDecodeError:
+        return None  # If the JSON is corrupted, return None
+    
+def delete_user():
+    try:
+        os.remove('local.json')  # Remove the file that contains the user data
+    except FileNotFoundError:
+        pass  # If the file doesn't exist, do nothing

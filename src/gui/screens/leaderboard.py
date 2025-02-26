@@ -21,17 +21,20 @@ def get_leaderboard():
 
 def leaderboard(mainMenu):
     """
-    Renders the leaderboard screen.
+    Renders the leaderboard screen, fetching the leaderboard data only once.
     """
+    # Fetch leaderboard data once
+    leaderboard_data = get_leaderboard()
+
     while True:
         MOUSE_POS = pygame.mouse.get_pos()
 
-        # Scale the background to fit the screen size.
+        # Scale background
         screen_width, screen_height = SCREEN.get_size()
         scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height))
         SCREEN.blit(scaled_bg, (0, 0))
 
-        # Create a semi-transparent leaderboard box.
+        # Leaderboard Box
         textbox_width = int(screen_width * 0.9)
         textbox_height = int(screen_height * 0.8)
         textbox_x = (screen_width - textbox_width) // 2
@@ -45,31 +48,25 @@ def leaderboard(mainMenu):
         title_rect = title_text.get_rect(center=(screen_width / 2, screen_height / 15))
         SCREEN.blit(title_text, title_rect)
 
-        # Fetch leaderboard data
-        leaderboard_data = get_leaderboard()
-
-        # Display leaderboard entries as a table
+        # Table Headers
         entry_font = screen_font(30)
-        column_spacing = 200  # Space between columns
+        column_spacing = 200
         start_x = textbox_x + 50
         start_y = textbox_y + 60
-
-        # Table Headers
         headers = ["Rank", "Username", "Wins", "Losses", "Earnings"]
         for i, header in enumerate(headers):
             header_surface = entry_font.render(header, True, "Yellow")
             SCREEN.blit(header_surface, (start_x + i * column_spacing, start_y))
 
-        # Display leaderboard entries
-        for i, entry in enumerate(leaderboard_data[:10]):  # Show only top 10
+        # Display leaderboard entries (Only top 10)
+        for i, entry in enumerate(leaderboard_data[:10]):
             row_y = start_y + (i + 1) * 40
             row_data = [str(entry["rank"]), entry["username"], str(entry["wins"]), str(entry["losses"]), str(entry["earnings"])]
-
             for j, cell in enumerate(row_data):
                 cell_surface = entry_font.render(cell, True, "White")
                 SCREEN.blit(cell_surface, (start_x + j * column_spacing, row_y))
 
-        # Create buttons
+        # Home Button
         home_button = Button(
             pos=(screen_width / 2, screen_height - 80),
             text_input="HOME",
@@ -91,7 +88,7 @@ def leaderboard(mainMenu):
                     mainMenu()
 
         # Draw cursor
-        SCREEN.blit(scaled_cursor, (MOUSE_POS[0], MOUSE_POS[1]))
+        SCREEN.blit(scaled_cursor, MOUSE_POS)
 
         # Update display
         pygame.display.update()

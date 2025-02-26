@@ -6,47 +6,37 @@ from src.gui.screens.settings import settings
 from src.gui.screens.multiplayer import multiPlayer
 from src.gui.screens.guide import guide_beginner
 from src.gui.screens.leaderboard import leaderboard
-from src.gui.screens.register import register
+from src.gui.screens.register import register, logout, load_user
 from src.gui.screens.user_page import user_page
 from src.gui.screens.tools import tools
 
 
 
 def mainMenu():
+    logged_in = load_user() is not None
+
     while True:
         MAIN_MOUSE_POS = pygame.mouse.get_pos()
-        # Calculate positions based on current screen size
-        screen_width, screen_height = SCREEN.get_size() 
+        screen_width, screen_height = SCREEN.get_size()
         scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height))
         SCREEN.blit(scaled_bg, (0, 0))
 
-        # Transparent textbox with rounded edges
-        textbox_width = int(screen_width * 0.25)      # 20% of screen width
-        textbox_height = int(screen_height * 0.7)      # 70% of screen height
+        # Transparent textbox
+        textbox_width = int(screen_width * 0.25)
+        textbox_height = int(screen_height * 0.7)
         textbox_x = int((screen_width - textbox_width) / 2)
-        textbox_y = int(screen_height * 0.15)          # Start 15% down from the top
+        textbox_y = int(screen_height * 0.15)
 
-        # Create a new Surface with per-pixel alpha (using SRCALPHA).
         textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
-        # Draw a filled rounded rectangle on the textbox_surface.
-        # The colour (0, 0, 0, 100) is black with an alpha value of 100 (semi-transparent).
-        # Adjust the border_radius (here, 20) to control the roundness of the corners.
-        pygame.draw.rect(
-            textbox_surface, 
-            (0, 0, 0, 100), 
-            (0, 0, textbox_width, textbox_height), 
-            border_radius=50
-        )
-        # Blit the textbox to the main screen.
+        pygame.draw.rect(textbox_surface, (0, 0, 0, 100), (0, 0, textbox_width, textbox_height), border_radius=50)
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
         MAIN_TEXT = screen_font(50).render("Poker", True, "Dark Green")
         MAIN_RECT = MAIN_TEXT.get_rect(center=(screen_width // 2, screen_height // 9))
         SCREEN.blit(MAIN_TEXT, MAIN_RECT)
 
-        # Define button labels and functions.
+        # Define button labels and functions
         buttons = [
-            ("REGISTER & LOGIN", register),
             ("USER", user_page),
             ("SINGLEPLAYER", singlePlayer),
             ("MULTIPLAYER", multiPlayer),
@@ -57,13 +47,17 @@ def mainMenu():
             ("QUIT", sys.exit)
         ]
 
+        if logged_in:
+            buttons.insert(0, ("LOGOUT", logout))  # Logout button
+        else:
+            buttons.insert(0, ("REGISTER & LOGIN", register))
+
         button_count = len(buttons)
-        button_spacing = textbox_height / (button_count + 1)  # Calculate spacing so buttons are evenly distributed inside the textbox.
-        textbox_center_x = textbox_x + textbox_width / 2  # Center of the textbox horizontally.
+        button_spacing = textbox_height / (button_count + 1)
+        textbox_center_x = textbox_x + textbox_width / 2
 
         button_objects = []
         for index, (text, action) in enumerate(buttons):
-            # Place each button relative to the top of the textbox.
             button_y = textbox_y + (index + 1) * button_spacing
             button = Button(
                 pos=(textbox_center_x, button_y),
@@ -71,7 +65,8 @@ def mainMenu():
                 font=screen_font(30),
                 base_colour="White",
                 hovering_colour="Light Green",
-                image=None)
+                image=None
+            )
             button.changecolour(MAIN_MOUSE_POS)
             button.update(SCREEN)
             button_objects.append((button, action))
@@ -89,7 +84,6 @@ def mainMenu():
                         else:
                             action(mainMenu)
 
-        # Draw the scaled cursor image at the mouse position
         SCREEN.blit(scaled_cursor, (MAIN_MOUSE_POS[0], MAIN_MOUSE_POS[1]))
 
         pygame.display.update()
