@@ -2,9 +2,8 @@ import pygame, sys
 import pygame.transform
 from src.gui.utils.button import Button
 from src.gui.utils.constants import BG, screen_font, SCREEN, FPS, scaled_cursor
-from src.singleplayer_game.game_gui.utils import changePlayersPositions
-from src.singleplayer_game.game_gui.player import Player
-from src.singleplayer_game.poker_round import poker_round
+from src.multiplayer_game.game_gui.player import Player
+from src.multiplayer_game.poker_round import poker_round
 
 screen_width = 1280
 screen_height = 720
@@ -12,8 +11,6 @@ START_STACK = 5000
 
 def gameMenu(mainMenu):
     """Starts the game loop and keeps it running consistently."""
-    import pygame
-    from src.singleplayer_game.game_gui.player import Player
     pygame.init()
     clock = pygame.time.Clock()
 
@@ -31,10 +28,11 @@ def gameMenu(mainMenu):
             mainMenu()   # Return to home screen if "HOME" is chosen
             return
 
-        # Create a human player and then the requested number of bots.
+        # Create the human players
         Player('Player 1', START_STACK, 'human')
         for i in range(start_choice):
-            Player(f'Bot {i+1}', START_STACK, 'AI')
+            idx = i + 1
+            Player(f'Player {idx+1}', START_STACK, 'human')
 
         game_running = True
         while game_running and len(Player.player_list_chair) > 1:
@@ -107,11 +105,11 @@ def menuStart(mainMenu):
 
         # Buttons definition
         buttons = [
-            ("1 Bot", 1),
-            ("2 Bots", 2),
-            ("3 Bots", 3),
-            ("4 Bots", 4),
-            ("5 Bots", 5),
+            ("2 Players", 1),
+            ("3 Players", 2),
+            ("4 Players", 3),
+            ("5 Players", 4),
+            ("6 Players", 5),
             ("HOME", mainMenu)
         ]
         button_objects = []
