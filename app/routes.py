@@ -1,9 +1,8 @@
-# app/routes.py
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, g
 from .models import User, Stats, Leaderboard
 from .cache import get_user_DBorCache
 from . import db
-import json, redis
+import json, redis, time
 
 main = Blueprint('main', __name__)
 
@@ -20,26 +19,33 @@ def get_user():
 
 @main.route("/register", methods=['POST'])
 def create_user():
+    if not request.is_json:
+        return jsonify({'error': 'Missing JSON in request'}), 400
+    
     data = request.json
-    if not data.get('username') and data.get('password'):
+
+    if not data or not data.get('username') or data.get('password'):
         return jsonify({'error': 'Please provide both name and password'}), 400
+    
     check = get_user_DBorCache(data['username'])
     if check:
         return jsonify({'error': 'User already exists'}), 400
-    
-    new_user = User(name=data['username'], password=data['password'])
-    db.session.add(new_user)
-    db.session.commit()
+    try:
+        new_user = User(name=data['username'], password=data['password'])
+        db.session.add(new_user)
+        db.session.commit()
 
-    new_stats = Stats(user_id=new_user.id, win_count=0, loss_count=0, earnings=0)
-    db.session.add(new_stats)
-    db.session.commit()
+        new_stats = Stats(user_id=new_user.id, win_count=0, loss_count=0, earnings=0)
+        db.session.add(new_stats)
+        db.session.commit()
 
-    new_leaderboard = Leaderboard(stats_id=new_stats.id, rank=0, earnings=0)
-    db.session.add(new_leaderboard)
-    db.session.commit()
+        new_leaderboard = Leaderboard(stats_id=new_stats.id, rank=0, earnings=0)
+        db.session.add(new_leaderboard)
+        db.session.commit()
 
-    return jsonify({"message": f"User {data['username']} created successfully!", "id": new_user.id}), 201
+        return jsonify({"message": f"User {data['username']} created successfully!", "id": new_user.id}), 201
+    except Exception as e:
+        return jsonify({"error": "Error creating user"}), 500
 
 @main.route("/leaderboard", methods=['GET'])
 def leaderboard():
@@ -63,4 +69,16 @@ def logout():
     if redis_client.exists(user_session_key):
         redis_client.delete(user_session_key)
         return jsonify({"message": f"User {username} logged out"}), 200
+    return jsonify({"error": "User not found"}), 404
     
+@main.route('/')
+def hello():
+    return 'Hello, World!'
+
+@main.errorhandler(404)
+def page_not_found(error):
+    return "Page not found", 404
+
+@main.errorhandler(500)
+def internal_server_error(error):
+    return "Internal Server Error", 500

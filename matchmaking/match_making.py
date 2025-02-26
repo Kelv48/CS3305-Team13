@@ -18,13 +18,13 @@ import logging
 from string import Template
 from json import JSONDecodeError
 from random import randint, randbytes
-from protocol import Protocols
+from matchmaking.protocol import Protocols
 from websockets.exceptions import ConnectionClosed, ConnectionClosedError, ConnectionClosedOK
-from  websockets.asyncio.server import serve, ServerConnection
+from websockets.asyncio.server import serve, ServerConnection
 
 # Server attributes
 host ="localhost"
-port = 80
+port = 8000
 template = Template('{"m_type": "$m_type", "data": $data}')   #This is a template for message to be sent to clients
 activeSessions = {}  
 
