@@ -1,13 +1,14 @@
 #For testing run file in main.py
+#TODO: Add locks to actions writing to activeSessions
 import json
 import redis
 import asyncio
 import logging
 import threading
-#ffrom game import game_class    #There are import errors in this module need to make stuff a package 
+#from game import game_class    #There are import errors in this module need to make stuff a package 
 from string import Template
 from protocol import Protocols
-from websockets.exceptions import ConnectionClosedError
+from websockets.exceptions import ConnectionClosedError, ConnectionClosed
 from websockets.asyncio.server import serve, ServerConnection
 
 '''
@@ -22,8 +23,8 @@ When a client leaves what needs to happen?
 2a.   other clients in the game need to be sent the new game object 
 2b.   If there is no one left in the session remove it from the dictionary
 3     Close ServerConnection and push and relevant info like player wallet to the db 
-
 '''
+
 #Server setup
 host = "localhost"
 port = 443
@@ -34,12 +35,26 @@ template = Template('{"m_type": "$m_type", "data": "$data"}')   #This is a templ
 channel = 'activeSessions'
 r = redis.Redis('localhost', 6379)
 pubsub = r.pubsub()
-pubsub.subscribe(channel)
+
+def addActiveSession(message):
+    '''This method is for adding new active game sessions created by match_making.py
+    to the activeSessions dict. This method is for initialising new sessions and NOT
+    for updating already tracked sessions'''
+
+    if message['type'] == 'message':
+            data = json.loads(message['data'])
+            sessionID = data.get('sessionID')
+            with lock:
+                activeSessions[sessionID] = {'clients':data['clients'], 'gameObj': data['gameObj']}
+                print(activeSessions)
+
+thread = pubsub.subscribe(**{channel: addActiveSession})
+pubsub.run_in_thread(1, True)
 #How do we get the server to update activeSessions parallel to message handling?
     #Threads will have to be used but that only provides concurrent execution 
 
 #Config Thread
-lock = threading.Lock()
+lock = threading.Lock() #Prevents deadlocks and race conditions 
 
 #Configure logging 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -47,21 +62,31 @@ logger = logging.getLogger(__name__)
 
 async def handleClient(websocket: ServerConnection): #ConnectionClosedError maybe raised do this in try block do avoid exceptions being raised
     logger.info(f"Connection from {websocket.remote_address}")
+    currentSessionID = None
+    userID =None
     while True:
         try:
-            
+            print(activeSessions)
             logger.info(f"Received message from client: {websocket.remote_address}")
             data = await websocket.recv(100)
-            
+            logger.info(f"message revived: {data}")
+
             if not data:
                 logger.error(f"Faulty/Missing message from client {websocket.remote_address}")
                 await clientLeave(websocket)
                 break
 
-            message = json.loads(data.decode())
+            message = json.loads(data)
+            currentSessionID = message['sessionID']
+            userID = message['userID']
             logger.debug(f"Received: {message}")
 
-            activeSessions[message['sessionID']]['clients'].add(websocket)       #Adds serverConnection to the appropriate session
+            #If clients username isn't in session add them userID → serverConnection
+            if message['userID'] not in activeSessions[message['sessionID']]['clients']:
+                with lock:
+                    activeSessions[message['sessionID']]['clients'][userID] = websocket     #Adds serverConnection to the appropriate session
+                    print(activeSessions)
+
 
             match message['m_type']:
                 case Protocols.Request.FOLD:
@@ -85,7 +110,7 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
                 
         except ConnectionResetError as e:   #Occurs if client or server closes connection without sending close frame
             print(f"disconnected from {websocket.remote_address}")
-            await clientLeave(websocket, message['sessionID'])
+            await clientLeave(websocket, userID, currentSessionID)
             break
 
         except KeyError as e:
@@ -94,7 +119,10 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
 
         except ConnectionClosedError as e:  #Raised when trying to interact with a closed connection
             print(f"disconnected from {websocket.remote_address}")
-            await clientLeave(websocket, message['sessionID'])
+            await clientLeave(websocket, userID, currentSessionID)
+            break
+
+        except UnboundLocalError as e:  #Can occur if connection  is closed with no close frame received or sent
             break
         
 
@@ -106,8 +134,8 @@ async def foldClient(websocket: ServerConnection, sessionID):
     #game.foldPlayer()
     
     #Broadcast messages to all other players 
-    logger.debug("starting to broadcast message")
-    for client_writer in activeSessions[sessionID]['clients']:
+    logger.info("starting to broadcast message")
+    for client_writer in activeSessions[sessionID]['clients'].values():
         if client_writer != websocket:
             try:
                 await client_writer.send("player has folded".encode())
@@ -125,8 +153,8 @@ async def raiseClient(websocket: ServerConnection, sessionID):
     #GameLogic manipulation 
     #game = games_dict[sessionID]['gameObj]
 
-    logger.debug("starting to broadcast message")
-    for client_writer in activeSessions[sessionID]['clients']:
+    logger.info("starting to broadcast message")
+    for client_writer in activeSessions[sessionID]['clients'].values():
         if client_writer != websocket:
             try:
                 await client_writer.send("player has raise the pot by __".encode())
@@ -142,8 +170,8 @@ async def clientCheck(websocket: ServerConnection, sessionID):
     #GameLogic manipulation 
     #game = games_dict[sessionID]['gameObj]
 
-    logger.debug("starting to broadcast message")
-    for client_writer in activeSessions[sessionID]['clients']:
+    logger.info("starting to broadcast message")
+    for client_writer in activeSessions[sessionID]['clients'].values():
         if client_writer != websocket:
             try:
                 await client_writer.send("player has checked".encode())
@@ -155,12 +183,12 @@ async def clientCheck(websocket: ServerConnection, sessionID):
     print("end of function")
 
 async def clientCall(websocket: ServerConnection, sessionID):
-    print("player has called")
+    logger.info("player has called")
     #GameLogic manipulation 
     #game = games_dict[sessionID]['gameObj]
 
-    logger.debug("starting to broadcast message")
-    for client_writer in activeSessions[sessionID]['clients']:
+    logger.info("starting to broadcast message")
+    for client_writer in activeSessions[sessionID]['clients'].values():
         if client_writer != websocket:
             try:
                 await client_writer.send("player has called".encode())
@@ -170,42 +198,52 @@ async def clientCall(websocket: ServerConnection, sessionID):
                 await clientLeave(client_writer, sessionID)
 
 
+async def closeClient(websocket: ServerConnection, sessionID=None, redirect=False):
+    #If client is in a game then invoke leaveGame()
+    #else disconnect the bastard
+    try:
+        if sessionID in activeSessions:
+            await clientLeave(websocket, sessionID, redirect)
+        else:
+            logger.info(f"{websocket.remote_address} has been closed")
+            await websocket.close()
 
-#TODO: add code that sends relevant player info to DB i.e. player wallet 
-async def clientLeave(websocket: ServerConnection, sessionID=None):
+    except ConnectionClosed as e:
+        print(f"Issue sending data to client {e}")
+
+    except ConnectionClosedError as e:
+        print(f"Issue sending data to client {e}")
+
+    except KeyError as e:
+        return
     
-    if sessionID != None:   #If the client is in a game 
-        
+#TODO: Add code that sends relevant player info to DB i.e. player wallet 
+async def clientLeave(websocket: ServerConnection, userID, sessionID):
+    try:
+        logger.info(f"Current active sessions {activeSessions}")
+        await websocket.close()
         #Update game object to reflect new players 
+        with lock:
+            #removed closed client from session
+            activeSessions[sessionID]['clients'].pop(userID)
+            print(len(activeSessions[sessionID]['clients']))
 
-        #Tell each client to remove player from their game 
-        for client_writer in activeSessions[sessionID]['clients']:
-            if client_writer != websocket:
+            if len(activeSessions[sessionID]['clients']) == 0:    #Deletes session if no WebSockets are left
+                    del activeSessions[sessionID]
+                    logger.info(f"session {sessionID} is deleted")
+                    return
+
+
+            #Tell each client to remove player from their game 
+            logger.info("Broadcasting change ")
+            for client_writer in activeSessions[sessionID]['clients'].values():    
                 #Send them the updated game state        
-                await client_writer.send("player has left".encode())
+                await client_writer.send("player has left")
 
-        #This statement was partially generated by ChatGTP
-        if websocket in activeSessions[sessionID].get('clients', set()):    #Removes websocket from set
-            activeSessions[sessionID]['clients'].discard(websocket)
-
-        if not activeSessions[sessionID].get('clients'):    #Deletes session if no WebSockets are left
-            activeSessions.pop(sessionID, None)
-
-    await websocket.close()
+    except ConnectionClosedError as e:
+        print("Error in clientLeave")
     
 
-def addActiveSession():
-    '''This method is for adding new active game sessions created by match_making.py
-    to the activeSessions dict. This method is for initialising new sessions and NOT
-    for updating already tracked sessions'''
-
-    #This is an infinite loop listening to any updates from the redis server
-    for message in pubsub.listen():
-        if message['type'] == 'message':
-            data = json.loads(message['data'])
-            sessionID = data.get('sessionID')
-            with lock:
-                activeSessions[sessionID] = {'clients':data['clients'], 'gameObj': data['gameObject']}
 
 
 async def main():
@@ -217,16 +255,13 @@ async def main():
 if __name__ == "__main__":
     try:
         #Server thread that will be using asyncio and handling messages 
-        serverThread = threading.Thread(target=lambda: asyncio.run(main()), daemon=True)
-        serverThread.start()
+        # serverThread = threading.Thread(target=lambda: asyncio.run(main()), daemon=True)
+        # serverThread.start()
 
-        #Redis pub/sub thread that initialises new sessions in active session tracking dict 
-        subThread = threading.Thread(target=addActiveSession, daemon=True)
-        subThread.start()
+        asyncio.run(main())
 
         #Merge Thread back into the main thread
-        serverThread.join()
-        subThread.join()
+        # serverThread.join()
         print("event_loop ended")
 
     except KeyboardInterrupt:
