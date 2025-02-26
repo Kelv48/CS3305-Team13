@@ -11,7 +11,13 @@ redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 @main.route("/login", methods=['POST'])
 def get_user():
     data = request.json
+
     username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({'error': 'Please provide both name and password'}), 400
+
     user = get_user_DBorCache(username)
     if user:
         return jsonify(user), 200

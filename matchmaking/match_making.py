@@ -23,7 +23,7 @@ from websockets.exceptions import ConnectionClosed, ConnectionClosedError, Conne
 from websockets.asyncio.server import serve, ServerConnection
 
 # Server attributes
-host ="localhost"
+host ="0.0.0.0"
 port = 8000
 template = Template('{"m_type": "$m_type", "data": $data}')   #This is a template for message to be sent to clients
 activeSessions = {}  
@@ -198,6 +198,12 @@ async def closeClient(websocket: ServerConnection, sessionID=None, redirect=Fals
     except KeyError as e:
         return
 
+async def handlePing(websocket: ServerConnection, message: dict):
+    if message['m_type'] == 'ping':  # Detects ping message from client
+        logger.info(f"Received ping from {websocket.remote_address}")
+        response_message = template.substitute(m_type='pong', data="Pong")
+        await websocket.send(response_message.encode())
+        logger.debug(f"Sent pong to {websocket.remote_address}")
  
 async def handleClient(websocket: ServerConnection):
     #Read and handle messages
