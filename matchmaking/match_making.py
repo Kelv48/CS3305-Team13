@@ -18,7 +18,7 @@ import logging
 from string import Template
 from json import JSONDecodeError
 from random import randint, randbytes
-from protocol import Protocols
+from matchmaking.protocol import Protocols
 from websockets.exceptions import ConnectionClosed, ConnectionClosedError, ConnectionClosedOK
 from  websockets.asyncio.server import serve, ServerConnection
 
