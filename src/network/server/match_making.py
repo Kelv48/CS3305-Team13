@@ -237,7 +237,7 @@ async def handleClient(websocket: ServerConnection):
             break
 
         except ConnectionClosedError as e:
-            await websocket.close()
+            await leaveGame(websocket, message['sessionID'])
             break
 
         except JSONDecodeError as e:
