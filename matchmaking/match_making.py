@@ -23,8 +23,8 @@ from websockets.exceptions import ConnectionClosed, ConnectionClosedError, Conne
 from  websockets.asyncio.server import serve, ServerConnection
 
 # Server attributes
-host ="localhost"
-port = 80
+host ="0.0.0.0"
+port = 8000
 template = Template('{"m_type": "$m_type", "data": $data}')   #This is a template for message to be sent to clients
 activeSessions = {}  
 
