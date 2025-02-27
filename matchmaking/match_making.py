@@ -131,7 +131,7 @@ async def redirect(sessionID):
     #Create game object 
 
     #Redirect each client in lobby to game server 
-    redirectMessage = json.dumps({"m_type": Protocols.Response.REDIRECT, "data": {"host": "localhost", "port": 443}})
+    redirectMessage = json.dumps({"m_type": Protocols.Response.REDIRECT, "data": {"host": "84.8.144.77", "port": 8001}})
     for serverConnection in activeSessions[sessionID]['clients']:                
         await serverConnection.send(redirectMessage)
                 
@@ -221,13 +221,14 @@ async def handleClient(websocket: ServerConnection):
                 break
 
             message = json.loads(data)
-            currentSessionID = message['sessionID']
+            if message['sessionID'] != None:
+                currentSessionID = message['sessionID']
             logger.info(f"message received: {message}")
 
             match message['m_type']:
                 
                 case Protocols.Request.CREATE_GAME:
-                    await createGame(websocket, message['data'])
+                    currentSessionID = await createGame(websocket, message['data'])
 
                 case Protocols.Request.JOIN_GAME:
                     await joinGame(websocket, message['data'])
@@ -240,11 +241,11 @@ async def handleClient(websocket: ServerConnection):
 
         except ConnectionError as e:
             print(f"Whoops\n{e}")
-            await leaveGame(websocket, message['sessionID'])
+            await leaveGame(websocket, currentSessionID)
             break
 
         except ConnectionClosedError as e:
-            await websocket.close()
+            await leaveGame(websocket, currentSessionID) 
             break
 
         except JSONDecodeError as e:

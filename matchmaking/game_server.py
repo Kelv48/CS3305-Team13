@@ -26,8 +26,8 @@ When a client leaves what needs to happen?
 '''
 
 #Server setup
-host = "localhost"
-port = 443
+host = "0.0.0.0"
+port = 8001
 activeSessions = {}                                             #Key:pair Game ID → set of connected clients + gameObj + queue 
 template = Template('{"m_type": "$m_type", "data": "$data"}')   #This is a template for message to be sent to clients
 
