@@ -18,13 +18,13 @@ import logging
 from string import Template
 from json import JSONDecodeError
 from random import randint, randbytes
-from matchmaking.protocol import Protocols
+from protocol import Protocols
 from websockets.exceptions import ConnectionClosed, ConnectionClosedError, ConnectionClosedOK
-from websockets.asyncio.server import serve, ServerConnection
+from  websockets.asyncio.server import serve, ServerConnection
 
 # Server attributes
-host ="0.0.0.0"
-port = 8000
+host ="localhost"
+port = 80
 template = Template('{"m_type": "$m_type", "data": $data}')   #This is a template for message to be sent to clients
 activeSessions = {}  
 
@@ -41,27 +41,25 @@ def generateSessionCode():
     hash = randbytes(randint(1, 128))
     return base64.b64encode(hash).decode('utf-8')[0:6]
 
-async def createGame(websocket:ServerConnection, maxPlayer:int):
-    print(type(maxPlayer))
+async def createGame(websocket:ServerConnection, maxPlayer:int, userID):
+    
     logger.info("Creating new session")
     sessionID = generateSessionCode() #ID of the game 
     activeSessions[sessionID] = {
-        'clients': {websocket}, 
-        'gameObj': None,    #Can get rid of this
+        'clients': {websocket:userID}, #Dictionary ServerConnection → username
         'maxPlayer': maxPlayer, 
         'forceStart': set(), 
         'numPlayer': 1, 
-        'ready': False
     }
     print(f"Game Session created\n {activeSessions[sessionID]}")
     message = template.substitute(m_type=Protocols.Response.SESSION_ID, data=json.dumps(sessionID))
     logger.debug(f"sending message: {message}")
     await websocket.send(message.encode())
+    return sessionID
 
 
-#TODO: Figure out how to get a player to join game that is already running
 #TODO: Need to disconnect ServerConnections properly
-async def joinGame(websocket: ServerConnection, sessionID):
+async def joinGame(websocket: ServerConnection, sessionID, userID):
     logger.info(f"adding {websocket.remote_address} to session:{sessionID}")
 
     try:
@@ -69,7 +67,7 @@ async def joinGame(websocket: ServerConnection, sessionID):
         if activeSessions[sessionID]['numPlayer'] < activeSessions[sessionID]['maxPlayer']: 
 
             activeSessions[sessionID]['numPlayer']+=1
-            activeSessions[sessionID]['clients'].add(websocket)
+            activeSessions[sessionID]['clients'][websocket] = userID
 
             join_message = template.substitute(m_type=Protocols.Response.SESSION_ID, data=json.dumps(sessionID))
             await websocket.send(join_message)
@@ -100,8 +98,6 @@ async def joinGame(websocket: ServerConnection, sessionID):
         print("Error occurred trying to send message to client")
         
         
-
-
 async def voteStart(websocket: ServerConnection, sessionID):
     logger.info("vote to start has been counted")
     try:
@@ -127,8 +123,8 @@ async def voteStart(websocket: ServerConnection, sessionID):
         print("Error occurred trying to send message to client")
       
 async def redirect(sessionID):
-    activeSessions[sessionID]['ready'] = True
-    #Create game object 
+    #Create game object using or numPlayer  as a constructing parameter 
+    gameObj = None
 
     #Redirect each client in lobby to game server 
     redirectMessage = json.dumps({"m_type": Protocols.Response.REDIRECT, "data": {"host": "localhost", "port": 443}})
@@ -137,8 +133,8 @@ async def redirect(sessionID):
                 
 
 
-         #Publish relevant info to redis server
-    data = {'sessionID':sessionID, 'clients':{}, 'gameObj':activeSessions[sessionID]['gameObj']}
+    #Publish relevant info to redis server
+    data = {'sessionID':sessionID, 'clients':{}, 'gameObj':gameObj}
     r.publish(channel, json.dumps(data))
 
 async def leaveGame(websocket: ServerConnection, sessionID, redirect=False):
@@ -148,7 +144,7 @@ async def leaveGame(websocket: ServerConnection, sessionID, redirect=False):
         
         logger.info("client has left lobby")
         activeSessions[sessionID]['numPlayer'] -=1 
-        activeSessions[sessionID]['clients'].remove(websocket)
+        activeSessions[sessionID]['clients'].pop(websocket)
         await websocket.close()
 
         if len(activeSessions[sessionID]['clients'])==0:
@@ -198,12 +194,6 @@ async def closeClient(websocket: ServerConnection, sessionID=None, redirect=Fals
     except KeyError as e:
         return
 
-async def handlePing(websocket: ServerConnection, message: dict):
-    if message['m_type'] == 'ping':  # Detects ping message from client
-        logger.info(f"Received ping from {websocket.remote_address}")
-        response_message = template.substitute(m_type='pong', data="Pong")
-        await websocket.send(response_message.encode())
-        logger.debug(f"Sent pong to {websocket.remote_address}")
  
 async def handleClient(websocket: ServerConnection):
     #Read and handle messages
@@ -221,16 +211,18 @@ async def handleClient(websocket: ServerConnection):
                 break
 
             message = json.loads(data)
-            currentSessionID = message['sessionID']
+            if message['sessionID'] != None:
+                currentSessionID = message['sessionID']
+
             logger.info(f"message received: {message}")
 
             match message['m_type']:
                 
                 case Protocols.Request.CREATE_GAME:
-                    await createGame(websocket, message['data'])
+                    currentSessionID = await createGame(websocket, message['data'], message['userID'])
 
                 case Protocols.Request.JOIN_GAME:
-                    await joinGame(websocket, message['data'])
+                    await joinGame(websocket, message['data'], message['userID'])
 
                 case Protocols.Request.START_GAME_EARLY_VOTE:
                     await voteStart(websocket, message['sessionID'])
@@ -240,11 +232,11 @@ async def handleClient(websocket: ServerConnection):
 
         except ConnectionError as e:
             print(f"Whoops\n{e}")
-            await leaveGame(websocket, message['sessionID'])
+            await closeClient(websocket, currentSessionID)
             break
 
         except ConnectionClosedError as e:
-            await websocket.close()
+            await closeClient(websocket, currentSessionID)
             break
 
         except JSONDecodeError as e:
