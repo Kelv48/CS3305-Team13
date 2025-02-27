@@ -129,37 +129,40 @@ async def main():
     c1, c2 = None, None  # Ensure variables exist before assignment
 
     try:
-        c1 = await Client.connect("localhost", 80 )  
+        # c1 = await Client.connect("84.8.144.77", 8000)
+        #c1 =  await Client.connect('localhost', 80)
+        # await asyncio.sleep(2)
+
+        c2  = await Client.connect("84.8.144.77", 8000)
         await asyncio.sleep(2)
 
-        c2  = await Client.connect("localhost", 80)
-        await asyncio.sleep(2)
-
-        c1.setID("c1")
+        # c1.setID("c1")
         c2.setID("c2")
 
-        await c1.send(Protocols.Request.CREATE_GAME, 3)
-        await c1.receive()
-        await asyncio.sleep(5)
+        # await c1.send(Protocols.Request.CREATE_GAME, 3)
+        # await c1.receive()
+        # await asyncio.sleep(5)
 
-        await c2.send(Protocols.Request.JOIN_GAME, c1.getSessionID())
+        await c2.send(Protocols.Request.JOIN_GAME, "BQN/V0")
         await c2.receive()
-        await asyncio.sleep(2)
+        # await asyncio.sleep(2)
 
-        await c1.send(Protocols.Request.START_GAME_EARLY_VOTE)
+        # await c1.send(Protocols.Request.START_GAME_EARLY_VOTE)
         await c2.send(Protocols.Request.START_GAME_EARLY_VOTE)
 
-        await c1.receive()
+        # await c1.receive()
         await c2.receive()
 
-        
-        await c1.receive()
+
+        # await c1.receive()
         await c2.receive()
 
-        await c1.send(Protocols.Request.CALL)
+        # await c1.send(Protocols.Request.CALL)
 
         await c2.send(Protocols.Request.FOLD)
-        await asyncio.sleep(2)
+        # await asyncio.sleep(2)
+        while True:
+            pass
         while True:
             pass
 
