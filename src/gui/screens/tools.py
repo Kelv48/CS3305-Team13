@@ -44,7 +44,7 @@ def tools(mainMenu):
 
         
         # Calculate positions based on current screen size
-        TOOLS_TEXT = screen_font(50).render("Tools", True, "Dark Green")
+        TOOLS_TEXT = screen_font(50).render("Tools", True, "Gold")
         TOOLS_RECT = TOOLS_TEXT.get_rect(center=(screen_width / 2, screen_height / 9))
         SCREEN.blit(TOOLS_TEXT, TOOLS_RECT)
 

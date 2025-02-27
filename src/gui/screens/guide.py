@@ -96,7 +96,7 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
         # Blit the textbox to the main screen.
         INITIAL_SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
-        title_surface = screen_font(45).render(title, True, "White")
+        title_surface = screen_font(45).render(title, True, "Gold")
         title_rect = title_surface.get_rect(center=(sw / 2, sh / 15))
         screen.blit(title_surface, title_rect)
 
@@ -152,22 +152,35 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
 
 
 def guide_beginner(main_menu):
+    # Beginner guide focuses on the fundamentals with 3 images:
     beginner_text = (
         '<font face="calibri_bold" size="3" color="#FFFFFF">'
-        '<img src="assets/images/HandRankings.png" '
-                     'float=right '
-                     'padding="5px 10px 5px 5px">'
-        '<h2>Beginner Poker Guide</h2>'
-        '<p><b>Overview:</b> This guide is designed for players who are new to poker. It covers the basics, including rules, hand rankings, and simple strategies.</p>'
-        '<p><b>Key Topics:</b></p>'
+        '<h2>How to Play Poker – Beginner Guide</h2>'
+        '<img src="assets/images/BeginnerOverview.png" style="display:block; margin:0 auto 20px auto;" alt="Beginner Overview">'
+        '<p>Learning how to play poker can be quick, easy and fun. The objective of poker is to either create the highest-ranking hand or convince all other players to fold – thereby winning the pot.</p>'
+        '<h3>Poker Rules for Beginners: Step-by-Step Guide</h3>'
+        '<ol>'
+        '<li><b>Shuffle:</b> The dealer shuffles the deck well between every hand. In Texas Hold’em, each player is dealt two hole cards (or more in other variants).'
+        '<img src="assets/images/ShuffleCards.png" style="float:left; padding:5px 10px 5px 5px; margin-right:10px;" alt="Shuffle Cards">'
+        '</li>'
+        '<li><b>Pre-Flop:</b> The initial betting round. Players have the option to call, raise, re-raise, or fold based on the potential of their starting hands.</li>'
+        '<li><b>Flop:</b> Three community cards are revealed in the centre of the table. Players now start building their hands.</li>'
+        '<li><b>Turn:</b> The fourth community card is dealt face-up, making the strength of your hand clearer.</li>'
+        '<li><b>River:</b> The fifth and final community card is placed on the board.</li>'
+        '<li><b>Showdown:</b> All remaining players reveal their cards, and the best hand wins the pot.</li>'
+        '</ol>'
+        '<h3>Types of Plays and Bets</h3>'
+        '<img src="assets/images/PokerActions.png" style="float:right; padding:5px 10px 5px 5px; margin-left:10px;" alt="Poker Actions">'
+        '<p>Get familiar with the basic actions at the poker table:</p>'
         '<ul>'
-        '<li><b>Poker Basics & Rules:</b> Learn the common rules of popular variants like Texas Hold’em, including betting rounds, blinds, and game flow.</li>'
-        '<li><b>Hand Rankings:</b> Understand the hierarchy of hands—from high card to royal flush—with visual aids to help you remember.</li>'
-        '<li><b>Basic Terminology:</b> Get familiar with essential poker terms like call, raise, fold, bluff, and pot odds.</li>'
-        '<li><b>Simple Strategies:</b> Start with fundamentals such as playing tight, understanding position, and knowing when to fold.</li>'
-        '<li><b>Practical Examples:</b> Walk through sample hands to learn decision-making at various stages of a game.</li>'
+        '<li><b>Check:</b> Passing the action without placing a bet.</li>'
+        '<li><b>Fold:</b> Discarding your cards when you believe your hand isn’t strong enough.</li>'
+        '<li><b>Bet:</b> Placing a wager when no bet has yet been made.</li>'
+        '<li><b>Call:</b> Matching an existing bet to continue playing.</li>'
+        '<li><b>Raise:</b> Increasing the amount of the current bet.</li>'
         '</ul>'
-        '<p>Additional tips: observe experienced players, practice in low-stakes games, and use free online tutorials for extra help.</p>'
+        '<p>Forced bets such as the small blind (usually 50 percent of the big blind) and the big blind (set amount) are required to encourage action.</p>'
+        '<p>For further details on hand strengths, refer to our poker hand rankings guide.</p>'
         '</font>'
     )
     run_guide_screen(
@@ -181,19 +194,30 @@ def guide_beginner(main_menu):
 
 
 def guide_intermediate(main_menu):
+    # Intermediate guide with 3 images focusing on starting hands, pot equity, and matchups:
     intermediate_text = (
         '<font face="calibri_bold" size="3" color="#FFFFFF">'
-        '<h2>Intermediate Poker Guide</h2>'
-        '<p><b>Overview:</b> This guide helps you refine your skills and dive into more nuanced poker strategies beyond the basics.</p>'
-        '<p><b>Key Topics:</b></p>'
+        '<h2>How to Play Poker – Intermediate Guide</h2>'
+        '<img src="assets/images/IntermediateOverview.png" style="display:block; margin:0 auto 20px auto;" alt="Intermediate Overview">'
+        '<p>After mastering the basics, it’s time to refine your game. In this section, we focus on understanding starting hands, calculating pot equity, and using statistics to improve your decision-making.</p>'
+        '<h3>Starting Poker Hands</h3>'
+        '<img src="assets/images/StartingHands.png" style="float:left; padding:5px 10px 5px 5px; margin-right:10px;" alt="Starting Hands">'
+        '<p>There are many possible starting hand combinations. Some of the key rankings include:</p>'
         '<ul>'
-        '<li><b>Advanced Betting Strategies:</b> Learn when to bet, raise, or fold based on your hand, table position, and opponent behavior.</li>'
-        '<li><b>Bluffing & Reading Opponents:</b> Develop techniques for effective bluffing and for interpreting betting patterns and tells.</li>'
-        '<li><b>Positional Awareness:</b> Understand the advantages of acting later in a hand and how to use that information to your benefit.</li>'
-        '<li><b>Introduction to Pot Odds:</b> Start calculating pot odds to make more informed decisions regarding calls and raises.</li>'
-        '<li><b>Game Dynamics:</b> Learn how different formats—cash games versus tournaments—and varying stack sizes affect your strategy.</li>'
+        '<li><b>Royal Flush:</b> A, K, Q, J, 10 of the same suit – the best hand possible.</li>'
+        '<li><b>Straight Flush:</b> Five consecutive cards of the same suit.</li>'
+        '<li><b>Four of a Kind:</b> Four cards of the same rank.</li>'
+        '<li><b>Full House:</b> Three cards of one rank and two cards of another.</li>'
+        '<li><b>Flush:</b> Any five cards of the same suit, not in sequence.</li>'
+        '<li><b>Straight:</b> Five consecutive cards in mixed suits.</li>'
+        '<li><b>Three of a Kind, Two Pair, One Pair, and High Card</b> – in descending order of strength.</li>'
         '</ul>'
-        '<p>Enhance your learning with interactive scenarios, hand analysis, and simulated practice rounds.</p>'
+        '<h3>Playing Your Hands and Pot Equity</h3>'
+        '<img src="assets/images/PotEquity.png" style="float:right; padding:5px 10px 5px 5px; margin-left:10px;" alt="Pot Equity">'
+        '<p>Knowing when to play a hand is crucial. Calculate your poker equity – the percentage chance of winning the pot based on your hand and the community cards – to guide your decision to bet or fold.</p>'
+        '<h3>Pre-Flop Matchups and Hand Improvements</h3>'
+        '<img src="assets/images/MatchupStats.png" style="display:block; margin:20px auto;" alt="Pre-Flop Matchups">'
+        '<p>Learn about match-ups such as an overpair versus an underpair and understand the probability of flopping a set (three of a kind) or a full house. Such statistics are essential for determining whether to invest in a hand.</p>'
         '</font>'
     )
     run_guide_screen(
@@ -207,20 +231,38 @@ def guide_intermediate(main_menu):
 
 
 def guide_advanced(main_menu):
+    # Advanced guide with 4 images on betting strategies, bluffing, and tips:
     advanced_text = (
         '<font face="calibri_bold" size="3" color="#FFFFFF">'
-        '<h2>Advanced Poker Guide</h2>'
-        '<p><b>Overview:</b> For experienced players, this guide delves into high-level tactics including mathematical analysis, game theory, and psychological strategies.</p>'
-        '<p><b>Key Topics:</b></p>'
+        '<h2>How to Play Poker – Advanced Guide</h2>'
+        '<img src="assets/images/AdvancedOverview.png" style="display:block; margin:0 auto 20px auto;" alt="Advanced Overview">'
+        '<p>For the experienced player, advanced strategies can make all the difference. This section covers sophisticated betting techniques, bluffing, and adjustments for different poker variations.</p>'
+        '<h3>Advanced Betting Strategies</h3>'
+        '<img src="assets/images/BettingStrategies.png" style="float:left; padding:5px 10px 5px 5px; margin-right:10px;" alt="Betting Strategies">'
+        '<p>Improve your game with techniques such as:</p>'
         '<ul>'
-        '<li><b>Mathematical Foundations:</b> Understand expected value (EV) calculations, variance, and risk management for long-term success.</li>'
-        '<li><b>Game Theory Optimal (GTO) Play:</b> Learn strategies to make your play unexploitable, striking a balance between exploitative and GTO approaches.</li>'
-        '<li><b>Advanced Bluffing Techniques:</b> Master semi-bluffs and refine the timing of your bluffs for maximum effect.</li>'
-        '<li><b>Psychological Strategies:</b> Develop mental toughness, manage tilt, and exploit opponents’ psychological weaknesses.</li>'
-        '<li><b>Range Analysis & Bet Sizing:</b> Hone your ability to assign plausible hand ranges to opponents and choose optimal bet sizes.</li>'
-        '<li><b>Tournament vs. Cash Game Nuances:</b> Understand the strategic adjustments required for tournament play versus cash games.</li>'
+        '<li><b>Raising:</b> Increasing the pot size to put pressure on opponents.</li>'
+        '<li><b>Check-Raising:</b> Initially checking then raising after an opponent bets, maximizing value when holding a strong hand.</li>'
+        '<li><b>Slow Playing:</b> Playing a strong hand deceptively to encourage opponents to commit more chips.</li>'
+        '<li><b>Exploitative Betting:</b> Adjusting your strategy to capitalize on predictable patterns in your opponents’ play.</li>'
         '</ul>'
-        '<p>Utilize in-depth case studies, detailed hand histories, and simulation tools to further refine your advanced tactics.</p>'
+        '<h3>Bluffing Techniques</h3>'
+        '<img src="assets/images/BluffingTechniques.png" style="float:right; padding:5px 10px 5px 5px; margin-left:10px;" alt="Bluffing Techniques">'
+        '<p>Bluffing is about making bets that force your opponents to fold superior hands. Consider semi-bluffing (betting on a draw) when you have potential to improve your hand.</p>'
+        '<h3>Top 10 Poker Tips</h3>'
+        '<img src="assets/images/PokerTips.png" style="display:block; margin:20px auto;" alt="Poker Tips">'
+        '<ol>'
+        '<li>Research and learn the game before playing for money.</li>'
+        '<li>Practice with free games to build your skills.</li>'
+        '<li>Observe your opponents and note their tendencies.</li>'
+        '<li>Keep your table image unpredictable.</li>'
+        '<li>Memorize hand rankings and stick to your strategy.</li>'
+        '<li>Manage your bankroll carefully.</li>'
+        '<li>Don’t overcommit to a weak hand.</li>'
+        '<li>Extract maximum value from strong hands.</li>'
+        '<li>Play fewer hands but play them aggressively.</li>'
+        '<li>Remember: Poker should be fun. Stay calm and focused.</li>'
+        '</ol>'
         '</font>'
     )
     run_guide_screen(

@@ -79,7 +79,7 @@ winner_sound = pygame.mixer.Sound("assets/sfx/winner.mp3") # Winner sound effect
 
 
 # Play background music
-pygame.mixer.music.play(-1)  # Loop indefinitely
+# pygame.mixer.music.play(-1)  # Loop indefinitely
 
 
 def screen_font(size):  # Returns Press-Start-2P in the desired size

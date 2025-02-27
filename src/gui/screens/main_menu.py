@@ -31,7 +31,7 @@ def mainMenu():
         pygame.draw.rect(textbox_surface, (0, 0, 0, 100), (0, 0, textbox_width, textbox_height), border_radius=50)
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
-        MAIN_TEXT = screen_font(50).render("Poker", True, "Dark Green")
+        MAIN_TEXT = screen_font(50).render("Poker", True, "Gold")
         MAIN_RECT = MAIN_TEXT.get_rect(center=(screen_width // 2, screen_height // 9))
         SCREEN.blit(MAIN_TEXT, MAIN_RECT)
 

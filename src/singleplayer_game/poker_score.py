@@ -50,9 +50,9 @@ def hand(composition):
     # score from 122.02 to 134.13
     elif len(set(handFigure)) == 2 and handFigure.count(handFigure[2]) != 4:
         if handFigure.count(handFigure[0]) == 2:
-            score = 120 + handFigure[2] + handFigure[0] / 100 # jezeli słabsze sa 2 karty
+            score = 120 + handFigure[2] + handFigure[0] / 100
         else:
-            score = 120 + handFigure[0] + handFigure[3] / 100 # jezeli słabsze sa 3 karty
+            score = 120 + handFigure[0] + handFigure[3] / 100 
         name_poker_hand = "Full house"
 
     # Condition for Flush
