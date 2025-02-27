@@ -125,14 +125,17 @@ async def main():
     # Await the connection if it's an async method
 
 
-async def main():
+#This is for testing purposes
+async def test_local():
     c1, c2 = None, None  # Ensure variables exist before assignment
 
     try:
-        c1 = await Client.connect("localhost", 80 )  
+        #c1 = await Client.connect("84.8.144.77", 8000)  
+        c1 =  await Client.connect('localhost', 80)
         await asyncio.sleep(2)
 
         c2  = await Client.connect("localhost", 80)
+        
         await asyncio.sleep(2)
 
         c1.setID("c1")
@@ -166,6 +169,21 @@ async def main():
     except KeyboardInterrupt:
        
         return  # Exit gracefully
+    
+async def test_remote():
+    c1 = None
+    try:
+        c1 = await Client.connect("84.8.144.77", 8000)  
+        await asyncio.sleep(2)
+
+        c1.setID("c1")
+        await c1.send(Protocols.Request.CREATE_GAME, 3)
+        await c1.receive()
+        await asyncio.sleep(5)
+
+
+    except KeyboardInterrupt:
+        return
 
 if __name__ == '__main__':
     asyncio.run(main())  # Run the async main() function
