@@ -7,7 +7,7 @@ import logging
 import threading
 #from game import game_class    #There are import errors in this module need to make stuff a package 
 from string import Template
-from matchmaking.protocol import Protocols
+from protocol import Protocols
 from websockets.exceptions import ConnectionClosedError, ConnectionClosed
 from websockets.asyncio.server import serve, ServerConnection
 
@@ -77,8 +77,12 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
                 break
 
             message = json.loads(data)
-            currentSessionID = message['sessionID']
-            userID = message['userID']
+
+            #This if statement prevents sessionID and username from being overridden by empty data messages
+            if message['sessionID']!= None and message['userID'] != None:
+                currentSessionID = message['sessionID']
+                userID = message['userID']
+
             logger.debug(f"Received: {message}")
 
             #If clients username isn't in session add them userID → serverConnection
