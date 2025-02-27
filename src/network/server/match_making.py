@@ -127,7 +127,7 @@ async def voteStart(websocket: ServerConnection, sessionID):
       
 async def redirect(sessionID):
     activeSessions[sessionID]['ready'] = True
-    #Create game object 
+    #Create game object using or numPlayer  as a constructing parameter 
 
     #Redirect each client in lobby to game server 
     redirectMessage = json.dumps({"m_type": Protocols.Response.REDIRECT, "data": {"host": "localhost", "port": 443}})
