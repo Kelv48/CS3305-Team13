@@ -213,25 +213,73 @@ def preflop_range_visualizer(mainMenu):
     # --- vs raise Scenario ---
     # Player options: HJ, CO, BTN, SB, BB
     vs_raise_data = {
-        "BB": {
-            "raise": {"AA", "KK", "QQ", "JJ", "AKs", "AQs", "AJs", "ATs"},
-            "call": {"TT", "99", "88", "77"}
-        },
         "HJ": {
-            "raise": {"AA", "KK", "QQ", "JJ", "AKs", "AQs"},
-            "call": {"TT", "99", "AQo", "KQs"}
+            "raise": {"AA", "KK", "QQ", "JJ",
+                      "AKs", "AQs", "AJs", "ATs", "A9s", "A5s", "A4s",
+                      "KQs", "KJs", "KTs",
+                      "QJs",
+                      "AKo", "AQo",
+                      "KQo"
+                      },
+            "call": set()
         },
         "CO": {
-            "raise": {"AA", "KK", "QQ", "JJ", "AKs", "AQs"},
-            "call": {"TT", "99", "AJo", "KQs"}
+            "raise": {"AA", "KK", "QQ", "JJ", "TT",
+                      "AKs", "AQs", "AJs", "ATs", "A9s", "A5s", "A4s",
+                      "KQs", "KJs", "KTs",
+                      "QJs",
+                      "AKo", "AQo",
+                      "KQo"
+                      },
+            "call": set()
         },
         "BTN": {
-            "raise": {"AA", "KK", "QQ", "JJ", "AKs", "AQs", "AJs"},
-            "call": {"TT", "99", "AQo", "KQs"}
+            "raise": {"AA", "KK", "QQ", "JJ", "TT",
+                      "AKs", "AQs", "AJs", "ATs", "A9s", "A5s", "A4s",
+                      "KQs", "KJs", "KTs",
+                      "QJs",
+                      "AKo", "AQo",
+                      "KQo"
+                      },
+            "call": {"99", "88", "77", "66", "55", "44",
+                     "98s", 
+                     "87s",
+                     "76s", 
+                     "65s", 
+                     "54s"
+                     }
         },
         "SB": {
-            "raise": {"AA", "KK", "QQ", "JJ", "AKs", "AQs"},
-            "call": {"TT", "99", "AJo", "KQs"}
+            "raise": {"AA", "KK", "QQ", "JJ", "TT",
+                      "AKs", "AQs", "AJs", "ATs", "A9s", "A5s", "A4s",
+                      "KQs", "KJs", "KTs",
+                      "QJs",
+                      "AKo", "AQo",
+                      },
+            "call": set()
+        },
+        "BB": {
+            "raise": {"AA", "KK", "QQ",
+                      "AKs", "AQs", "AJs", "ATs", "A5s", "A4s",
+                      "KQs", "KJs",
+                      "AKo",
+                      "KQo"
+                      },
+            "call": {"JJ", "TT", "99", "88", "77", "66", "55", "44", "33", "22",
+                     "A9s", "A8s", "A7s", "A6s", "A3s", "A2s",
+                     "KTs", "K9s", "K8s", "K7s", "K6s", "K5s", "K4s", "K3s",
+                     "QJs", "QTs", "Q9s", "Q8s", "Q7s",
+                     "JTs", "J9s", "J8s",
+                     "T9s", "T8s", "T7s",
+                     "98s", "97s", "96s",
+                     "87s", "86s",
+                     "76s", "75s",
+                     "65s", "64s",
+                     "54s", "53s",
+                     "43s",
+
+                     "AQo", "AJo", "ATo",
+                     }
         }
     }
 
@@ -239,75 +287,168 @@ def preflop_range_visualizer(mainMenu):
     # Player options: LJ, HJ, CO, BTN, SB
     vs_3bet_data = {
         "LJ": {
-            "raise": {"AA", "KK", "QQ", "AKs", "AKo"},
-            "call": {"JJ", "TT", "99", "AQs", "AJs", "KQs"}
+            "raise": {"AA", "KK",
+                      "AKs", "A5s", "A4s",
+                      "AKo"
+                      },
+            "call": {"QQ","JJ", "TT", "99", 
+                     "AQs", "AJs", "ATs",
+                     "KQs", "KJs",
+                     "QJs"
+                     }
         },
         "HJ": {
-            "raise": {"AA", "KK", "QQ", "AKs", "AKo", "AQs"},
-            "call": {"JJ", "TT", "99", "AQo", "KQs", "JTs"}
+            "raise": {"AA", "KK",
+                      "AKs", "A5s",
+                      "AKo", "AQo"
+                      },
+            "call": {"QQ","JJ", "TT", "99", "88", "77",
+                     "AQs", "AJs", "ATs",
+                     "KQs"
+                     }
         },
         "CO": {
-            "raise": {"AA", "KK", "QQ", "JJ", "AKs", "AKo", "AQs"},
-            "call": {"TT", "99", "88", "AJs", "KQs", "JTs"}
+            "raise": {"AA", "KK", "QQ", "JJ",
+                      "AKs", "A5s",
+                      "AKo", "AQo"
+                      },
+            "call": {"TT", "99", "88", "77",
+                     "AQs", "AJs", "ATs", "A9s",
+                     "KQs", "KJs", "KTs",
+                     "QJs",
+                     "JTs"
+                     }
         },
         "BTN": {
-            "raise": {"AA", "KK", "QQ", "AKs", "AKo", "AQs", "AJs"},
-            "call": {"JJ", "TT", "99", "88", "KQs", "JTs"}
+            "raise": {"AA", "KK", "QQ", "JJ", "TT",
+                      "AKs", "AQs", "A5s",
+                      "AKo", "AQo"
+                      },
+            "call": {"99", "88", "77", "66", "55",
+                     "AJs", "ATs", "A9s", "A8s",
+                     "KQs", "KJs", "KTs", "K9s",
+                     "QJs", "QTs",
+                     "JTs",
+                     "T9s", 
+                     "98s", 
+                     "87s", 
+                     "76s", 
+                     "65s"
+                     }
         },
         "SB": {
-            "raise": {"AA", "KK", "QQ", "AKs", "AKo"},
-            "call": {"JJ", "TT", "99", "AQs", "KQs"}
+            "raise": {"AA", "KK", "QQ", "JJ", "TT",
+                      "AKs", "AQs", "A7s", "A6s", "A5s", "A4s",
+                      "AKo", "AQo", "AJo", "ATo"
+                      },
+            "call": {"99", "88", "77",
+                     "AJs", "ATs", "A9s", "A8s",
+                     "KQs", "KJs", "KTs", "K9s",
+                     "QJs", "QTs", "Q9s",
+                     "JTs", "J9s",
+                     "T9s"
+                     }
         }
     }
+    
+    
     
     
     # --- vs 4bet Scenario ---
     # Player options: HJ, CO, BTN, SB, BB
     vs_4bet_data = {
-        "BB": {
-            "raise": {"AA", "KK", "QQ", "AKs", "AKo"},
-            "call": {"JJ", "TT", "AQs", "AJs"}
-        },
         "HJ": {
-            "raise": {"AA", "KK", "QQ", "AKs", "AKo"},
-            "call": {"JJ", "TT", "99", "AQs", "AJs", "KQs"}
+            "raise": {"AA", "KK",
+                      "AKs",
+                      "AKo"
+                      },
+            "call": {"QQ","JJ",
+                     "AQs", "AJs",
+                     "KQs"
+                     }
         },
         "CO": {
-            "raise": {"AA", "KK", "QQ", "JJ", "AKs", "AKo"},
-            "call": {"TT", "99", "88", "AQs", "AJs", "KQs", "KQo"}
+            "raise": {"AA", "KK",
+                      "AKs",
+                      "AKo"
+                      },
+            "call": {"QQ","JJ",
+                     "AQs", "AJs",
+                     "KQs"
+                     }
         },
         "BTN": {
-            "raise": {"AA", "KK", "QQ", "JJ", "AKs", "AKo", "AQs"},
-            "call": {"TT", "99", "88", "77", "AJs", "KQs", "QJs"}
+            "raise": {"AA", "KK",
+                      "AKs",
+                      "AKo"
+                      },
+            "call": {"QQ","JJ",
+                     "AQs", "AJs",
+                     "KQs"
+                     }
         },
         "SB": {
-            "raise": {"AA", "KK", "QQ", "AKs", "AKo"},
-            "call": {"JJ", "TT", "99", "AQs", "AJs"}
+            "raise": {"AA", "KK",
+                      "AKs",
+                      "AKo"
+                      },
+            "call": {"QQ","JJ",
+                     "AQs", "AJs",
+                     "KQs"
+                     }
+        },
+        "BB": {
+            "raise": {"AA", "KK",
+                      "AKs",
+                      "AKo"
+                      },
+            "call": {"QQ",
+                     "AQs"
+                     }
         }
     }
-    
+
+
+
+
+
     # --- vs 5bet Scenario ---
     # Player options: LJ, HJ, CO, BTN, SB
     vs_5bet_data = {
         "LJ": {
-            "raise": {"AA", "KK", "QQ", "AKs", "AKo"},
-            "call": {"JJ", "TT"}
+            "raise": set(),
+            "call": {"AA", "KK",
+                     "AKs",
+                     "AKo"
+                     }
         },
         "HJ": {
-            "raise": {"AA", "KK", "QQ", "AKs", "AKo"},
-            "call": {"JJ", "TT"}
+            "raise": set(),
+            "call": {"AA", "KK",
+                     "AKs",
+                     "AKo"
+                     }
         },
         "CO": {
-            "raise": {"AA", "KK", "QQ", "JJ", "AKs", "AKo"},
-            "call": {"TT", "99"}
+            "raise": set(),
+            "call": {"AA", "KK", "QQ", "JJ",
+                     "AKs",
+                     "AKo"
+                     }
         },
         "BTN": {
-            "raise": {"AA", "KK", "QQ", "AKs", "AKo"},
-            "call": {"JJ", "TT", "99"}
+            "raise": set(),
+            "call": {"AA", "KK", "QQ", "JJ",
+                     "AKs",
+                     "AKo"
+                     }
         },
         "SB": {
-            "raise": {"AA", "KK", "QQ", "AKs", "AKo"},
-            "call": {"JJ", "TT"}
+            "raise": set(),
+            "call": {"AA", "KK", "QQ", "JJ", "TT",
+                     "AKs", "AQs",
+                     "AKo"
+                     }
         }
     }
     
