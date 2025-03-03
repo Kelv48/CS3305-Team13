@@ -7,7 +7,7 @@ class User(db.Model):
     name = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
 
-    # relationships
+    # Relationships
     stats = db.relationship('Stats', backref='user', lazy=True)
 
     def __repr__(self):
@@ -16,7 +16,7 @@ class User(db.Model):
 class Stats(db.Model):
     __tablename__ = 'stats'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), unique=True, nullable=False)  # Unique to avoid duplicate stats
     win_count = db.Column(db.Integer, default=0, nullable=False)
     loss_count = db.Column(db.Integer, default=0, nullable=False)
     earnings = db.Column(db.Integer, default=0, nullable=False)
@@ -28,8 +28,8 @@ class Stats(db.Model):
         CheckConstraint('earnings >= 0', name='check_earnings'),
     )
 
-    # Relationships
-    leaderboard = db.relationship('Leaderboard', backref='stats', lazy=True, cascade="all, delete", uselist=False)
+    # One-to-one relationship with Leaderboard
+    leaderboard = db.relationship('Leaderboard', backref='stats', lazy=True, uselist=False)
 
     def __repr__(self):
         return f'<Stats User: {self.user_id}, Wins: {self.win_count}, Losses: {self.loss_count}, Earnings: {self.earnings}>'
@@ -37,16 +37,17 @@ class Stats(db.Model):
 class Leaderboard(db.Model):
     __tablename__ = 'leaderboard'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), unique=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE')) 
     stats_id = db.Column(db.Integer, db.ForeignKey('stats.id', ondelete='CASCADE'), unique=True, nullable=False)
     rank = db.Column(db.Integer, default=0, nullable=False)
     earnings = db.Column(db.Integer, default=0, nullable=False)
 
-    # Define unique constraint for stats_id
+    # Unique constraint on stats_id
     __table_args__ = (db.UniqueConstraint('stats_id', name='unique_stats_leaderboard'),)
 
-    # Relationship to User
-    user = db.relationship('User', backref='leaderboard', lazy=True, uselist=False)
+    # Relationships
+    user = db.relationship('User', backref=db.backref('leaderboard', uselist=False), lazy=True)
 
     def __repr__(self):
-        return f'<Leaderboard {self.stats_id}>'
+        return f'<Leaderboard User: {self.user_id}, Rank: {self.rank}, Earnings: {self.earnings}>'
+    

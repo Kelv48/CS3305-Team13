@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: 157a773b5281
+Revision ID: 70fff0bdb0b1
 Revises: 
-Create Date: 2025-02-26 13:24:34.980793
+Create Date: 2025-03-03 23:38:11.025312
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '157a773b5281'
+revision = '70fff0bdb0b1'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -35,14 +35,17 @@ def upgrade():
     sa.CheckConstraint('loss_count >= 0', name='check_loss_count'),
     sa.CheckConstraint('win_count >= 0', name='check_win_count'),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('user_id')
     )
     op.create_table('leaderboard',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('stats_id', sa.Integer(), nullable=False),
     sa.Column('rank', sa.Integer(), nullable=False),
     sa.Column('earnings', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['stats_id'], ['stats.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('stats_id'),
     sa.UniqueConstraint('stats_id', name='unique_stats_leaderboard')

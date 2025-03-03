@@ -37,26 +37,33 @@ def get_leaderboard():
 
 def update_leaderboard():
     try:
-        # Fetch top-ranked players from Stats table (sorted by earnings in descending order)
         stats_data = Stats.query.order_by(Stats.earnings.desc()).limit(10).all()
 
         leaderboard_list = []
-        for stats in stats_data:
+        last_earnings = None
+        rank = 1
+
+        for i, stats in enumerate(stats_data):
+            if stats.earnings != last_earnings:
+                rank = i + 1  # New rank for a new earnings value
             leaderboard_entry = {
-                "user_id": stats.user_id,
+                "rank": rank,  # Rank is now the first value
+                "username": stats.user.name,  # Get the username of the user
                 "win_count": stats.win_count,
                 "loss_count": stats.loss_count,
                 "earnings": stats.earnings
             }
             leaderboard_list.append(leaderboard_entry)
 
+            last_earnings = stats.earnings
+
             # Update the Leaderboard table
             leaderboard_entry_db = Leaderboard.query.filter_by(stats_id=stats.id).first()
             if leaderboard_entry_db:
-                leaderboard_entry_db.rank = leaderboard_list.index(leaderboard_entry) + 1
+                leaderboard_entry_db.rank = rank
                 leaderboard_entry_db.earnings = stats.earnings
             else:
-                new_entry = Leaderboard(stats_id=stats.id, rank=leaderboard_list.index(leaderboard_entry) + 1, earnings=stats.earnings)
+                new_entry = Leaderboard(stats_id=stats.id, rank=rank, earnings=stats.earnings)
                 db.session.add(new_entry)
 
         db.session.commit()
