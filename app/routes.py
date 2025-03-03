@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, g
 from .models import User, Stats, Leaderboard
-from .cache import get_user_DBorCache
+from .cache import get_user_DBorCache, get_leaderboard
 from . import db
 import json, redis, time
 
@@ -53,14 +53,13 @@ def create_user():
     except Exception as e:
         return jsonify({"error": "Error creating user"}), 500
 
+
 @main.route("/leaderboard", methods=['GET'])
 def leaderboard():
-    # Fetch leaderboard data from Redis
-    leaderboard_data = redis_client.get("leaderboard")
-    
+    leaderboard_data = get_leaderboard()  # Call the function from cache
+
     if leaderboard_data:
-        # Convert JSON string to Python list
-        return jsonify(json.loads(leaderboard_data)), 200
+        return jsonify(leaderboard_data), 200
     else:
         return jsonify({"error": "Leaderboard data not found"}), 404
 
