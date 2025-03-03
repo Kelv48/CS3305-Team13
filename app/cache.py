@@ -29,20 +29,16 @@ def get_user_DBorCache(user_name):
 
 def get_leaderboard():
     leaderboard_data = redis_client.get("leaderboard")
-    
     if leaderboard_data:
         return json.loads(leaderboard_data)  # Convert JSON string to Python list
-    
+
     # If no cached leaderboard, update it
     return update_leaderboard()
 
 def update_leaderboard():
     try:
+        # Fetch top-ranked players from Stats table (sorted by earnings in descending order)
         stats_data = Stats.query.order_by(Stats.earnings.desc()).limit(10).all()
-
-        if not stats_data:
-            print("No data found in stats table.")
-            return None  # Return None if no data exists
 
         leaderboard_list = []
         for stats in stats_data:
@@ -54,6 +50,7 @@ def update_leaderboard():
             }
             leaderboard_list.append(leaderboard_entry)
 
+            # Update the Leaderboard table
             leaderboard_entry_db = Leaderboard.query.filter_by(stats_id=stats.id).first()
             if leaderboard_entry_db:
                 leaderboard_entry_db.rank = leaderboard_list.index(leaderboard_entry) + 1
@@ -64,6 +61,7 @@ def update_leaderboard():
 
         db.session.commit()
 
+        # Store the updated leaderboard in Redis with a 1-hour expiry
         redis_client.setex("leaderboard", 3600, json.dumps(leaderboard_list))
 
         return leaderboard_list
