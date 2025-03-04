@@ -260,7 +260,15 @@ async def clientLeave(websocket: ServerConnection, userID, sessionID):
         logger.info(f"user leaving: {userID}")
         await websocket.close()
         #Update game object to reflect new players 
-        
+
+        #Upload money to player wallet
+        key = f'user:{userID}'
+        user = json.loads(redisClient.get(key)) #entry in redis db
+        #user['wallet'] += gameObj.getMoney(userID) - 500
+        redisClient.set(key, json.dumps(user))
+
+        #Upload to earnings
+
         with lock:
             #removed closed client from session
             activeSessions[sessionID]['clients'].pop(userID)
