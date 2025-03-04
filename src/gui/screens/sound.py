@@ -148,14 +148,16 @@ def sound(mainMenu):
     {"name": "After Hours", "path": "assets/music/After Hours.mp3"},
     {"name": "Bumpin On Sunset", "path": "assets/music/Bumpin On Sunset.mp3"},
     {"name": "Desafinado", "path": "assets/music/Desafinado.mp3"},
-    {"name": "In A Sentimanal Mood", "path": "assets/music/In A Sentimanal Mood.mp3"},
+    {"name": "In A Sentimental Mood", "path": "assets/music/In A Sentimental Mood.mp3"},
     {"name": "Lenny", "path": "assets/music/Lenny.mp3"},
     {"name": "Lets Go Gambling", "path": "assets/music/Lets Go Gambling.mp3"},
     {"name": "Manhattan", "path": "assets/music/Manhattan.mp3"},
     {"name": "Midnight Blue", "path": "assets/music/Midnight Blue.mp3"},
     {"name": "Mood Indigo", "path": "assets/music/Mood Indigo.mp3"},
     {"name": "So What", "path": "assets/music/So What.mp3"},
-    {"name": "Take Five", "path": "assets/music/Take Five.mp3"}
+    {"name": "Take Five", "path": "assets/music/Take Five.mp3"},
+    {"name": "Sea Shanty", "path": "assets/music/Sea Shanty.mp3"},
+    {"name": "Circus Theme", "path": "assets/music/Circus Theme.mp3"}
     ]
 
 
