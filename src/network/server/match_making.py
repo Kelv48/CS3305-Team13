@@ -91,7 +91,7 @@ async def joinGame(websocket: ServerConnection, sessionID, userID):
             await websocket.send(error_message.encode())
 
     except KeyError as e:
-        error_message = template.substitute(m_type=Protocols.Response.ERROR, data="The game that you are trying to join does not exist")
+        error_message = template.substitute(m_type=Protocols.Response.ERROR, data=json.dumps("The game that you are trying to join does not exist"))
         await websocket.send(error_message.encode())
 
     except ConnectionClosed as e:
@@ -116,7 +116,7 @@ async def voteStart(websocket: ServerConnection, sessionID):
                 await serverConnection.send(message)
 
     except KeyError as e:
-        error_message = template.substitute(m_type=Protocols.Response.ERROR, data="The game that you are trying to vote does not exist")
+        error_message = template.substitute(m_type=Protocols.Response.ERROR, data=json.dumps("The game that you are trying to join does not exist"))
         await websocket.send(error_message)
 
     except ConnectionClosed as e:
@@ -168,7 +168,7 @@ async def leaveGame(websocket: ServerConnection, sessionID, redirect=False):
         logger.debug(f"active sessions left: {activeSessions}")
 
     except KeyError as e:
-        error_message = template.substitute(m_type=Protocols.Response.ERROR, data="The game that you are trying to leave does not exist")
+        error_message = template.substitute(m_type=Protocols.Response.ERROR, data=json.dumps("The game that you are trying to join does not exist"))
         await websocket.send(error_message)
 
     except ConnectionClosed as e:
