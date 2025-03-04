@@ -95,16 +95,16 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
             match message['m_type']:
                 case Protocols.Request.FOLD:
                     logger.info(f"client is folding")
-                    await foldClient(websocket, message['sessionID'])
+                    await foldClient(websocket, message['sessionID'], userID)
 
                 case Protocols.Request.RAISE:
-                    await raiseClient(websocket, message['sessionID'])
+                    await raiseClient(websocket, message['sessionID'], userID)
 
                 case Protocols.Request.CHECK:
-                    await clientCheck(websocket, message['sessionID'])
+                    await clientCheck(websocket, message['sessionID'], userID)
 
                 case Protocols.Request.CALL:
-                    await clientCall(websocket, message['sessionID'])
+                    await clientCall(websocket, message['sessionID'], userID)
 
                 case Protocols.Request.LEAVE:
                     #TODO:redo this so that message and update is broadcast to all players in the current game
@@ -131,7 +131,7 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
         
 
 
-async def foldClient(websocket: ServerConnection, sessionID):
+async def foldClient(websocket: ServerConnection, sessionID, userID):
     print("player has folded")
     #GameLogic manipulation 
     #game = games_dict[sessionID]['gameObj]
@@ -147,12 +147,12 @@ async def foldClient(websocket: ServerConnection, sessionID):
             except ConnectionClosedError:    #If a player has disconnected 
                 #Broadcast info to the other players and remove data from game and server
                 print("client has disconnected during broadcast")
-                await clientLeave(client_writer, sessionID)
+                await clientLeave(client_writer, sessionID, userID)
     
     print("end of function")
 
 
-async def raiseClient(websocket: ServerConnection, sessionID):
+async def raiseClient(websocket: ServerConnection, sessionID, userID):
     print("player has raise")
     #GameLogic manipulation 
     #game = games_dict[sessionID]['gameObj]
@@ -165,11 +165,11 @@ async def raiseClient(websocket: ServerConnection, sessionID):
 
             except ConnectionClosedError:
                 print("client has disconnected during broadcast")
-                await clientLeave(client_writer, sessionID)
+                await clientLeave(client_writer, sessionID, userID)
     print("end of function")
 
 
-async def clientCheck(websocket: ServerConnection, sessionID):
+async def clientCheck(websocket: ServerConnection, sessionID, userID):
     print("player has checked")
     #GameLogic manipulation 
     #game = games_dict[sessionID]['gameObj]
@@ -182,11 +182,11 @@ async def clientCheck(websocket: ServerConnection, sessionID):
         
             except ConnectionClosedError:
                 print("client has disconnected during broadcast")
-                await clientLeave(client_writer, sessionID)
+                await clientLeave(client_writer, sessionID, userID)
 
     print("end of function")
 
-async def clientCall(websocket: ServerConnection, sessionID):
+async def clientCall(websocket: ServerConnection, sessionID, userID):
     logger.info("player has called")
     #GameLogic manipulation 
     #game = games_dict[sessionID]['gameObj]
@@ -199,7 +199,7 @@ async def clientCall(websocket: ServerConnection, sessionID):
 
             except ConnectionClosedError:
                 print("client has disconnected during broadcast")
-                await clientLeave(client_writer, sessionID)
+                await clientLeave(client_writer, sessionID, userID)
 
 
 async def closeClient(websocket: ServerConnection, sessionID=None, redirect=False):
@@ -227,6 +227,7 @@ async def clientLeave(websocket: ServerConnection, userID, sessionID):
         logger.info(f"user leaving: {userID}")
         await websocket.close()
         #Update game object to reflect new players 
+        #Upload money to player wallet
         with lock:
             #removed closed client from session
             activeSessions[sessionID]['clients'].pop(userID)
