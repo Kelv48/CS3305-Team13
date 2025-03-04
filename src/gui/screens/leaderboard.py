@@ -58,13 +58,14 @@ def leaderboard(mainMenu):
             header_surface = entry_font.render(header, True, "Gold")
             SCREEN.blit(header_surface, (start_x + i * column_spacing, start_y))
 
-        # Display leaderboard entries (Only top 10)
         for i, entry in enumerate(leaderboard_data[:10]):
             row_y = start_y + (i + 1) * 40
-            row_data = [str(entry["rank"]), entry["username"], str(entry["wins"]), str(entry["losses"]), str(entry["earnings"])]
+            row_data = [str(i + 1), entry['username'], str(entry["win_count"]), str(entry["loss_count"]), str(entry["earnings"])]  
             for j, cell in enumerate(row_data):
-                cell_surface = entry_font.render(cell, True, "White")
+                cell_surface = entry_font.render(str(cell), True, "White")  # Ensure cell is a string
                 SCREEN.blit(cell_surface, (start_x + j * column_spacing, row_y))
+
+
 
         # Home Button
         home_button = Button(
