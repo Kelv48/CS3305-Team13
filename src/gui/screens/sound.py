@@ -143,27 +143,20 @@ def sound(mainMenu):
 
     # Define the playlist with 20 songs for the dropdown playlist
     playlist = [
-    {"name": "The Gambler", "path": "assets/music/the_gambler.mp3"},
-    {"name": "Luck Be a Lady", "path": "assets/music/luck_be_a_lady.mp3"},
-    {"name": "Poker Face", "path": "assets/music/poker_face.mp3"},
-    {"name": "Ace of Spades", "path": "assets/music/ace_of_spades.mp3"},
-    {"name": "Viva Las Vegas", "path": "assets/music/viva_las_vegas.mp3"},
-    {"name": "Waking Up in Vegas", "path": "assets/music/waking_up_in_vegas.mp3"},
-    {"name": "House of the Rising Sun", "path": "assets/music/house_of_the_rising_sun.mp3"},
-    {"name": "Money", "path": "assets/music/money.mp3"},
-    {"name": "Two of a Kind, Workin' on a Full House", "path": "assets/music/two_of_a_kind.mp3"},
-    {"name": "Big Money", "path": "assets/music/big_money.mp3"},
-    {"name": "Sharp Dressed Man", "path": "assets/music/sharp_dressed_man.mp3"},
-    {"name": "Deal", "path": "assets/music/deal.mp3"},
-    {"name": "Easy Money", "path": "assets/music/easy_money.mp3"},
-    {"name": "Black Betty", "path": "assets/music/black_betty.mp3"},
-    {"name": "When the Levee Breaks", "path": "assets/music/when_the_levee_breaks.mp3"},
-    {"name": "All In", "path": "assets/music/all_in.mp3"},
-    {"name": "Queen of Hearts", "path": "assets/music/queen_of_hearts.mp3"},
-    {"name": "High Roller", "path": "assets/music/high_roller.mp3"},
-    {"name": "House of Cards", "path": "assets/music/house_of_cards.mp3"},
-    {"name": "Gambler's Blues", "path": "assets/music/gamblers_blues.mp3"}
-]
+    {"name": "Los Santos", "path": "assets/music/Los Santos.mp3"},
+    {"name": "Poker Face", "path": "assets/music/poker_face.wav"},
+    {"name": "After Hours", "path": "assets/music/After Hours.mp3"},
+    {"name": "Bumpin On Sunset", "path": "assets/music/Bumpin On Sunset.mp3"},
+    {"name": "Desafinado", "path": "assets/music/Desafinado.mp3"},
+    {"name": "In A Sentimanal Mood", "path": "assets/music/In A Sentimanal Mood.mp3"},
+    {"name": "Lenny", "path": "assets/music/Lenny.mp3"},
+    {"name": "Lets Go Gambling", "path": "assets/music/Lets Go Gambling.mp3"},
+    {"name": "Manhattan", "path": "assets/music/Manhattan.mp3"},
+    {"name": "Midnight Blue", "path": "assets/music/Midnight Blue.mp3"},
+    {"name": "Mood Indigo", "path": "assets/music/Mood Indigo.mp3"},
+    {"name": "So What", "path": "assets/music/So What.mp3"},
+    {"name": "Take Five", "path": "assets/music/Take Five.mp3"}
+    ]
 
 
     # Create the dropdown menu for songs
@@ -171,8 +164,8 @@ def sound(mainMenu):
     dropdown_width = 250
     dropdown_height = 40
     # Position it below the sfx slider (adjust as needed)
-    dropdown_x = SCREEN.get_width() // 2 - dropdown_width // 2
-    dropdown_y = SCREEN.get_height() / 2 + 80  
+    dropdown_x = SCREEN.get_width() // 2 - dropdown_width // 18
+    dropdown_y = SCREEN.get_height() / 2 - 190  
     song_dropdown = Dropdown(
         dropdown_x, dropdown_y, dropdown_width, dropdown_height,
         playlist, dropdown_font, pygame.Color("White"), pygame.Color("LightGreen"), pygame.Color("Black"),
@@ -189,7 +182,7 @@ def sound(mainMenu):
 
         screen_width, screen_height = SCREEN.get_size()
         # Transparent textbox with rounded edges
-        textbox_width = int(screen_width * 0.25)
+        textbox_width = int(screen_width * 0.60)
         textbox_height = int(screen_height * 0.7)
         textbox_x = int((screen_width - textbox_width) / 2)
         textbox_y = int(screen_height * 0.15)
@@ -204,16 +197,16 @@ def sound(mainMenu):
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
         # Center sliders
-        music_volume_slider.rect.x = SOUND_width / 2 - music_volume_slider.rect.width / 2
+        music_volume_slider.rect.x = SOUND_width / 3 - music_volume_slider.rect.width / 2
         music_volume_slider.rect.y = SOUND_height / 3.5
-        sfx_volume_slider.rect.x = SOUND_width / 2 - sfx_volume_slider.rect.width / 2
+        sfx_volume_slider.rect.x = SOUND_width / 3 - sfx_volume_slider.rect.width / 2
         sfx_volume_slider.rect.y = SOUND_height / 2
 
         # Render slider labels
         music_label = screen_font(30).render("Music Volume", True, "White")
         sfx_label = screen_font(30).render("Sound Effects Volume", True, "White")
-        music_label_rect = music_label.get_rect(center=(SOUND_width / 2, music_volume_slider.rect.y - 20))
-        sfx_label_rect = sfx_label.get_rect(center=(SOUND_width / 2, sfx_volume_slider.rect.y - 20))
+        music_label_rect = music_label.get_rect(center=(SOUND_width / 3, music_volume_slider.rect.y - 20))
+        sfx_label_rect = sfx_label.get_rect(center=(SOUND_width / 3, sfx_volume_slider.rect.y - 20))
         SCREEN.blit(music_label, music_label_rect)
         SCREEN.blit(sfx_label, sfx_label_rect)
 
@@ -222,8 +215,8 @@ def sound(mainMenu):
         sfx_percentage = f"{int(sfx_volume_slider.value * 100)}%"
         music_percentage_label = screen_font(30).render(music_percentage, True, "White")
         sfx_percentage_label = screen_font(30).render(sfx_percentage, True, "White")
-        music_percentage_rect = music_percentage_label.get_rect(center=(SOUND_width / 2, music_volume_slider.rect.y + 40))
-        sfx_percentage_rect = sfx_percentage_label.get_rect(center=(SOUND_width / 2, sfx_volume_slider.rect.y + 40))
+        music_percentage_rect = music_percentage_label.get_rect(center=(SOUND_width / 3, music_volume_slider.rect.y + 40))
+        sfx_percentage_rect = sfx_percentage_label.get_rect(center=(SOUND_width / 3, sfx_volume_slider.rect.y + 40))
         SCREEN.blit(music_percentage_label, music_percentage_rect)
         SCREEN.blit(sfx_percentage_label, sfx_percentage_rect)
 
