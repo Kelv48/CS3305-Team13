@@ -36,6 +36,9 @@ channel = 'activeSessions'
 r = redis.Redis('localhost', 6379)
 pubsub = r.pubsub()
 
+#Redis client setup
+redisClient = redis.Redis(host='localhost', port=6379, decode_responses=True)   #Used to manipulate player stats/Player wallet
+
 def addActiveSession(message):
     '''This method is for adding new active game sessions created by match_making.py
     to the activeSessions dict. This method is for initialising new sessions and NOT
@@ -106,6 +109,9 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
                 case Protocols.Request.CALL:
                     await clientCall(websocket, message['sessionID'], userID)
 
+                case Protocols.Request.BAILOUT:
+                    await clientBailout(websocket,message['sessionID'], userID, message['data'])
+
                 case Protocols.Request.LEAVE:
                     #TODO:redo this so that message and update is broadcast to all players in the current game
                     await clientLeave(websocket, message['userID'], message['sessionID'])
@@ -129,6 +135,33 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
         except UnboundLocalError as e:  #Can occur if connection  is closed with no close frame received or sent
             break
         
+#TODO: Look over this code cuz this might be shite
+async def clientBailout(websocket, sessionID, userID, data):
+    '''
+    This method withdraws money from player's account wallet  and adds it to their 
+    game wallet 
+    1. Query redis to get users account entry
+    2. Subtract the requested amount from the wallet 
+    3. Update the account entry to store the new total
+    '''
+    key = f'user:{userID}'
+    user = await json.loads(redisClient.get(key))
+    #Add withdraw to player game wallet 
+    user['wallet'] = user['wallet'] - data
+    await redisClient.set(key, json.dumps(user))
+
+    #Broadcast info all clients in the session to update their game
+    logger.info("starting to broadcast message")
+    for client_writer in activeSessions[sessionID]['clients'].values():
+        if client_writer != websocket:
+            try:
+                await client_writer.send("player has bailed out".encode())
+
+            except ConnectionClosedError:    #If a player has disconnected 
+                #Broadcast info to the other players and remove data from game and server
+                print("client has disconnected during broadcast")
+                await clientLeave(client_writer, sessionID, userID)
+    
 
 
 async def foldClient(websocket: ServerConnection, sessionID, userID):
@@ -227,7 +260,15 @@ async def clientLeave(websocket: ServerConnection, userID, sessionID):
         logger.info(f"user leaving: {userID}")
         await websocket.close()
         #Update game object to reflect new players 
+
         #Upload money to player wallet
+        key = f'user:{userID}'
+        user = json.loads(redisClient.get(key)) #entry in redis db
+        #user['wallet'] += gameObj.getMoney(userID) - 500
+        redisClient.set(key, json.dumps(user))
+
+        #Upload to earnings
+
         with lock:
             #removed closed client from session
             activeSessions[sessionID]['clients'].pop(userID)

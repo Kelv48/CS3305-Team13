@@ -7,6 +7,8 @@ class Protocols:
         PLAYER_CARDS = 'protocol.player_card'                      #Used to assign players hand 
         START = 'protocol.start'                                   #Used to tell client that its there turn 
         TURN = 'protocol.turn'
+        LIST_OF_GAMES = 'protocol.response_list_of_games'          #Used to provide for a list of games
+        BAILOUT = 'protocol.response_bailout'                      #Used to return bailout 
         OPPONENT = 'protocol.opponent'                             #Used to update other clients of an opponents move
         WINNER = 'protocol.winner'                                 #Used to reveal the winner of the round 
         OPPONENT_LEFT = 'protocol.opponent_left'                   #Used to tell client that another player has left the game 
@@ -32,6 +34,6 @@ class Protocols:
         LOGOUT = 'protocol.request_logout'                              #Used by client to log out
         LEAVE = 'protocol.request_leave'                                #Used to send request to leave game 
         LIST_OF_GAMES = 'protocol.request_list_of_games'                #Used to request for a list of games
-        INITIALISE = 'protocol.initialise'                               
+        BAILOUT = 'protocol.request_bailout'                            #Used to request bailout
         
 
