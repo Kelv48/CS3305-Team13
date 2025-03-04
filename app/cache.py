@@ -27,28 +27,42 @@ def get_user_DBorCache(user_name):
         return user_data
     return None
 
-def get_leaderboard():
+def get_or_update_leaderboard():
+    """
+    Checks if the leaderboard data is in the cache. If it is, returns it.
+    If not, fetches the leaderboard data from the database, updates it, 
+    stores it in the cache, and then returns it.
+    """
+    # Check if the leaderboard data exists in the cache
     leaderboard_data = redis_client.get("leaderboard")
     if leaderboard_data:
-        return json.loads(leaderboard_data)  # Convert JSON string to Python list
-
-    # If no cached leaderboard, update it
-    return update_leaderboard()
-
-def update_leaderboard():
+        print("Cache hit")
+        return json.loads(leaderboard_data)  # Return cached leaderboard data
+    
+    print("Cache miss")
     try:
+        # Fetch top-ranked players from the Stats table (sorted by earnings)
         stats_data = Stats.query.order_by(Stats.earnings.desc()).limit(10).all()
 
         leaderboard_list = []
         last_earnings = None
         rank = 1
 
+        # Process each player in stats_data and create leaderboard entries
         for i, stats in enumerate(stats_data):
+            # Fetch the username from the User table using the user_id from Stats
+            user = User.query.get(stats.user_id)
+            if not user:
+                continue  # Skip if user doesn't exist for some reason
+
+            # If earnings have changed, update the rank
             if stats.earnings != last_earnings:
                 rank = i + 1  # New rank for a new earnings value
+            
+            # Create a leaderboard entry
             leaderboard_entry = {
                 "rank": rank,  # Rank is now the first value
-                "username": stats.user.name,  # Get the username of the user
+                "username": user.name,  # Get the username of the user from the User table
                 "win_count": stats.win_count,
                 "loss_count": stats.loss_count,
                 "earnings": stats.earnings
@@ -57,7 +71,7 @@ def update_leaderboard():
 
             last_earnings = stats.earnings
 
-            # Update the Leaderboard table
+            # Update the Leaderboard table with the new rank and earnings
             leaderboard_entry_db = Leaderboard.query.filter_by(stats_id=stats.id).first()
             if leaderboard_entry_db:
                 leaderboard_entry_db.rank = rank
@@ -66,12 +80,14 @@ def update_leaderboard():
                 new_entry = Leaderboard(stats_id=stats.id, rank=rank, earnings=stats.earnings)
                 db.session.add(new_entry)
 
+        # Commit changes to the database
         db.session.commit()
 
         # Store the updated leaderboard in Redis with a 1-hour expiry
         redis_client.setex("leaderboard", 3600, json.dumps(leaderboard_list))
 
         return leaderboard_list
+
     except Exception as e:
         print(f"Error updating leaderboard: {e}")
         return None

@@ -1,7 +1,7 @@
 # app/routes.py
 from flask import Blueprint, request, jsonify, g
 from .models import User, Stats, Leaderboard
-from .cache import get_user_DBorCache, get_leaderboard
+from .cache import get_user_DBorCache, get_or_update_leaderboard
 from . import db
 import json, redis, time
 
@@ -66,7 +66,7 @@ def create_user():
 # Route for fetching the leaderboard
 @main.route("/leaderboard", methods=['GET'])
 def leaderboard():
-    leaderboard_data = get_leaderboard()  # Call the function from cache to get the leaderboard
+    leaderboard_data = get_or_update_leaderboard()  # Call the function from cache to get the leaderboard
 
     if leaderboard_data:
         return jsonify(leaderboard_data), 200
