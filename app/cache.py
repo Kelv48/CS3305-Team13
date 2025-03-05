@@ -29,11 +29,6 @@ def get_user_DBorCache(user_name):
     return None
 
 def get_or_update_leaderboard():
-    """
-    Checks if the leaderboard data is in the cache. If it is, returns it.
-    If not, fetches the leaderboard data from the database, updates it, 
-    stores it in the cache, and then returns it.
-    """
     # Check if the leaderboard data exists in the cache
     leaderboard_data = redis_client.get("leaderboard")
     if leaderboard_data:
@@ -43,7 +38,7 @@ def get_or_update_leaderboard():
     print("Cache miss")
     try:
         # Fetch top-ranked players from the Stats table (sorted by earnings)
-        stats_data = Stats.query.order_by(Stats.earnings.desc()).limit(10).all()
+        stats_data = Stats.query.order_by(Stats.earnings.desc()).all()
 
         leaderboard_list = []
         last_earnings = None
