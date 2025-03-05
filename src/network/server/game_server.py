@@ -28,8 +28,8 @@ When a client leaves what needs to happen?
 #Server setup
 host = "localhost"
 port = 443
-activeSessions = {}                                             #Key:pair Game ID → set of connected clients + gameObj + queue 
-template = Template('{"m_type": "$m_type", "data": "$data"}')   #This is a template for message to be sent to clients
+activeSessions = {}                                             #Key:pair Game ID → set of connected clients
+template = Template('{"m_type": "$m_type", "data": $data}')   #This is a template for message to be sent to clients
 
 #Redis pub/sub setup 
 channel = 'activeSessions'
@@ -124,7 +124,7 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
             break
 
         except KeyError as e:
-            error_message = template.substitute(m_type=Protocols.Response.ERROR, data='Invalid session ID')
+            error_message = template.substitute(m_type=Protocols.Response.ERROR, data=json.dumps("Invalid session ID"))
             await websocket.send(error_message.encode())
 
         except ConnectionClosedError as e:  #Raised when trying to interact with a closed connection
@@ -144,6 +144,7 @@ async def clientBailout(websocket, sessionID, userID, data):
     2. Subtract the requested amount from the wallet 
     3. Update the account entry to store the new total
     '''
+    logger.info("Withdrawing money from redis")
     key = f'user:{userID}'
     user = await json.loads(redisClient.get(key))
     #Add withdraw to player game wallet 
@@ -151,7 +152,7 @@ async def clientBailout(websocket, sessionID, userID, data):
     await redisClient.set(key, json.dumps(user))
 
     #Broadcast info all clients in the session to update their game
-    logger.info("starting to broadcast message")
+    logger.info("broadcast message that player has been bailed out")
     for client_writer in activeSessions[sessionID]['clients'].values():
         if client_writer != websocket:
             try:
@@ -262,6 +263,7 @@ async def clientLeave(websocket: ServerConnection, userID, sessionID):
         #Update game object to reflect new players 
 
         #Upload money to player wallet
+        logger.info("Uploading players money via Redis")
         key = f'user:{userID}'
         user = json.loads(redisClient.get(key)) #entry in redis db
         #user['wallet'] += gameObj.getMoney(userID) - 500
