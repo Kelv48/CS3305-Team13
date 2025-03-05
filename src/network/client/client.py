@@ -179,13 +179,16 @@ async def test_remote():
         await asyncio.sleep(2)
 
         c1.setID("c1")
-        await c1.send(Protocols.Request.CREATE_GAME, 3)
+        await c1.send(Protocols.Request.JOIN_GAME, "N+86QY")
         await c1.receive()
         await asyncio.sleep(5)
+
+        await c1.receive()
+        await c1.receive()
 
 
     except KeyboardInterrupt:
         return
 
 if __name__ == '__main__':
-    asyncio.run(main())  # Run the async main() function
+    asyncio.run(test_remote())  # Run the async main() function
