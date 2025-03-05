@@ -38,10 +38,10 @@ def get_or_update_leaderboard():
     print("Cache miss")
     try:
         # Fetch top-ranked players from the Stats table (sorted by earnings)
-        stats_data = Stats.query.order_by(Stats.earnings.desc()).all()
+        stats_data = Stats.query.order_by(Stats.earnings.desc()).limit(10).all()
 
         leaderboard_list = []
-        last_earnings = 2000
+        last_earnings = None
         rank = 1
 
         # Process each player in stats_data and create leaderboard entries

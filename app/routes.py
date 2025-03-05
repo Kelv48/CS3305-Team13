@@ -81,14 +81,14 @@ def get_stats():
         "user_id" :user.id,
         "win_count" : stats.win_count,
         "loss_count" : stats.loss_count,
-        "earnings" : stats.earnings,
-        "wallet" : user.wallet
+        "wallet" : user.wallet,
+        "earnings" : stats.earnings
     }
 
     return jsonify(stats_data), 200
 
 # Route for fetching the leaderboard
-@main.route("/leaderboard", methods=['POST'])
+@main.route("/leaderboard", methods=['GET'])
 def leaderboard():
     leaderboard_data = get_or_update_leaderboard()  # Call the function from cache to get the leaderboard
 
