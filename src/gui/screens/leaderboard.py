@@ -2,7 +2,7 @@ import pygame
 import sys
 import requests
 from src.gui.utils.button import Button
-from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor
+from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor, FPS
 
 # Flask API base URL (update if needed)
 BASE_URL = "http://84.8.144.77:5000"
@@ -27,6 +27,8 @@ def leaderboard(mainMenu):
     leaderboard_data = get_leaderboard()
 
     while True:
+        clock = pygame.time.Clock()
+        clock.tick(FPS)
         MOUSE_POS = pygame.mouse.get_pos()
 
         # Scale background
@@ -44,7 +46,7 @@ def leaderboard(mainMenu):
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
         # Title
-        title_text = screen_font(50).render("Top Earners", True, "Gold")
+        title_text = screen_font(50).render("LEADERBOARD", True, "Gold")
         title_rect = title_text.get_rect(center=(screen_width / 2, screen_height / 15))
         SCREEN.blit(title_text, title_rect)
 

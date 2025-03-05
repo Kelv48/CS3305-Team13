@@ -1,6 +1,6 @@
 import pygame, sys
 from src.gui.utils.button import Button
-from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor
+from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor, FPS
 
 
 from src.singleplayer_game.game_menu import gameMenu
@@ -8,6 +8,8 @@ from src.singleplayer_game.game_menu import gameMenu
 
 def singlePlayer(mainMenu):
     while True:
+        clock = pygame.time.Clock()
+        clock.tick(FPS)
         SINGLE_MOUSE_POS = pygame.mouse.get_pos()
 
         # Calculate positions based on current screen size    # Scale the background to fit the screen
@@ -40,7 +42,7 @@ def singlePlayer(mainMenu):
 
         
         # Calculate positions based on current screen size
-        SINGLE_TEXT = screen_font(50).render("Poker", True, "Gold")
+        SINGLE_TEXT = screen_font(50).render("SINGLEPLAYER", True, "Gold")
         SINGLE_RECT = SINGLE_TEXT.get_rect(center=(screen_width / 2, screen_height / 9))
         SCREEN.blit(SINGLE_TEXT, SINGLE_RECT)
 
@@ -51,7 +53,7 @@ def singlePlayer(mainMenu):
 
         # Calculate vertical spacing with closer spacing
         button_count = len(buttons)
-        button_height = screen_height / (button_count + 3) # Change number bigger to make the buttons closer
+        button_height = screen_height / (button_count + 1.2) # Change number bigger to make the buttons closer
 
         # Create and position buttons
         button_objects = []

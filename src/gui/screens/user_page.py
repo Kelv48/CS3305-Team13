@@ -1,6 +1,6 @@
 import pygame, sys, json, os
 from src.gui.utils.button import Button
-from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor
+from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor, FPS
 
 # Define the temporary JSON file for user data.
 USER_DATA_FILE = "assets/   temp_user_data.json"
@@ -43,6 +43,8 @@ def save_user_data(data):
         json.dump(data, f)
 
 def user_page(mainMenu):
+    clock = pygame.time.Clock()
+    clock.tick(FPS)
     while True:
         USER_MOUSE_POS = pygame.mouse.get_pos()
 
@@ -69,7 +71,7 @@ def user_page(mainMenu):
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
         # Display header text.
-        header_text = screen_font(45).render("This is the USER screen.", True, "White")
+        header_text = screen_font(45).render("USER PAGE", True, "Gold")
         header_rect = header_text.get_rect(center=(screen_width / 2, screen_height / 15))
         SCREEN.blit(header_text, header_rect)
 

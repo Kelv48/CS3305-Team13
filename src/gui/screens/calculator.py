@@ -3,11 +3,10 @@ import sys
 import random
 import itertools
 from collections import Counter
-from src.gui.utils.constants import screen_font, BG, SCREEN, scaled_cursor
+from src.gui.utils.constants import screen_font, BG, SCREEN, scaled_cursor, FPS
 pygame.init()
 
 # ----- Global Constants & Settings -----
-pygame.display.set_caption("Poker Calculator")
 BG_COLOR = pygame.Color('white')
 COLOR_INACTIVE = pygame.Color('lightskyblue3')
 COLOR_ACTIVE = pygame.Color('dodgerblue2')
@@ -182,6 +181,7 @@ def load_card_images(card_width, card_height):
 # ----- Main GUI Loop with Card Selection -----
 def run_poker_calculator(mainMenu, num_simulations=1000):
     clock = pygame.time.Clock()
+    clock.tick(FPS)
 
     # Dimensions for card images and grid layout.
     CARD_WIDTH, CARD_HEIGHT = 60, 90
@@ -299,7 +299,7 @@ def run_poker_calculator(mainMenu, num_simulations=1000):
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
         # Place header text near top of textbox
-        header_text = "This is the POKER CALCULATOR screen."
+        header_text = "EQUITY CALCULATOR"
         CALCULATOR_TEXT = screen_font(45).render(header_text, True, "Gold")
         header_y = 30
         CALCULATOR_RECT = CALCULATOR_TEXT.get_rect(center=(textbox_x + textbox_width // 2, header_y))
@@ -370,4 +370,3 @@ def run_poker_calculator(mainMenu, num_simulations=1000):
         SCREEN.blit(scaled_cursor, current_mouse_pos)
         
         pygame.display.flip()
-        clock.tick(30)

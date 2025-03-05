@@ -1,9 +1,11 @@
 import sys
 import pygame
-from src.gui.utils.constants import SCREEN, BG, screen_font, scaled_cursor
+from src.gui.utils.constants import SCREEN, BG, screen_font, scaled_cursor, FPS
 
 def hand_equity_visualizer(mainMenu):
     pygame.init()
+    clock = pygame.time.Clock()
+    clock.tick(FPS)
 
     #
     # 1. Complete Equity Dictionary (all 169 combos).
@@ -140,7 +142,7 @@ def hand_equity_visualizer(mainMenu):
     SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
     # Place header text near the top of the textbox
-    header_text = "This is the HAND EQUITY screen."
+    header_text = "HAND EQUITY"
     HAND_VISUALIZER_TEXT = screen_font(45).render(header_text, True, "Gold")
     header_y = textbox_y - 20
     HAND_VISUALIZER_RECT = HAND_VISUALIZER_TEXT.get_rect(center=(textbox_x + textbox_width // 2, header_y))
@@ -386,7 +388,5 @@ def hand_equity_visualizer(mainMenu):
         SCREEN.blit(scaled_cursor, current_mouse_pos)
 
         pygame.display.flip()
-        clock.tick(30)
-
     pygame.quit()
     sys.exit()
