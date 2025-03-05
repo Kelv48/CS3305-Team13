@@ -1,6 +1,6 @@
 import sys
 import pygame
-from src.gui.utils.constants import SCREEN, BG, screen_font, scaled_cursor
+from src.gui.utils.constants import SCREEN, BG, screen_font, scaled_cursor, FPS
 from src.gui.screens.ranges_data import template_data, open_ranges
 
 # Helper Functions for Valid Positions
@@ -54,7 +54,8 @@ def get_visible_categories(options_data):
 
 # Preflop Range Visualizer Code
 def preflop_range_visualizer(mainMenu):
-    pygame.init()
+    clock = pygame.time.Clock()
+    clock.tick(FPS)
     
     # Window and Asset Setup
     screen_width, screen_height = SCREEN.get_size()
@@ -69,8 +70,8 @@ def preflop_range_visualizer(mainMenu):
     pygame.draw.rect(textbox_surface, (0, 0, 0, 100), (0, 0, textbox_width, textbox_height), border_radius=50)
     
     # Header text.
-    header_text = "This is the PREFLOP RANGE screen."
-    HAND_VISUALIZER_TEXT = screen_font(45).render(header_text, True, "White")
+    header_text = "PREFLOP RANGE"
+    HAND_VISUALIZER_TEXT = screen_font(45).render(header_text, True, "Gold")
     header_rect = HAND_VISUALIZER_TEXT.get_rect(center=(textbox_x + textbox_width // 2, textbox_y - 20))
     
     # Grid Layout Settings
@@ -250,7 +251,7 @@ def preflop_range_visualizer(mainMenu):
         SCREEN.blit(scaled_cursor, current_mouse_pos)
     
         pygame.display.flip()
-        clock.tick(30)
+
     
     pygame.quit()
     sys.exit()

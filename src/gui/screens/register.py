@@ -3,7 +3,7 @@ import sys, os
 import requests
 import json
 from src.gui.utils.button import Button
-from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor
+from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor, FPS
 
 BASE_URL = 'http://84.8.144.77:5000'
 LOCAL_FILE = "local.json"
@@ -98,6 +98,8 @@ def register(mainMenu):
     message = ""
 
     while True:
+        clock = pygame.time.Clock()
+        clock.tick(FPS)
         REGISTER_MOUSE_POS = pygame.mouse.get_pos()
         username_box, password_box, button_objects = render_screen("Register", username, password, active_input, [
             ("Enter", registerUser),

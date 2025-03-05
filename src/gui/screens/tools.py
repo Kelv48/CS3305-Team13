@@ -1,7 +1,7 @@
 
 import pygame, sys
 from src.gui.utils.button import Button
-from src.gui.utils.constants import BG, screen_font, SCREEN, screen_font, scaled_cursor
+from src.gui.utils.constants import BG, screen_font, SCREEN, screen_font, scaled_cursor, FPS
 from src.gui.screens.hand_equity import hand_equity_visualizer
 from src.gui.screens.preflop_range import preflop_range_visualizer
 from src.gui.screens.calculator import run_poker_calculator
@@ -10,6 +10,8 @@ from src.gui.screens.calculator import run_poker_calculator
 
 def tools(mainMenu):
     while True:
+        clock = pygame.time.Clock()
+        clock.tick(FPS)
         TOOLS_MOUSE_POS = pygame.mouse.get_pos()
 
         # Calculate positions based on current screen size    # Scale the background to fit the screen
@@ -52,17 +54,17 @@ def tools(mainMenu):
         buttons = [
             ("HAND EQUITY", hand_equity_visualizer),
             ("PREFLOP RANGE", preflop_range_visualizer),
-            ("CALCULATOR", run_poker_calculator),
+            ("EQUITY CALCULATOR", run_poker_calculator),
             ("HOME", mainMenu)]
 
         # Calculate vertical spacing with closer spacing
         button_count = len(buttons)
-        button_height = screen_height / (button_count + 3) # Change number bigger to make the buttons closer
+        button_height = screen_height / (button_count + 2) # Change number bigger to make the buttons closer
 
         # Create and position buttons
         button_objects = []
         for index, (text, action) in enumerate(buttons):
-            button_y = (index + 2.5) * button_height        # Change number bigger to make buttons go down on y axis
+            button_y = (index + 1.5) * button_height        # Change number bigger to make buttons go down on y axis
             button = Button(
                 pos=(screen_width / 2, button_y), 
                 text_input=text, 

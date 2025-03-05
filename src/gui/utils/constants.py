@@ -12,9 +12,14 @@ RED = (255, 0, 0)
 GREEN = (94, 151, 82)
 
 # Screen settings
-FPS = 1
+FPS = 60
 WIDTH = 1280
 HEIGHT = 720
+START_STACK = 5000
+screen_width = 1280
+screen_height = 720
+
+pygame.display.set_caption("GAMBLERS DEN")
 
 # SCREEN = pygame.display.set_mode((1280, 720), pygame.FULLSCREEN)    # Fullscreen
 SCREEN = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)    # Resizable
@@ -50,7 +55,7 @@ bb_icon = pygame.transform.scale(bb_icon, (70, 70))
 
 
 # Background
-BG = pygame.image.load("assets/images/Background.jpg").convert_alpha()
+BG = pygame.image.load("assets/images/BE.jpeg").convert_alpha()
 BG.set_colorkey(WHITE)
 
 
@@ -69,8 +74,6 @@ GAME_BG.set_colorkey(WHITE)
 
 
 
-# Background music
-pygame.mixer.music.load("assets/music/poker_face.wav") # Background music file
 
 
 # Sound effect
