@@ -1,4 +1,3 @@
-    
 #This is for the message headers between client and server 
 class Protocols:
     class Response:
@@ -35,4 +34,3 @@ class Protocols:
         # LOGOUT = 'protocol.request_logout'                              #Used by client to log out
         LIST_OF_GAMES = 'protocol.request_list_of_games'                #Used to request for a list of games
         BAILOUT = 'protocol.request_bailout'                            #Used to request bailout
-        

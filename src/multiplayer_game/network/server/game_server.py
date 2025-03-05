@@ -29,7 +29,7 @@ When a client leaves what needs to happen?
 host = "localhost"
 port = 443
 activeSessions = {}                                             #Key:pair Game ID → set of connected clients
-template = Template('{"m_type": "$m_type", "data": $data}')   #This is a template for message to be sent to clients
+template = Template('{"m_type": "$m_type", "data": "$data"}')   #This is a template for message to be sent to clients
 
 #Redis pub/sub setup 
 channel = 'activeSessions'
@@ -313,4 +313,3 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
         print("We are ending test")
-

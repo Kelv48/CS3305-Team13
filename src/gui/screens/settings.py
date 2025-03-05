@@ -133,7 +133,7 @@ class Dropdown:
     def get_selected_option(self):
         return self.options[self.selected_index]
 
-def sound(mainMenu):
+def settings(mainMenu):
     music_volume = 0.5  # Default music volume
     sfx_volume = 0.5    # Default sound effects volume
     pygame.mixer.music.set_volume(music_volume)  # Set initial music volume

@@ -112,7 +112,7 @@ async def voteStart(websocket: ServerConnection, sessionID):
         logger.debug("Broadcasting vote to start game")  
         message = template.substitute(m_type=Protocols.Response.FORCE_START, data=len(activeSessions[sessionID]['forceStart']))
         for serverConnection in activeSessions[sessionID]['clients']:
-            if serverConnection != websocket:
+            #if serverConnection != websocket:
                 await serverConnection.send(message)
 
     except KeyError as e:

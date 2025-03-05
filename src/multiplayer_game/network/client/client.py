@@ -1,13 +1,50 @@
 import json
 from websockets.sync.client import connect
 from websockets.exceptions import ConnectionClosed, InvalidURI
-from src.network.server.protocol import Protocols
+from src.multiplayer_game.network.server.protocol import Protocols
 
 class Client:
     def __init__(self, websocket=None):
         self.client = websocket
         self.id = None
         self.sessionID = None
+        self.create_game_screen = None
+        self.lobby_screen = None
+        self.main_menu = None
+        self.join_game_screen = None
+        self.loading_screen = None
+
+    def set_loading_screen(self, action):
+        self.loading_screen = action
+
+    def set_create_game_screen(self, action):
+        self.create_game_screen = action
+
+    def set_main_menu(self, action):
+        self.main_menu = action
+
+    def load_main_menu(self):
+        self.main_menu()
+
+    def set_lobby_screen(self, action):
+        self.lobby_screen = action
+
+    def set_join_game_screen(self, action):
+        self.join_game_screen = action
+
+    def run_game(self, option):
+        if option == 0:
+            self.create_game_screen()
+        if option == 1:
+            self.join_game_screen()
+        if option == 2:
+            self.loading_screen()
+
+
+        msg = self.receive()
+        match msg['m_type']:
+            case Protocols.Response.START_GAME_EARLY_VOTE:
+                vote_start_count = int(msg['data'])
 
     @classmethod
     def connect(cls, host, port):
@@ -43,7 +80,7 @@ class Client:
                 case Protocols.Response.SESSION_ID:
                     self.setSessionID(der['data'])
             
-            return der['data']
+            return der
         except ConnectionClosed as e:
             print("Client connection closed")
 
@@ -72,32 +109,19 @@ class Client:
     def setID(self, id):
         self.id = id 
 
-# Testing synchronous version
 def test_local():
     c1, c2 = None, None
     try:
         c1 = Client.connect('localhost', 80)
         c2 = Client.connect("localhost", 80)
         
-        c1.setID("c1")
         c2.setID("c2")
-        
-        c1.send(Protocols.Request.CREATE_GAME, 3)
-        c1.receive()
-        
-        c2.send(Protocols.Request.JOIN_GAME, c1.getSessionID())
-        c2.receive()
-        
-        c1.send(Protocols.Request.START_GAME_EARLY_VOTE)
+        c2.send(Protocols.Request.JOIN_GAME, "BQN/V0")
         c2.receive()
         
         c2.send(Protocols.Request.START_GAME_EARLY_VOTE)
-        c1.receive()
-        
-        c1.receive()
         c2.receive()
-        
-        c1.send(Protocols.Request.CALL)
+        c2.receive()
         c2.send(Protocols.Request.FOLD)
         
         while True:
@@ -110,13 +134,10 @@ def test_remote():
     try:
         c1 = Client.connect("84.8.144.77", 8000)
         c1.setID("c1")
-        await c1.send(Protocols.Request.CREATE_GAME, 3)
-        await c1.receive()
-        await asyncio.sleep(5)
-
-
+        c1.send(Protocols.Request.CREATE_GAME, 3)
+        c1.receive()
     except KeyboardInterrupt:
         return
 
 if __name__ == '__main__':
-    asyncio.run(main())  # Run the async main() function
+    test_local()

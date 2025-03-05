@@ -2,8 +2,13 @@ import pygame, sys
 from src.gui.utils.button import Button
 from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor
 
-from src.multiplayer_game.game_menu import gameMenu
-from src.multiplayer_game.lobby_screen import lobbyScreen
+import asyncio
+
+from src.multiplayer_game.create_game import create_game
+from src.multiplayer_game.join_game import join_game
+from src.multiplayer_game.loading_screen import loading_screen
+
+from src.multiplayer_game.network.client.client import Client
 
 def multiPlayer(mainMenu):
     while True:
@@ -45,8 +50,9 @@ def multiPlayer(mainMenu):
 
         # Define button labels and functions
         buttons = [
-            ("CREATE GAME", lobbyScreen),
-            ("JOIN GAME", "JOIN GAME"),
+            ("CREATE GAME", create_game),
+            ("JOIN GAME", join_game),
+            ("LOADING SCREEN", loading_screen),
             ("HOME", mainMenu)]
 
         # Calculate vertical spacing with closer spacing
@@ -80,9 +86,25 @@ def multiPlayer(mainMenu):
                         if action == sys.exit:
                             pygame.quit()
                             sys.exit()
-                        elif action == lobbyScreen:
-                            lobbyScreen(mainMenu)
-                        else:
+                        if action == create_game:
+                            c = Client()
+                            c.set_main_menu(mainMenu)
+                            c.set_create_game_screen(lambda: create_game(mainMenu))
+                            print("MULTIPLAYER ACTION = CREATE GAME")
+                            c.run_game(0)
+                        if action == join_game:
+                            c = Client()
+                            c.set_main_menu(mainMenu)
+                            c.set_join_game_screen(lambda: join_game(mainMenu))
+                            print("MULTIPLAYER ACTION = JOIN GAME")
+                            c.run_game(1)
+                        if action == loading_screen:
+                            c = Client()
+                            c.set_main_menu(mainMenu)
+                            c.set_loading_screen(lambda: loading_screen(mainMenu))
+                            print("MULTIPLAYER ACTION = LOADING SCREEN")
+                            c.run_game(2)
+                        if action == mainMenu:
                             action()
 
         # Draw the scaled cursor image at the mouse position

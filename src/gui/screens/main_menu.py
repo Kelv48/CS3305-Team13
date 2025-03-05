@@ -1,21 +1,24 @@
-import pygame, sys
+import pygame
+import sys
 from src.gui.utils.button import Button
-from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor
+from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor, FPS
 from src.gui.screens.singleplayer import singlePlayer
 from src.gui.screens.settings import settings
 from src.gui.screens.multiplayer import multiPlayer
-from src.gui.screens.guide import guide_beginner
+from src.gui.screens.guide import how_to_play_poker
 from src.gui.screens.leaderboard import leaderboard
 from src.gui.screens.register import register, logout, load_user
 from src.gui.screens.user_page import user_page
 from src.gui.screens.tools import tools
 
 
-
 def mainMenu():
+    clock = pygame.time.Clock()
     logged_in = load_user() is not None
 
-    while True:
+    running = True
+    while running:
+        clock.tick(FPS)  # Limit to 60 FPS
         MAIN_MOUSE_POS = pygame.mouse.get_pos()
         screen_width, screen_height = SCREEN.get_size()
         scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height))
@@ -31,24 +34,24 @@ def mainMenu():
         pygame.draw.rect(textbox_surface, (0, 0, 0, 100), (0, 0, textbox_width, textbox_height), border_radius=50)
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
-        MAIN_TEXT = screen_font(50).render("Poker", True, "Gold")
+        MAIN_TEXT = screen_font(50).render("Gamblers Den", True, "Gold")
         MAIN_RECT = MAIN_TEXT.get_rect(center=(screen_width // 2, screen_height // 9))
         SCREEN.blit(MAIN_TEXT, MAIN_RECT)
 
         # Define button labels and functions
         buttons = [
-            ("USER", user_page),
             ("SINGLEPLAYER", singlePlayer),
             ("MULTIPLAYER", multiPlayer),
-            ("GUIDE", guide_beginner),
-            ("SETTINGS", settings),
+            ("GUIDE", how_to_play_poker),
             ("TOOLS", tools),
             ("LEADERBOARD", leaderboard),
+            ("SETTINGS", settings),
             ("QUIT", sys.exit)
         ]
 
         if logged_in:
             buttons.insert(0, ("LOGOUT", logout))  # Logout button
+            buttons.insert(1, ("USER", user_page))
         else:
             buttons.insert(0, ("REGISTER & LOGIN", register))
 
@@ -57,7 +60,6 @@ def mainMenu():
         textbox_center_x = textbox_x + textbox_width / 2
 
         button_objects = []
-        #For loop draws buttons
         for index, (text, action) in enumerate(buttons):
             button_y = textbox_y + (index + 1) * button_spacing
             button = Button(
@@ -72,16 +74,15 @@ def mainMenu():
             button.update(SCREEN)
             button_objects.append((button, action))
 
+        # Handle events synchronously
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for button, action in button_objects:
                     if button.checkForInput(MAIN_MOUSE_POS):
                         if action == sys.exit:
-                            pygame.quit()
-                            sys.exit()
+                            running = False
                         else:
                             action(mainMenu)
 
@@ -89,6 +90,8 @@ def mainMenu():
 
         pygame.display.update()
 
+    pygame.quit()
+    sys.exit()
+
 if __name__ == "__main__":
     mainMenu()
-

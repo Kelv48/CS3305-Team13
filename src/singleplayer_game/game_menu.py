@@ -26,7 +26,6 @@ def gameMenu(mainMenu):
 
         if start_choice == "HOME":
             mainMenu()   # Return to home screen if "HOME" is chosen
-            return
 
         # Create a human player and then the requested number of bots.
         Player('Player 1', START_STACK, 'human')
