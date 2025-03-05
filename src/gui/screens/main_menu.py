@@ -41,7 +41,6 @@ def mainMenu():
         # Define button labels and functions
         buttons = [
             ("SINGLEPLAYER", singlePlayer),
-            ("MULTIPLAYER", multiPlayer),
             ("GUIDE", how_to_play_poker),
             ("TOOLS", tools),
             ("LEADERBOARD", leaderboard),
@@ -52,6 +51,7 @@ def mainMenu():
         if logged_in:
             buttons.insert(0, ("LOGOUT", logout))  # Logout button
             buttons.insert(1, ("USER", user_page))
+            buttons.insert(3, ("MULTIPLAYER", multiPlayer))
         else:
             buttons.insert(0, ("REGISTER & LOGIN", register))
 
