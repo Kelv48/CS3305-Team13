@@ -7,6 +7,8 @@ class Protocols:
         PLAYER_CARDS = 'protocol.player_card'                      #Used to assign players hand 
         START = 'protocol.start'                                   #Used to tell client that its there turn 
         TURN = 'protocol.turn'
+        LIST_OF_GAMES = 'protocol.response_list_of_games'          #Used to provide for a list of games
+        BAILOUT = 'protocol.response_bailout'                      #Used to return bailout 
         OPPONENT = 'protocol.opponent'                             #Used to update other clients of an opponents move
         WINNER = 'protocol.winner'                                 #Used to reveal the winner of the round 
         OPPONENT_LEFT = 'protocol.opponent_left'                   #Used to tell client that another player has left the game 
@@ -24,14 +26,13 @@ class Protocols:
         CHECK = 'protocol.check'
         FOLD = 'protocol.fold'
         CALL = 'protocol.call'
+        LEAVE = 'protocol.request_leave'                                #Used to send request to leave game 
         CREATE_GAME = 'protocol.request_create_game'                    #Used by client to join a game
         JOIN_GAME = 'protocol.request_join_game'                        #Used by client to create a game 
         START_GAME_EARLY_VOTE = 'protocol.request_start_game_early'
-        AUTHENTICATION = 'protocol.request_authentication'              #Used to request of auth when client logs in 
+        # AUTHENTICATION = 'protocol.request_authentication'              #Used to request of auth when client logs in 
         CREATE_ACCOUNT = 'protocol.request_create_account'              #Used to create an account, which is stored in DB 
-        LOGOUT = 'protocol.request_logout'                              #Used by client to log out
-        LEAVE = 'protocol.request_leave'                                #Used to send request to leave game 
+        # LOGOUT = 'protocol.request_logout'                              #Used by client to log out
         LIST_OF_GAMES = 'protocol.request_list_of_games'                #Used to request for a list of games
-        INITIALISE = 'protocol.initialise'                               
+        BAILOUT = 'protocol.request_bailout'                            #Used to request bailout
         
-
