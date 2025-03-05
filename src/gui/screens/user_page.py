@@ -34,62 +34,68 @@ def load_user_data():
     return None  # Server request failed → Redirect
 
 def user_page(mainMenu):
-    # Load user data, if invalid → Go back to main menu
     user_data = load_user_data()
     if not user_data:
         mainMenu()
         return
 
+    username = user_data.get("username", "User")  # Get username or fallback to "User"
     clock = pygame.time.Clock()
     
     while True:
         clock.tick(FPS)
         USER_MOUSE_POS = pygame.mouse.get_pos()
         SCREEN.fill((0, 0, 0))  # Clear screen
-        
-        # Background
+
         screen_width, screen_height = SCREEN.get_size()
+
+        # Background
         scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height))
         SCREEN.blit(scaled_bg, (0, 0))
 
-        # Semi-transparent textbox
-        textbox_width, textbox_height = int(screen_width * 0.9), int(screen_height * 0.8)
-        textbox_x, textbox_y = (screen_width - textbox_width) // 2, int(screen_height * 0.1)
-        textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
-        pygame.draw.rect(textbox_surface, (0, 0, 0, 100), (0, 0, textbox_width, textbox_height), border_radius=50)
-        SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
-
-        # Header
-        header_text = screen_font(45).render("USER PAGE", True, "Gold")
-        header_rect = header_text.get_rect(center=(screen_width / 2, screen_height / 15))
+        # Dynamic Header with Glow Effect (e.g., "Kelvin's Page")
+        header_text = screen_font(50).render(f"{username}'s Page", True, "Gold")
+        header_shadow = screen_font(50).render(f"{username}'s Page", True, (255, 215, 0, 100))
+        header_rect = header_text.get_rect(center=(screen_width / 2, screen_height * 0.15))
+        
+        SCREEN.blit(header_shadow, (header_rect.x + 2, header_rect.y + 2))  # Glow effect
         SCREEN.blit(header_text, header_rect)
 
-        # Display user data
-        data_font = screen_font(20)
-        line_spacing = 30
-        data_x, data_y = textbox_x + 20, textbox_y + 20
+        # User info container
+        box_width, box_height = int(screen_width * 0.8), int(screen_height * 0.6)
+        box_x, box_y = (screen_width - box_width) // 2, int(screen_height * 0.25)
+        info_surface = pygame.Surface((box_width, box_height), pygame.SRCALPHA)
+        pygame.draw.rect(info_surface, (0, 0, 0, 150), (0, 0, box_width, box_height), border_radius=30)
+        SCREEN.blit(info_surface, (box_x, box_y))
+
+        # Display user stats in a formatted way
+        data_font = screen_font(25)
+        line_spacing = 50
+        col_spacing = box_width // 2 - 50  # Two-column layout
+        data_x, data_y = box_x + 40, box_y + 30
         current_line = 0
 
-        for key, value in user_data.items():
-            key_surface = data_font.render(f"{key}:", True, "White")
-            SCREEN.blit(key_surface, (data_x, data_y + current_line * line_spacing))
-            current_line += 1
+        stats = list(user_data.items())
+        half = len(stats) // 2
 
-            if isinstance(value, dict):
-                for sub_key, sub_value in value.items():
-                    sub_surface = data_font.render(f"   {sub_key}: {sub_value}", True, "White")
-                    SCREEN.blit(sub_surface, (data_x + 10, data_y + current_line * line_spacing))
-                    current_line += 1
-            else:
-                value_surface = data_font.render(f"   {value}", True, "White")
-                SCREEN.blit(value_surface, (data_x + 10, data_y + current_line * line_spacing))
-                current_line += 1
+        for i, (key, value) in enumerate(stats):
+            x_offset = col_spacing if i >= half else 0
+            y_offset = (i % half) * line_spacing
 
-        # "Back" Button
+            # Background card for each stat
+            stat_bg = pygame.Surface((col_spacing - 20, 40), pygame.SRCALPHA)
+            pygame.draw.rect(stat_bg, (255, 255, 255, 50), (0, 0, col_spacing - 20, 40), border_radius=15)
+            SCREEN.blit(stat_bg, (data_x + x_offset, data_y + y_offset))
+
+            # Render stat text
+            key_surface = data_font.render(f"{key}: {value}", True, "White")
+            SCREEN.blit(key_surface, (data_x + 10 + x_offset, data_y + y_offset + 5))
+
+        # "Back" Button with glowing effect
         USER_BACK = Button(
-            pos=(screen_width / 2, screen_height * 2 / 2.5),
+            pos=(screen_width / 2, screen_height * 0.9),
             text_input="HOME",
-            font=screen_font(30),
+            font=screen_font(35),
             base_colour="White",
             hovering_colour="Light Green",
             image=None,
