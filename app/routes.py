@@ -111,10 +111,17 @@ def logout():
         return jsonify({"message": f"User {username} logged out"}), 200
     return jsonify({"error": "User not found"}), 404
 
-# Route for a basic test
-@main.route('/')
-def hello():
-    return 'Hello, World!'
+# Routes for server interop
+# Route for game termination
+@main.route("/terminate", methods=['POST'])
+# expects a JSON of the usernames and their game info to update user and stats db
+# can also update cache or do it in a separate route
+ 
+# Route for fetching/updating from db
+
+# Route for fetching/updating from cache
+
+# All routes will return JSON responses and a confirmation status code
 
 # Custom error handlers
 @main.errorhandler(404)
