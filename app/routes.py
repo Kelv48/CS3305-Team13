@@ -63,8 +63,32 @@ def create_user():
     except Exception as e:
         return jsonify({"error": f"Error creating user: {str(e)}"}), 500
 
+# ROute for getting user stats
+@main.route("/stats", methods=['POST'])
+def get_stats():
+    data = request.json
+    username = data.get('username')
+    if not username:
+        return jsonify({'error': 'Please provide a username'}), 400
+    user = User.query.filter_by(name=username).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    stats = Stats.query.filter_by(user_id=user.id).first()
+    if not stats:
+        return jsonify({'error': 'Stats not found'}), 404
+    stats_data = {
+        "username" : user.name,
+        "user_id" :user.id,
+        "win_count" : stats.win_count,
+        "loss_count" : stats.loss_count,
+        "earnings" : stats.earnings,
+        "wallet" : user.wallet
+    }
+
+    return jsonify(stats_data), 200
+
 # Route for fetching the leaderboard
-@main.route("/leaderboard", methods=['GET'])
+@main.route("/leaderboard", methods=['POST'])
 def leaderboard():
     leaderboard_data = get_or_update_leaderboard()  # Call the function from cache to get the leaderboard
 

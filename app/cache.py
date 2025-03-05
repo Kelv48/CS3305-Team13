@@ -41,7 +41,7 @@ def get_or_update_leaderboard():
         stats_data = Stats.query.order_by(Stats.earnings.desc()).all()
 
         leaderboard_list = []
-        last_earnings = None
+        last_earnings = 2000
         rank = 1
 
         # Process each player in stats_data and create leaderboard entries
@@ -80,7 +80,7 @@ def get_or_update_leaderboard():
         db.session.commit()
 
         # Store the updated leaderboard in Redis with a 1-hour expiry
-        redis_client.setex("leaderboard", 3600, json.dumps(leaderboard_list))
+        redis_client.setex("leaderboard", 300, json.dumps(leaderboard_list))
 
         return leaderboard_list
 
