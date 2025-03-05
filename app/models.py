@@ -6,6 +6,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
+    wallet = db.Column(db.Integer, default=1000, nullable=False)
 
     # Relationships
     stats = db.relationship('Stats', backref='user', lazy=True)

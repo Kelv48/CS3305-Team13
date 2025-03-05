@@ -87,10 +87,7 @@ def logout():
         return jsonify({"message": f"User {username} logged out"}), 200
     return jsonify({"error": "User not found"}), 404
 
-# Route for a basic test
-@main.route('/')
-def hello():
-    return 'Hello, World!'
+
 
 # Custom error handlers
 @main.errorhandler(404)
