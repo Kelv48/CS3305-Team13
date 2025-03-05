@@ -28,8 +28,14 @@ def render_screen(title, username, password, active_input, button_actions, messa
     title_rect = title_text.get_rect(center=(screen_width / 2, screen_height / 9))
     SCREEN.blit(title_text, title_rect)
 
+    # Display message if any
+    if message:
+        message_text = screen_font(25).render(message, True, "Red")
+        message_rect = message_text.get_rect(center=(screen_width / 2, screen_height / 1.95))
+        SCREEN.blit(message_text, message_rect)
+
     username_box = pygame.Rect(screen_width / 2 - 100, screen_height / 4, 200, 40)
-    password_box = pygame.Rect(screen_width / 2 - 100, screen_height / 2.5, 200, 40)
+    password_box = pygame.Rect(screen_width / 2 - 100, screen_height / 2.7, 200, 40)
 
     username_colour = "Green" if active_input == "username" else "White"
     password_colour = "Green" if active_input == "password" else "White"
@@ -73,7 +79,7 @@ def render_screen(title, username, password, active_input, button_actions, messa
     button_spacing_factor = 2
 
     for index, (text, action) in enumerate(button_actions):
-        button_y = (index + 4) * (screen_height / (len(button_actions) * button_spacing_factor + 2))
+        button_y = (index + 3.2) * (screen_height / (len(button_actions) * button_spacing_factor + 0.8))
         
         button = Button(
             pos=(screen_width / 2, button_y), 
@@ -119,7 +125,7 @@ def register(mainMenu):
                         elif action == login:
                             login(mainMenu)
                         elif action == registerUser:  # Check for Enter button action
-                            registerUser(username, password)
+                            message = registerUser(username, password)
                 if username_box.collidepoint(REGISTER_MOUSE_POS):
                     active_input = "username"
                 elif password_box.collidepoint(REGISTER_MOUSE_POS):
@@ -149,9 +155,9 @@ def registerUser(username, password):
     response = requests.post(url, data=json.dumps(payload), headers=headers)
 
     if response.status_code == 201:
-        print(f"User {username} registered successfully!")
+        return f"User {username} registered successfully!"
     else:
-        print(f"Failed to register: {response.json()}")
+        return f"Failed to register"
 
 # Login Functionality
 def login(mainMenu):
@@ -188,7 +194,7 @@ def login(mainMenu):
                         elif action == register:
                             register(mainMenu)
                         elif action == loginUser:
-                            loginUser(username, password)
+                            message = loginUser(username, password)
                         elif action == logout:
                             logout(mainMenu)
                 if username_box.collidepoint(LOGIN_MOUSE_POS):
@@ -221,11 +227,11 @@ def loginUser(username, password):
         userdata = response.json()
         if userdata["password"] == password:
             save_user(username, password)
-            print(f"User {username} logged in successfully!")
+            return f"User {username} logged in successfully!"
         else:
-            print("Incorrect password!")
+            return "Incorrect password!"
     else:
-        print(f"Failed to login: {response.json()}")
+        return f"Failed to login"
 
 def logout(mainMenu):
     username = load_user()

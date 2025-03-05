@@ -207,8 +207,8 @@ def sound(mainMenu):
         sfx_volume_slider.rect.y = SOUND_height / 2
 
         # Render slider labels
-        music_label = screen_font(30).render("Music Volume", True, "White")
-        sfx_label = screen_font(30).render("Sound Effects Volume", True, "White")
+        music_label = screen_font(30).render("MUSIC VOLUME", True, "White")
+        sfx_label = screen_font(30).render("SOUND EFFECTS VOLUME", True, "White")
         music_label_rect = music_label.get_rect(center=(SOUND_width / 3, music_volume_slider.rect.y - 20))
         sfx_label_rect = sfx_label.get_rect(center=(SOUND_width / 3, sfx_volume_slider.rect.y - 20))
         SCREEN.blit(music_label, music_label_rect)

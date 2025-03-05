@@ -7,18 +7,19 @@ from pygame_gui.elements import UITextBox
 from pygame_gui.core import ObjectID
 
 from src.gui.utils.button import Button
-from src.gui.utils.constants import BG, screen_font, SCREEN as INITIAL_SCREEN, scaled_cursor
+from src.gui.utils.constants import BG, screen_font, SCREEN as INITIAL_SCREEN, scaled_cursor, FPS
 
 
-def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, intermediate_callback, advanced_callback):
+def run_guide_screen(title, guide_text, main_menu_callback, hand_ranking_callback, how_to_play_poker_callback):
 
     screen = INITIAL_SCREEN
-    pygame.display.set_caption(title)
+
 
     # Absolute path for the theme file
-    manager = pygame_gui.UIManager(screen.get_size(), 'assets/embedded_images_theme.json')
+    manager = pygame_gui.UIManager(screen.get_size(), 'json/embedded_images_theme.json')
 
     clock = pygame.time.Clock()
+    clock.tick(FPS)
     is_running = True
 
     def create_text_box():
@@ -43,34 +44,27 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
             hovering_colour="Light Green",
             image=None)
 
-        beginner_button = Button(
+        how_to_play_poker_button = Button(
             pos=(sw * 0.4, y_pos),
-            text_input="BEGINNER",
+            text_input="HOW TO PLAY POKER",
             font=screen_font(30),
             base_colour="White",
             hovering_colour="Light Green",
             image=None)
 
-        intermediate_button = Button(
+        hand_ranking_button = Button(
             pos=(sw * 0.6, y_pos),
-            text_input="INTERMEDIATE",
+            text_input="HAND RANKING",
             font=screen_font(30),
             base_colour="White",
             hovering_colour="Light Green",
             image=None)
 
-        advanced_button = Button(
-            pos=(sw * 0.8, y_pos),
-            text_input="ADVANCED",
-            font=screen_font(30),
-            base_colour="White",
-            hovering_colour="Light Green",
-            image=None)
-
-        return back_button, beginner_button, intermediate_button, advanced_button
+        
+        return back_button, how_to_play_poker_button, hand_ranking_button
 
     text_box = create_text_box()
-    back_button, beginner_button, intermediate_button, advanced_button = create_buttons()
+    back_button, how_to_play_poker_button, hand_ranking_button = create_buttons()
 
     while is_running:
         sw, sh = screen.get_size()
@@ -102,11 +96,10 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
 
         # Update button positions
         back_button.pos = (sw * 0.2, int(sh * 0.9))
-        beginner_button.pos = (sw * 0.4, int(sh * 0.9))
-        intermediate_button.pos = (sw * 0.6, int(sh * 0.9))
-        advanced_button.pos = (sw * 0.8, int(sh * 0.9))
+        how_to_play_poker_button.pos = (sw * 0.4, int(sh * 0.9))
+        hand_ranking_button.pos = (sw * 0.6, int(sh * 0.9))
 
-        for button in (back_button, beginner_button, intermediate_button, advanced_button):
+        for button in (back_button, how_to_play_poker_button, hand_ranking_button):
             button.changecolour(pygame.mouse.get_pos())
             button.update(screen)
 
@@ -122,22 +115,20 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
                 manager.set_window_resolution((event.w, event.h))
                 text_box.kill()
                 text_box = create_text_box()
-                back_button, beginner_button, intermediate_button, advanced_button = create_buttons()
+                back_button, how_to_play_poker_button, hand_ranking_button = create_buttons()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 if back_button.checkForInput(mouse_pos):
                     is_running = False
                     main_menu_callback()
-                elif beginner_button.checkForInput(mouse_pos):
+                elif hand_ranking_button.checkForInput(mouse_pos):
                     is_running = False
-                    beginner_callback()
-                elif intermediate_button.checkForInput(mouse_pos):
+                    hand_ranking_callback()
+                elif how_to_play_poker_button.checkForInput(mouse_pos):
                     is_running = False
-                    intermediate_callback()
-                elif advanced_button.checkForInput(mouse_pos):
-                    is_running = False
-                    advanced_callback()
+                    how_to_play_poker_callback()
+                
 
             manager.process_events(event)
 
@@ -151,17 +142,17 @@ def run_guide_screen(title, guide_text, main_menu_callback, beginner_callback, i
         pygame.display.update()
 
 
-def guide_beginner(main_menu):
+def hand_ranking(main_menu):
     # Beginner guide focuses on the fundamentals with 3 images:
-    beginner_text = (
+    hand_ranking_text = (
         '<font face="calibri_bold" size="3" color="#FFFFFF">'
-        '<h2>How to Play Poker – Beginner Guide</h2>'
-        '<img src="assets/images/BeginnerOverview.png" style="display:block; margin:0 auto 20px auto;" alt="Beginner Overview">'
+        '<h2>Hand Ranking – Beginner Guide</h2>'
+        #'<img src="assets/images/BeginnerOverview.png" style="display:block; margin:0 auto 20px auto;" alt="Beginner Overview">'
         '<p>Learning how to play poker can be quick, easy and fun. The objective of poker is to either create the highest-ranking hand or convince all other players to fold – thereby winning the pot.</p>'
         '<h3>Poker Rules for Beginners: Step-by-Step Guide</h3>'
         '<ol>'
         '<li><b>Shuffle:</b> The dealer shuffles the deck well between every hand. In Texas Hold’em, each player is dealt two hole cards (or more in other variants).'
-        '<img src="assets/images/ShuffleCards.png" style="float:left; padding:5px 10px 5px 5px; margin-right:10px;" alt="Shuffle Cards">'
+        #'<img src="assets/images/ShuffleCards.png" style="float:left; padding:5px 10px 5px 5px; margin-right:10px;" alt="Shuffle Cards">'
         '</li>'
         '<li><b>Pre-Flop:</b> The initial betting round. Players have the option to call, raise, re-raise, or fold based on the potential of their starting hands.</li>'
         '<li><b>Flop:</b> Three community cards are revealed in the centre of the table. Players now start building their hands.</li>'
@@ -170,7 +161,7 @@ def guide_beginner(main_menu):
         '<li><b>Showdown:</b> All remaining players reveal their cards, and the best hand wins the pot.</li>'
         '</ol>'
         '<h3>Types of Plays and Bets</h3>'
-        '<img src="assets/images/PokerActions.png" style="float:right; padding:5px 10px 5px 5px; margin-left:10px;" alt="Poker Actions">'
+        #'<img src="assets/images/PokerActions.png" style="float:right; padding:5px 10px 5px 5px; margin-left:10px;" alt="Poker Actions">'
         '<p>Get familiar with the basic actions at the poker table:</p>'
         '<ul>'
         '<li><b>Check:</b> Passing the action without placing a bet.</li>'
@@ -184,24 +175,23 @@ def guide_beginner(main_menu):
         '</font>'
     )
     run_guide_screen(
-        title="Beginner Poker Guide",
-        guide_text=beginner_text,
+        title="Hand Ranking",
+        guide_text=hand_ranking_text,
         main_menu_callback=main_menu,
-        beginner_callback=lambda: guide_beginner(main_menu),
-        intermediate_callback=lambda: guide_intermediate(main_menu),
-        advanced_callback=lambda: guide_advanced(main_menu)
+        hand_ranking_callback=lambda: hand_ranking(main_menu),
+        how_to_play_poker_callback=lambda: how_to_play_poker(main_menu)
     )
 
 
-def guide_intermediate(main_menu):
+def how_to_play_poker(main_menu):
     # Intermediate guide with 3 images focusing on starting hands, pot equity, and matchups:
     intermediate_text = (
         '<font face="calibri_bold" size="3" color="#FFFFFF">'
         '<h2>How to Play Poker – Intermediate Guide</h2>'
-        '<img src="assets/images/IntermediateOverview.png" style="display:block; margin:0 auto 20px auto;" alt="Intermediate Overview">'
+        #'<img src="assets/images/IntermediateOverview.png" style="display:block; margin:0 auto 20px auto;" alt="Intermediate Overview">'
         '<p>After mastering the basics, it’s time to refine your game. In this section, we focus on understanding starting hands, calculating pot equity, and using statistics to improve your decision-making.</p>'
         '<h3>Starting Poker Hands</h3>'
-        '<img src="assets/images/StartingHands.png" style="float:left; padding:5px 10px 5px 5px; margin-right:10px;" alt="Starting Hands">'
+        #'<img src="assets/images/StartingHands.png" style="float:left; padding:5px 10px 5px 5px; margin-right:10px;" alt="Starting Hands">'
         '<p>There are many possible starting hand combinations. Some of the key rankings include:</p>'
         '<ul>'
         '<li><b>Royal Flush:</b> A, K, Q, J, 10 of the same suit – the best hand possible.</li>'
@@ -213,63 +203,17 @@ def guide_intermediate(main_menu):
         '<li><b>Three of a Kind, Two Pair, One Pair, and High Card</b> – in descending order of strength.</li>'
         '</ul>'
         '<h3>Playing Your Hands and Pot Equity</h3>'
-        '<img src="assets/images/PotEquity.png" style="float:right; padding:5px 10px 5px 5px; margin-left:10px;" alt="Pot Equity">'
+        #'<img src="assets/images/PotEquity.png" style="float:right; padding:5px 10px 5px 5px; margin-left:10px;" alt="Pot Equity">'
         '<p>Knowing when to play a hand is crucial. Calculate your poker equity – the percentage chance of winning the pot based on your hand and the community cards – to guide your decision to bet or fold.</p>'
         '<h3>Pre-Flop Matchups and Hand Improvements</h3>'
-        '<img src="assets/images/MatchupStats.png" style="display:block; margin:20px auto;" alt="Pre-Flop Matchups">'
+        #'<img src="assets/images/MatchupStats.png" style="display:block; margin:20px auto;" alt="Pre-Flop Matchups">'
         '<p>Learn about match-ups such as an overpair versus an underpair and understand the probability of flopping a set (three of a kind) or a full house. Such statistics are essential for determining whether to invest in a hand.</p>'
         '</font>'
     )
     run_guide_screen(
-        title="Intermediate Poker Guide",
+        title="How to Play Poker",
         guide_text=intermediate_text,
         main_menu_callback=main_menu,
-        beginner_callback=lambda: guide_beginner(main_menu),
-        intermediate_callback=lambda: guide_intermediate(main_menu),
-        advanced_callback=lambda: guide_advanced(main_menu)
-    )
-
-
-def guide_advanced(main_menu):
-    # Advanced guide with 4 images on betting strategies, bluffing, and tips:
-    advanced_text = (
-        '<font face="calibri_bold" size="3" color="#FFFFFF">'
-        '<h2>How to Play Poker – Advanced Guide</h2>'
-        '<img src="assets/images/AdvancedOverview.png" style="display:block; margin:0 auto 20px auto;" alt="Advanced Overview">'
-        '<p>For the experienced player, advanced strategies can make all the difference. This section covers sophisticated betting techniques, bluffing, and adjustments for different poker variations.</p>'
-        '<h3>Advanced Betting Strategies</h3>'
-        '<img src="assets/images/BettingStrategies.png" style="float:left; padding:5px 10px 5px 5px; margin-right:10px;" alt="Betting Strategies">'
-        '<p>Improve your game with techniques such as:</p>'
-        '<ul>'
-        '<li><b>Raising:</b> Increasing the pot size to put pressure on opponents.</li>'
-        '<li><b>Check-Raising:</b> Initially checking then raising after an opponent bets, maximizing value when holding a strong hand.</li>'
-        '<li><b>Slow Playing:</b> Playing a strong hand deceptively to encourage opponents to commit more chips.</li>'
-        '<li><b>Exploitative Betting:</b> Adjusting your strategy to capitalize on predictable patterns in your opponents’ play.</li>'
-        '</ul>'
-        '<h3>Bluffing Techniques</h3>'
-        '<img src="assets/images/BluffingTechniques.png" style="float:right; padding:5px 10px 5px 5px; margin-left:10px;" alt="Bluffing Techniques">'
-        '<p>Bluffing is about making bets that force your opponents to fold superior hands. Consider semi-bluffing (betting on a draw) when you have potential to improve your hand.</p>'
-        '<h3>Top 10 Poker Tips</h3>'
-        '<img src="assets/images/PokerTips.png" style="display:block; margin:20px auto;" alt="Poker Tips">'
-        '<ol>'
-        '<li>Research and learn the game before playing for money.</li>'
-        '<li>Practice with free games to build your skills.</li>'
-        '<li>Observe your opponents and note their tendencies.</li>'
-        '<li>Keep your table image unpredictable.</li>'
-        '<li>Memorize hand rankings and stick to your strategy.</li>'
-        '<li>Manage your bankroll carefully.</li>'
-        '<li>Don’t overcommit to a weak hand.</li>'
-        '<li>Extract maximum value from strong hands.</li>'
-        '<li>Play fewer hands but play them aggressively.</li>'
-        '<li>Remember: Poker should be fun. Stay calm and focused.</li>'
-        '</ol>'
-        '</font>'
-    )
-    run_guide_screen(
-        title="Advanced Poker Guide",
-        guide_text=advanced_text,
-        main_menu_callback=main_menu,
-        beginner_callback=lambda: guide_beginner(main_menu),
-        intermediate_callback=lambda: guide_intermediate(main_menu),
-        advanced_callback=lambda: guide_advanced(main_menu)
+        hand_ranking_callback=lambda: hand_ranking(main_menu),
+        how_to_play_poker_callback=lambda: how_to_play_poker(main_menu)
     )
