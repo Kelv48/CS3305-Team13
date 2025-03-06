@@ -7,7 +7,7 @@ import logging
 import threading
 #from game import game_class    #There are import errors in this module need to make stuff a package 
 from string import Template
-from protocol import Protocols
+from matchmaking.protocol import Protocols
 from websockets.exceptions import ConnectionClosedError, ConnectionClosed
 from websockets.asyncio.server import serve, ServerConnection
 
@@ -26,8 +26,8 @@ When a client leaves what needs to happen?
 '''
 
 #Server setup
-host = "localhost"
-port = 443
+host = "0.0.0.0"
+port = 8001
 activeSessions = {}                                             #Key:pair Game ID → set of connected clients
 template = Template('{"m_type": "$m_type", "data": "$data"}')   #This is a template for message to be sent to clients
 

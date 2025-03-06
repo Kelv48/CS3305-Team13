@@ -18,7 +18,7 @@ import logging
 from string import Template
 from json import JSONDecodeError
 from random import randint, randbytes
-from protocol import Protocols
+from matchmaking.protocol import Protocols
 from websockets.exceptions import ConnectionClosed, ConnectionClosedError, ConnectionClosedOK
 from  websockets.asyncio.server import serve, ServerConnection
 
@@ -29,8 +29,8 @@ class SetEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 # Server attributes
-host ="localhost"
-port = 80
+host ="0.0.0.0"
+port = 8000
 template = Template('{"m_type": "$m_type", "data": $data}')   #This is a template for message to be sent to clients
 activeSessions = {}  
 
@@ -162,7 +162,7 @@ async def leaveGame(websocket: ServerConnection, sessionID, redirect=False):
         
         #If lobby isn't being redirected then update other clients in the lobby
         if not redirect:
-            message = template.substitute(m_type=Protocols.Response.LOBBY_UPDATE, data=activeSessions[sessionID])
+            message = template.substitute(m_type=Protocols.Response.LOBBY_UPDATE, data=activeSessions[sessionID]['numPlayer'])
             logger.info(f"broadcasting {websocket.remote_address} has left game")
             #Broadcasting new player count in lobby to other clients 
             for serverConnection in  activeSessions[sessionID]['clients']:

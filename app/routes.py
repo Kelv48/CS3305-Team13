@@ -121,7 +121,8 @@ def update():
 
     if not game_id or not num_players:
         return jsonify({"error": "Please provide both game_id and num_players"}), 400
-
+    
+    #   write a function to update the game info
     # Update the game info in the cache or DB
     # Check if the game exists in the cache or DB
     # If it does, update the game info
