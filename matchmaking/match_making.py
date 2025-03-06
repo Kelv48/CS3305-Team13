@@ -18,7 +18,7 @@ import logging
 from string import Template
 from json import JSONDecodeError
 from random import randint, randbytes
-from matchmaking.protocol import Protocols
+from protocol import Protocols
 from websockets.exceptions import ConnectionClosed, ConnectionClosedError, ConnectionClosedOK
 from  websockets.asyncio.server import serve, ServerConnection
 
@@ -91,7 +91,7 @@ async def joinGame(websocket: ServerConnection, sessionID, userID):
             await websocket.send(error_message.encode())
 
     except KeyError as e:
-        error_message = template.substitute(m_type=Protocols.Response.ERROR, data="The game that you are trying to join does not exist")
+        error_message = template.substitute(m_type=Protocols.Response.ERROR, data=json.dumps("The game that you are trying to join does not exist"))
         await websocket.send(error_message.encode())
 
     except ConnectionClosed as e:
@@ -112,11 +112,11 @@ async def voteStart(websocket: ServerConnection, sessionID):
         logger.debug("Broadcasting vote to start game")  
         message = template.substitute(m_type=Protocols.Response.FORCE_START, data=len(activeSessions[sessionID]['forceStart']))
         for serverConnection in activeSessions[sessionID]['clients']:
-            if serverConnection != websocket:
+            #if serverConnection != websocket:
                 await serverConnection.send(message)
 
     except KeyError as e:
-        error_message = template.substitute(m_type=Protocols.Response.ERROR, data="The game that you are trying to vote does not exist")
+        error_message = template.substitute(m_type=Protocols.Response.ERROR, data=json.dumps("The game that you are trying to join does not exist"))
         await websocket.send(error_message)
 
     except ConnectionClosed as e:
@@ -127,7 +127,7 @@ async def redirect(sessionID):
     gameObj = None
 
     #Redirect each client in lobby to game server 
-    redirectMessage = json.dumps({"m_type": Protocols.Response.REDIRECT, "data": {"host": "84.8.144.77", "port": 8001}})
+    redirectMessage = json.dumps({"m_type": Protocols.Response.REDIRECT, "data": {"host": "localhost", "port": 443}})
     for serverConnection in activeSessions[sessionID]['clients']:                
         await serverConnection.send(redirectMessage)
                 
@@ -168,7 +168,7 @@ async def leaveGame(websocket: ServerConnection, sessionID, redirect=False):
         logger.debug(f"active sessions left: {activeSessions}")
 
     except KeyError as e:
-        error_message = template.substitute(m_type=Protocols.Response.ERROR, data="The game that you are trying to leave does not exist")
+        error_message = template.substitute(m_type=Protocols.Response.ERROR, data=json.dumps("The game that you are trying to join does not exist"))
         await websocket.send(error_message)
 
     except ConnectionClosed as e:
