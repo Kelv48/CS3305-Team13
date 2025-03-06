@@ -156,7 +156,7 @@ async def leaveGame(websocket: ServerConnection, sessionID, redirect=False):
         
         #If lobby isn't being redirected then update other clients in the lobby
         if not redirect:
-            message = template.substitute(m_type=Protocols.Response.LOBBY_UPDATE, data=activeSessions[sessionID])
+            message = template.substitute(m_type=Protocols.Response.LOBBY_UPDATE, data=activeSessions[sessionID]['numPlayer'])
             logger.info(f"broadcasting {websocket.remote_address} has left game")
             #Broadcasting new player count in lobby to other clients 
             for serverConnection in  activeSessions[sessionID]['clients']:

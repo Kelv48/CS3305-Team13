@@ -112,10 +112,38 @@ def logout():
     return jsonify({"error": "User not found"}), 404
 
 # Routes for server interop
+@main.route("/update", methods=['POST'])
+# expects a game id and number of players
+def update():
+    data = request.json
+    game_id = data.get('game_id')
+    num_players = data.get('num_players')
+
+    if not game_id or not num_players:
+        return jsonify({"error": "Please provide both game_id and num_players"}), 400
+
+    # Update the game info in the cache or DB
+    # Check if the game exists in the cache or DB
+    # If it does, update the game info
+    # If it doesn't, return an error
+    return jsonify({"message": f"Game {game_id} updated successfully!"}), 200
+
 # Route for game termination
 @main.route("/terminate", methods=['POST'])
-# expects a JSON of the usernames and their game info to update user and stats db
-# can also update cache or do it in a separate route
+def terminate():
+    # deletes a game_id if it exists in the cache
+    data = request.json
+    game_id = data.get('game_id')
+
+    if not game_id:
+        return jsonify({"error": "Please provide a game_id"}), 400
+    else:
+        game_key = f"game:{game_id}"
+        if redis_client.exists(game_key):
+            redis_client.delete(game_key)
+            return jsonify({"message": f"Game {game_id} terminated successfully!"}), 200
+        return jsonify({"error": "Game not found"}), 404
+
  
 # Route for fetching/updating from db
 
