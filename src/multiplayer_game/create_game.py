@@ -3,6 +3,7 @@ from src.gui.utils.button import Button
 from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor, FPS
 import threading
 import json
+from src.multiplayer_game.game_menu import gameMenu
 from src.multiplayer_game.network.client.client import Client
 from src.multiplayer_game.network.server.protocol import Protocols
 from websockets.exceptions import ConnectionClosed
@@ -58,8 +59,18 @@ def create_game(mainMenu, c=None):
                             num_players = data.get("data")
                             print(f"Number of players updated: {num_players}")
                 
-                # case Protocols.Response.REDIRECT:
-                #             client.redirect(msg['data']['host'], msg['data']['port'])
+                case Protocols.Response.REDIRECT:
+                             #Client is already connected 
+
+                             #Wait to receive list of clients 
+                             client_list = client.receive()
+                             #Set up client to run game_menu.py 
+                             client.set_main_menu(mainMenu)
+                             client.set_game_screen(lambda: gameMenu(mainMenu, client_list['data']))
+                             #pass the client list into game_menu
+                             client.run_game(3)
+
+                             pass
                 #             #Move to game screen
                 #             return  #Exit the thread
                 # case Protocols.Response.SESSION_ID:
