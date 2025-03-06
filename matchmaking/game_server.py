@@ -7,7 +7,7 @@ import logging
 import threading
 #from game import game_class    #There are import errors in this module need to make stuff a package 
 from string import Template
-from protocol import Protocols
+from matchmaking.protocol import Protocols
 from websockets.exceptions import ConnectionClosedError, ConnectionClosed
 from websockets.asyncio.server import serve, ServerConnection
 
