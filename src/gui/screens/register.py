@@ -20,7 +20,7 @@ def render_screen(title, username, password, active_input, button_actions, messa
 
     textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
     pygame.draw.rect(
-        textbox_surface, (0, 0, 0, 100), (0, 0, textbox_width, textbox_height), border_radius=50
+        textbox_surface, (0, 0, 0, 150), (0, 0, textbox_width, textbox_height), border_radius=50
     )
     SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
     

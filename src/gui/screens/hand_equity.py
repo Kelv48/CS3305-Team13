@@ -135,7 +135,7 @@ def hand_equity_visualizer(mainMenu):
     textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
     pygame.draw.rect(
         textbox_surface,
-        (0, 0, 0, 100),  # black semi-transparent background
+        (0, 0, 0, 150),  # black semi-transparent background
         (0, 0, textbox_width, textbox_height),
         border_radius=50
     )
@@ -170,7 +170,7 @@ def hand_equity_visualizer(mainMenu):
     VERY_LIGHT_GREY = (240, 240, 240)
     PAIR_GREY = (200, 200, 200)
     SLIDER_TRACK_COLOUR = (180, 180, 180)
-    SLIDER_KNOB_COLOUR = (100, 100, 250)
+    SLIDER_KNOB_COLOUR = (255, 0, 0)
 
     # Ranks (index 0 = A, 1 = K, ..., 12 = 2)
     ranks = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"]
@@ -182,7 +182,7 @@ def hand_equity_visualizer(mainMenu):
     selected = [[False for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
 
     # We'll start the slider at 100% (select everything)
-    slider_value = 100.0
+    slider_value = 0
     slider_dragging = False
 
     # Container for the grid + slider

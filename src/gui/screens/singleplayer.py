@@ -32,7 +32,7 @@ def singlePlayer(mainMenu):
         # Adjust the border_radius (here, 20) to control the roundness of the corners.
         pygame.draw.rect(
             textbox_surface, 
-            (0, 0, 0, 100), 
+            (0, 0, 0, 150), 
             (0, 0, textbox_width, textbox_height), 
             border_radius=50
         )

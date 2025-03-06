@@ -4,7 +4,7 @@ from src.gui.utils.constants import game_font, scaled_cursor, GAME_BG
 
 import time
 import pygame
-from src.gui.utils.constants import SCREEN, BEIGE, GREEN
+from src.gui.utils.constants import SCREEN, BEIGE, GREEN, RED
 from src.singleplayer_game.game_gui.game_button import x_buttons, y_button, width_button
 from pygame_widgets.slider import Slider
 from pygame_widgets.textbox import TextBox
@@ -61,6 +61,15 @@ def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=Non
                             decision = [button.name, slider.getValue() + min_raise]
                         else:
                             decision = [button.name]
+                        # Display the decision on screen
+                        decision_text = f"You {decision[0]}"
+                        if decision[0] == 'raise':
+                            decision_text += f" ${decision[1]}"
+                        text_surface = font.render(decision_text, True, RED)
+                        text_pos = (580, 450)  # Position near the player's position
+                        SCREEN.blit(text_surface, text_pos)
+                        pygame.display.flip()
+                        pygame.time.delay(1000)  # Show the decision for 1 second
                         pause_action = False
                         break
 
@@ -428,6 +437,6 @@ def drawCustomCursor():
     so that it always appears on top.
     """
     from src.gui.utils.constants import SCREEN, scaled_cursor
-    # *** Draw the custom cursor last so it’s always on top ***
+    # *** Draw the custom cursor last so it's always on top ***
     current_mouse_pos = pygame.mouse.get_pos()
     SCREEN.blit(scaled_cursor, current_mouse_pos)
