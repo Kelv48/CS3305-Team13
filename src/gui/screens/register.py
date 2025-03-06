@@ -226,7 +226,8 @@ def loginUser(username, password):
     if response.status_code == 200:
         userdata = response.json()
         if userdata["password"] == password:
-            save_user(username, password)
+            wallet = userdata["wallet"]
+            save_user(username, wallet)
             return f"User {username} logged in successfully!"
         else:
             return "Incorrect password!"
@@ -270,10 +271,10 @@ def logout(mainMenu):
     mainMenu()
 
 # Temp functions
-def save_user(username, password):
+def save_user(username, wallet):
     # to be updated to store a hash when security is implemented in db/redis
     with open(LOCAL_FILE, 'w') as f:
-        json.dump({"username": username, "password": password}, f)
+        json.dump({"username": username, "wallet": wallet}, f)
 
 def load_user():
     try:
