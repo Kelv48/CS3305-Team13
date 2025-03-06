@@ -32,6 +32,7 @@ def join_game(mainMenu):
     
     # Text input variables
     input_text = ""
+    lobby_code = ""  # Variable to store the final lobby code
     input_active = False
     input_rect = None
     input_font = screen_font(30)
@@ -65,7 +66,7 @@ def join_game(mainMenu):
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
         
         # Calculate positions based on current screen size
-        LOBBY_TEXT = screen_font(50).render("Lobby", True, "Gold")
+        LOBBY_TEXT = screen_font(50).render("USER INFO", True, "Gold")
         LOBBY_RECT = LOBBY_TEXT.get_rect(center=(screen_width / 2, screen_height / 13))
         SCREEN.blit(LOBBY_TEXT, LOBBY_RECT)
 
@@ -247,8 +248,9 @@ def join_game(mainMenu):
             if event.type == pygame.KEYDOWN:
                 if input_active:
                     if event.key == pygame.K_RETURN:
-                        # Handle enter key - you can add specific logic here
-                        print(f"Entered lobby code: {input_text}")
+                        # Store the input text in lobby_code when Enter is pressed
+                        lobby_code = input_text
+                        print(f"Entered lobby code: {lobby_code}")
                     elif event.key == pygame.K_BACKSPACE:
                         input_text = input_text[:-1]
                     else:
