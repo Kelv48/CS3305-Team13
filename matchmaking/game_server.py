@@ -270,6 +270,9 @@ async def clientLeave(websocket: ServerConnection, userID, sessionID):
         redisClient.set(key, json.dumps(user))
 
         #Upload to earnings
+        #redisClient.set(f'earnings:{userID}', gameObj.getMoney(userID))
+        #request to update player stats in db
+        # response = 
 
         with lock:
             #removed closed client from session
