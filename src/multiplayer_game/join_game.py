@@ -1,4 +1,4 @@
-import pygame, sys
+import pygame, sys, json
 from src.gui.utils.button import Button
 from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor, FPS
 from src.multiplayer_game.create_game import create_game
@@ -25,8 +25,16 @@ DUMMY_LOBBIES = [
 
 def join_game(mainMenu):
     print("JOIN GAME SCREEN")
+
+    #Retrieving username form auth json file
+    with open('local.json', 'r') as f:
+        data = json.load(f)
+        username = data['username']
+
+    #Establish connection    
     c =  Client.connect("84.8.144.77", 8000)
     #c = Client.connect("localhost", 80)
+    c.setID(username)
 
     # #Thread config 
     # stop_thread = threading.Event() #Used to stop thread from calling itself
