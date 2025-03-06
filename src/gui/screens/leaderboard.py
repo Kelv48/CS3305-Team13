@@ -53,7 +53,7 @@ def leaderboard(mainMenu):
         column_spacing = 200
         start_x = textbox_x + 50
         start_y = textbox_y + 60
-        headers = ["Rank", "Username", "Wins", "Losses", "Earnings"]
+        headers = ["Rank", "Username", "Pot Wins", "Bailouts", "Earnings"]
         for i, header in enumerate(headers):
             header_surface = entry_font.render(header, True, "Gold")
             SCREEN.blit(header_surface, (start_x + i * column_spacing, start_y))
