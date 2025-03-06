@@ -2,8 +2,9 @@ from src.singleplayer_game.game_gui.player import Player
 from src.singleplayer_game.game_gui.game_button import buttons
 from src.singleplayer_game.bot import AI
 from src.singleplayer_game.game_gui.utils import playerDecision, arrangeRoom, drawPlayer
-from src.gui.utils.constants import BB
+from src.gui.utils.constants import BB, SCREEN, game_font, RED
 from src.singleplayer_game.bot import BettingRound
+import pygame
 
 
 def auction(common_cards=None):
@@ -88,7 +89,27 @@ def getPlayerDecision(player, options, min_raise, max_raise, common_cards, call_
         n_player_in_round = number_player - n_fold
         bot = AI(player.cards, options, call_value, min_raise, max_raise, pot, n_player_in_round, common_cards)
         decision = bot.decision(betting_round)
-        print(player.name, decision)
+        # Display AI decision on screen
+        decision_text = f"{player.name} {decision[0]}"
+        if decision[0] == 'raise':
+            decision_text += f" ${decision[1]}"
+        text_surface = game_font(20).render(decision_text, True, RED)
+        # Position the text near the player's position
+        if player == player_list[0]:
+            text_pos = (580, 450)  # Position for player 0
+        elif player == player_list[1]:
+            text_pos = (360, 400)  # Position for player 1
+        elif player == player_list[2]:
+            text_pos = (380, 300)  # Position for player 2
+        elif player == player_list[3]:
+            text_pos = (580, 280)  # Position for player 3
+        elif player == player_list[4]:
+            text_pos = (780, 300)  # Position for player 4
+        else:
+            text_pos = (800, 400)  # Position for player 5
+        SCREEN.blit(text_surface, text_pos)
+        pygame.display.flip()
+        pygame.time.delay(1000)  # Show the decision for 1 second
 
     # decision is expected to be a two-element sequence; extract chips if needed
     chips = int(decision[1]) if decision[0] == 'raise' else None
@@ -109,8 +130,6 @@ def processDecision(decision, chips, player, player_list):
         processAllIn(player, player_list)
     elif decision == 'raise':
         processRaise(player, chips, player_list)
-
-
 
 
 def processCall(player, player_list):
@@ -153,7 +172,6 @@ def resetAllDecisions(player_list):
     for p in player_list:
         if p.live and p.decision:
             p.decision = False
-
 
 
 def updateUI(common_cards):

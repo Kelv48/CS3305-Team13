@@ -90,7 +90,7 @@ def menuStart(mainMenu):
         textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
         pygame.draw.rect(
             textbox_surface, 
-            (0, 0, 0, 100), 
+            (0, 0, 0, 150), 
             (0, 0, textbox_width, textbox_height), 
             border_radius=50
         )
@@ -158,6 +158,23 @@ def menuEnd(mainMenu):
     win_text = font.render(f'{winner} won the game!', True, "White")
     SCREEN.blit(win_text, ((screen_width - win_text.get_width()) // 2, 100))
 
+
+    # Create a semi-transparent textbox with rounded edges
+    textbox_width = int(screen_width * 0.25)
+    textbox_height = int(screen_height * 0.7)
+    textbox_x = int((screen_width - textbox_width) / 2)
+    textbox_y = int(screen_height * 0.15)
+
+    textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
+    pygame.draw.rect(
+        textbox_surface, 
+        (0, 0, 0, 150), 
+        (0, 0, textbox_width, textbox_height), 
+        border_radius=50
+    )
+    SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
+
+    
     # Define buttons for "New Game" and "Exit"
     button_new_game = Button(
         pos=(screen_width / 2, 300),
