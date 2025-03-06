@@ -1,7 +1,7 @@
 import pygame, sys
-import threading
 from src.gui.utils.button import Button
 from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor, FPS
+from src.multiplayer_game.create_game import create_game
 from src.multiplayer_game.network.server.protocol import Protocols
 
 # #Temp import
@@ -25,7 +25,8 @@ DUMMY_LOBBIES = [
 
 def join_game(mainMenu):
     print("JOIN GAME SCREEN")
-    c = Client.connect("localhost", 80)
+    c =  Client.connect("84.8.144.77", 8000)
+    #c = Client.connect("localhost", 80)
 
     # #Thread config 
     # stop_thread = threading.Event() #Used to stop thread from calling itself
@@ -218,7 +219,8 @@ def join_game(mainMenu):
         # Define button labels and functions
         buttons = [
             ("LEAVE LOBBY", mainMenu),
-            ("JOIN GAME", lambda: print(f"Joining lobby: {input_text if input_text else DUMMY_LOBBIES[selected_lobby]['CODE']}") if selected_lobby is not None or input_text else None)
+            ("JOIN GAME", create_game)
+            #("JOIN GAME", lambda: print(f"Joining lobby: {input_text if input_text else DUMMY_LOBBIES[selected_lobby]['CODE']}") if selected_lobby is not None or input_text else None)
         ]
 
         # Calculate horizontal spacing for buttons
@@ -281,10 +283,21 @@ def join_game(mainMenu):
                         if action == sys.exit:
                             pygame.quit()
                             sys.exit()
-                        elif action == "start_game_early":
-                            print("Starting game early")
-                        elif action is not None:  # Only execute if action is not None
-                            #stop_thread.is_set()
+                        if button.text_input == "JOIN GAME":
+                            #Send what is in text box to server
+                            c.send(Protocols.Request.JOIN_GAME, input_text)
+                            #receive message to set client sessionID
+                            c.receive()
+                            #pass create_game(mainMenu, client) to client instance (please work)
+                            c.set_main_menu(mainMenu)
+                            c.set_create_game_screen(lambda: create_game(mainMenu, c))
+                            c.run_game(0)
+
+                            print("Joining game")
+                        # if action is not None:  # Only execute if action is not None
+                        #     #stop_thread.is_set()
+                        #     action()
+                        if action == mainMenu:
                             action()
 
             # Handle text input
@@ -299,7 +312,7 @@ def join_game(mainMenu):
                     else:
                         # Only allow alphanumeric characters
                         if event.unicode.isalnum() and len(input_text) < 6:
-                            input_text += event.unicode.upper()
+                            input_text += event.unicode
 
             # Handle mouse wheel scrolling
             if event.type == pygame.MOUSEWHEEL:

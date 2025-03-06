@@ -14,6 +14,8 @@ class Client:
         self.join_game_screen = None
         self.loading_screen = None
 
+        self.game_screen = None
+
     def set_loading_screen(self, action):
         self.loading_screen = action
 
@@ -32,6 +34,9 @@ class Client:
     def set_join_game_screen(self, action):
         self.join_game_screen = action
 
+    def set_game_screen(self, action):
+        self.game_screen = action
+
     def run_game(self, option):
         if option == 0:
             self.create_game_screen()
@@ -39,12 +44,14 @@ class Client:
             self.join_game_screen()
         if option == 2:
             self.loading_screen()
+        if option == 3:
+            self.game_screen()
 
 
-        msg = self.receive()
-        match msg['m_type']:
-            case Protocols.Response.START_GAME_EARLY_VOTE:
-                vote_start_count = int(msg['data'])
+        # der = self.receive()
+        # match der['m_type']:
+        #     case Protocols.Response.START_GAME_EARLY_VOTE:
+        #         vote_start_count = int(der['data'])
 
     @classmethod
     def connect(cls, host, port):
@@ -71,20 +78,15 @@ class Client:
     def receive(self):
         try:
             print(f"{self.id} is waiting for a message")
-            message = self.client.recv(10)
-            #print(f"{self.id} received message: {message}")
+            message = self.client.recv(timeout=10)
+            print(f"{self.id} received message: {message}")
             der = json.loads(message)
-            
             match der['m_type']:
                 case Protocols.Response.REDIRECT:
-                    self.redirect(der['data']['host'], der['data']['port'])
+                        self.redirect(der['data']['host'], der['data']['port'])
                 case Protocols.Response.SESSION_ID:
-                    self.setSessionID(der['data'])
-            
+                        self.setSessionID(der['data'])
             return der
-        except ConnectionClosed as e:
-            print("Client connection closed")
-
         #If no message is received within time-limit
         except TimeoutError as e:
             print("AAAAAA I'M FUCKING OFF RECEIVING THE MESSAGE ")
@@ -140,10 +142,18 @@ def test_remote():
     try:
         c1 = Client.connect("84.8.144.77", 8000)
         c1.setID("c1")
-        c1.send(Protocols.Request.CREATE_GAME, 3)
+        c1.send(Protocols.Request.JOIN_GAME, "WuA2fT")
         c1.receive()
+
+        while True:
+            if input("exit ") == "y":
+                break
+        
+        c1.send(Protocols.Request.LEAVE)
+        while True:
+            pass
     except KeyboardInterrupt:
         return
 
 if __name__ == '__main__':
-    test_local()
+    test_remote()

@@ -5,9 +5,9 @@ import threading
 import json
 from src.multiplayer_game.network.client.client import Client
 from src.multiplayer_game.network.server.protocol import Protocols
+from websockets.exceptions import ConnectionClosed
 
-def create_game(mainMenu):
-    
+def create_game(mainMenu, c=None):
     print("CREATE GAME SCREEN")
     global vote_start_count, num_players, listening
     vote_start_count = 0  # Default value
@@ -25,10 +25,13 @@ def create_game(mainMenu):
 
     # Connect to the server
 
-    #client =  Client.connect("84.8.144.77", 8000)
-    client = Client.connect('localhost', 80)
-    client.setID(username)  #sets clients username 
-
+    if not c:
+        client =  Client.connect("84.8.144.77", 8000)
+        #client = Client.connect('localhost', 80)
+        client.setID(username)  #sets clients username 
+        client.send(Protocols.Request.CREATE_GAME, 3)
+    else:
+         client = c
     
     def listener_thread():
         global vote_start_count, num_players
@@ -40,7 +43,10 @@ def create_game(mainMenu):
 
       
         #It is getting stuck here so it isn't properly exiting when application is closed 
-        msg = client.receive()
+        try:
+            msg = client.receive()
+        except ConnectionClosed as e:
+            print("Client connection closed")
         if msg:
             data = msg  # Assuming msg is already a dictionary
             match data['m_type']:
@@ -53,22 +59,23 @@ def create_game(mainMenu):
                             num_players = data.get("data")
                             print(f"Number of players updated: {num_players}")
                 
-                case Protocols.Response.REDIRECT:
-                            client.redirect(msg['data']['host'], msg['data']['port'])
-                case Protocols.Response.SESSION_ID:
-                        client.setSessionID(msg['data'])
+                # case Protocols.Response.REDIRECT:
+                #             client.redirect(msg['data']['host'], msg['data']['port'])
+                #             #Move to game screen
+                #             return  #Exit the thread
+                # case Protocols.Response.SESSION_ID:
+                #         client.setSessionID(msg['data'])
 
       
         # Schedule the function to run again in 1 second
         threading.Timer(5, listener_thread).start()
         print("AAAAAAAA calling thread function again")
-     
-
-    client.send(Protocols.Request.CREATE_GAME, 3)
     
+
     listener_thread()
     clock = pygame.Clock()
     while True:
+        #print("AAAAAA WHY AREN'T YOU RENDERING ;)")
         clock.tick(FPS)
         
         LOBBY_MOUSE_POS = pygame.mouse.get_pos()
