@@ -1,53 +1,76 @@
 import pygame, sys
 from src.gui.utils.button import Button
-from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor
-
+from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor, FPS
+import threading
 import json
-import asyncio
 from src.multiplayer_game.network.client.client import Client
 from src.multiplayer_game.network.server.protocol import Protocols
 
-# def create_game_async():
-#     print("CREATE GAME SCREEN")
-
-#     # Connect to the server
-#     client =  Client.connect("localhost", 80)
-#     client.send(Protocols.Request.CREATE_GAME, 3)
-
-#     msg =  client.receive()  # Get the vote count from the server
-#     vote_start_count = 0  # Default value
-#     print("AHAHAHHHAHAHA", type(msg), "||||", msg)
-#     if msg:
-#         print(msg)
-#         match msg['m_type']:
-#             case Protocols.Response.FORCE_START:
-#                 # vote_start_count = int(msg.get('data'))  # Ensure conversion to int
-#                 vote_start_count = msg.get('data')
-#                 print(f"Vote count: {vote_start_count}")
-
 def create_game(mainMenu):
+    
     print("CREATE GAME SCREEN")
-    #Retrieve username
+    global vote_start_count, num_players, listening
+    vote_start_count = 0  # Default value
+    num_players = 1       #Default value 
+
+    #Thread config 
+    stop_thread = threading.Event() #Used to stop thread from calling itself
+    lock = threading.Lock()         #Used to prevent race conditions/deadlocks
+
+
+    #Retrieve username from login file
     with open('local.json', 'r') as f:
         data = json.load(f)
         username = data['username']
+
     # Connect to the server
-    client =  Client.connect("localhost", 80)
-    client.setID(username)
+
+    #client =  Client.connect("84.8.144.77", 8000)
+    client = Client.connect('localhost', 80)
+    client.setID(username)  #sets clients username 
+
+    
+    def listener_thread():
+        global vote_start_count, num_players
+        
+        #If it is set the escape the threaded method
+        if stop_thread.is_set():
+            print("AAAAAA Thread is stopped")
+            return
+
+      
+        #It is getting stuck here so it isn't properly exiting when application is closed 
+        msg = client.receive()
+        if msg:
+            data = msg  # Assuming msg is already a dictionary
+            match data['m_type']:
+                case Protocols.Response.FORCE_START:
+                    with lock:
+                            vote_start_count = data['data']
+                            print(f"Vote count updated: {vote_start_count}")
+                case Protocols.Response.LOBBY_UPDATE:
+                        with lock:
+                            num_players = data.get("data")
+                            print(f"Number of players updated: {num_players}")
+                
+                case Protocols.Response.REDIRECT:
+                            client.redirect(msg['data']['host'], msg['data']['port'])
+                case Protocols.Response.SESSION_ID:
+                        client.setSessionID(msg['data'])
+
+      
+        # Schedule the function to run again in 1 second
+        threading.Timer(5, listener_thread).start()
+        print("AAAAAAAA calling thread function again")
+     
+
     client.send(Protocols.Request.CREATE_GAME, 3)
-
-    msg =  client.receive()  # Get the vote count from the server
-    vote_start_count = 0  # Default value
-    print("AHAHAHHHAHAHA", type(msg), "||||", msg)
-    if msg:
-        print(msg)
-        match msg['m_type']:
-            case Protocols.Response.FORCE_START:
-                # vote_start_count = int(msg.get('data'))  # Ensure conversion to int
-                vote_start_count = msg.get('data')
-                print(f"Vote count: {vote_start_count}")
-
+    
+    listener_thread()
+    clock = pygame.Clock()
     while True:
+        clock.tick(FPS)
+        
         LOBBY_MOUSE_POS = pygame.mouse.get_pos()
 
         # Calculate positions based on current screen size    # Scale the background to fit the screen
@@ -89,16 +112,15 @@ def create_game(mainMenu):
         SCREEN.blit(GAME_CODE_TEXT, GAME_CODE_RECT)
 
         # Display game code
-        game_code = "ABC123"  # placeholder game code
+        game_code = client.getSessionID()  # placeholder game code
         code_text = screen_font(40).render(game_code, True, "White")
         code_rect = code_text.get_rect(center=(screen_width / 2, screen_height / 2.5))
         SCREEN.blit(code_text, code_rect)
 
         # Display start game votes on the left and number of players on the right (both out of 6 max)
-        start_votes = 2  # placeholder for current vote count
-        num_players = 4  # placeholder for current number of players
-        
-        votes_text = screen_font(30).render(f"Votes: {start_votes}/6", True, "Gold")
+
+       #with lock:
+        votes_text = screen_font(30).render(f"Votes: {vote_start_count}/6", True, "Gold")
         players_text = screen_font(30).render(f"Players: {num_players}/6", True, "Gold")
         votes_rect = votes_text.get_rect(midleft=(200, screen_height / 2))
         players_rect = players_text.get_rect(midright=(screen_width - 200, screen_height / 2))
@@ -140,18 +162,37 @@ def create_game(mainMenu):
                 for button, action in button_objects:
                     if button.checkForInput(LOBBY_MOUSE_POS):
                         if action == sys.exit:
+                            stop_thread.set()
                             pygame.quit()
                             sys.exit()
                         elif action == "start_game_early":
                             print("Starting game early")
                             client.send(Protocols.Request.START_GAME_EARLY_VOTE) # Send the vote to the server
-
-                            #print(data)
+                        
                         else:
+                            client.disconnect()
+                            stop_thread.set()
                             action()
+
+        # readable, _, _ = select.select([client.client.socket], [], [], 0.1)
+        # print(client.client.socket)
+        # # for s in readable:
+        # #     if s == client.websocket:
+        # if  not readable:
+        #         print("AAAAAAAAA MESSAGE ME")
+        #         msg = client.receive(5)  # Receive message from WebSocket
+        #         if msg:
+        #             msg_data = json.loads(msg)
+        #             match msg_data.get('type'):
+        #                 case 'FORCE_START':
+        #                     vote_start_count = msg_data.get('data')
+        #                     print(f"Vote count: {vote_start_count}")
+        #                 case 'UPDATE_PLAYERS':
+        #                     num_players = msg_data.get('data', 0)
+        #                     print(f"Number of players: {num_players}")
 
         # Draw the scaled cursor image at the mouse position
         SCREEN.blit(scaled_cursor, (LOBBY_MOUSE_POS[0], LOBBY_MOUSE_POS[1]))
-
+    
         # Update the display
         pygame.display.update()
