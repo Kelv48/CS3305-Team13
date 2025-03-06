@@ -18,7 +18,7 @@ DUMMY_LOBBIES = [
 
 def join_game(mainMenu):
     print("JOIN GAME SCREEN")
-    c = asyncio.run(Client.connect("localhost", 80))
+    c = Client.connect("localhost", 80)
 
     while True:
         LOBBY_MOUSE_POS = pygame.mouse.get_pos()
