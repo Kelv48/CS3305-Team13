@@ -1,7 +1,8 @@
 import pygame, sys
-import asyncio
+import threading
 from src.gui.utils.button import Button
-from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor
+from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor, FPS
+from src.multiplayer_game.network.server.protocol import Protocols
 
 # #Temp import
 # from src.gui.screens.main_menu import mainMenu
@@ -19,9 +20,49 @@ DUMMY_LOBBIES = [
 def join_game(mainMenu):
     print("JOIN GAME SCREEN")
     c = Client.connect("localhost", 80)
-    selected_lobby = None
 
+    #Thread config 
+    stop_thread = threading.Event() #Used to stop thread from calling itself
+    lock = threading.Lock()         #Used to prevent race conditions/deadlocks
+    def listener_thread():
+        global vote_start_count, num_players
+        
+        #If it is set the escape the threaded method
+        if stop_thread.is_set():
+            print("AAAAAA Thread is stopped")
+            return
+
+      
+        #It is getting stuck here so it isn't properly exiting when application is closed 
+        msg = c.receive()
+        if msg:
+            data = msg  # Assuming msg is already a dictionary
+            match data['m_type']:
+                case Protocols.Response.FORCE_START:
+                    with lock:
+                            vote_start_count = data['data']
+                            print(f"Vote count updated: {vote_start_count}")
+                case Protocols.Response.LOBBY_UPDATE:
+                        with lock:
+                            num_players = data.get("data")
+                            print(f"Number of players updated: {num_players}")
+                
+                case Protocols.Response.REDIRECT:
+                            c.redirect(msg['data']['host'], msg['data']['port'])
+                            return  #Exit the thread
+                case Protocols.Response.SESSION_ID:
+                        c.setSessionID(msg['data'])
+
+      
+        # Schedule the function to run again in 1 second
+        threading.Timer(5, listener_thread).start()
+        print("AAAAAAAA calling thread function again")
+
+    listener_thread()
+    clock = pygame.Clock()
+    selected_lobby = None
     while True:
+        clock.tick(FPS)
         LOBBY_MOUSE_POS = pygame.mouse.get_pos()
 
         # Calculate positions based on current screen size    # Scale the background to fit the screen
@@ -155,6 +196,7 @@ def join_game(mainMenu):
                         elif action == "start_game_early":
                             print("Starting game early")
                         elif action is not None:  # Only execute if action is not None
+                            stop_thread.is_set()
                             action()
 
         # Draw the scaled cursor image at the mouse position
