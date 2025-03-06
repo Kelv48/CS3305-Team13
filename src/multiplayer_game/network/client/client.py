@@ -50,6 +50,7 @@ class Client:
     def connect(cls, host, port):
         try:
             websocket = connect(f"ws://{host}:{port}")
+
             return cls(websocket)
         except InvalidURI as e:
             print(e)
@@ -70,8 +71,8 @@ class Client:
     def receive(self):
         try:
             print(f"{self.id} is waiting for a message")
-            message = self.client.recv()
-            print(f"{self.id} received message: {message}")
+            message = self.client.recv(10)
+            #print(f"{self.id} received message: {message}")
             der = json.loads(message)
             
             match der['m_type']:
@@ -84,6 +85,11 @@ class Client:
         except ConnectionClosed as e:
             print("Client connection closed")
 
+        #If no message is received within time-limit
+        except TimeoutError as e:
+            print("AAAAAA I'M FUCKING OFF RECEIVING THE MESSAGE ")
+            return
+
     def redirect(self, host, port):
         self.disconnect()
         print("Client redirected")
@@ -91,10 +97,10 @@ class Client:
 
     def disconnect(self):
         self.client.send(Protocols.Request.LEAVE)
+        self.resetClient()
         self.client.close()
 
     def resetClient(self):
-        self.setID(None)
         self.setSessionID(None)
 
     def getSessionID(self):
