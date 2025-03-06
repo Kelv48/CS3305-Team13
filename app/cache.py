@@ -7,6 +7,17 @@ from .models import User
 
 redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
+def update_db(game_id):
+    cache_key = f'game:{game_id}'
+    cached_data = redis_client.get(cache_key)
+    if cached_data:
+        # for user in cached_data['players']:
+        # update their wallets
+        # update their stats
+        # return 0 for success
+        # return 1 for failure
+        pass
+
 def get_user_DBorCache(user_name):
     cache_key = f'user:{user_name}'
     cached_data = redis_client.get(cache_key)

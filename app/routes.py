@@ -1,7 +1,7 @@
 # app/routes.py
 from flask import Blueprint, request, jsonify, g
 from .models import User, Stats, Leaderboard
-from .cache import get_user_DBorCache, get_or_update_leaderboard
+from .cache import get_user_DBorCache, get_or_update_leaderboard, update_db 
 from . import db
 import json, redis, time
 
@@ -117,12 +117,15 @@ def logout():
 def update():
     data = request.json
     game_id = data.get('game_id')
-    num_players = data.get('num_players')
 
-    if not game_id or not num_players:
-        return jsonify({"error": "Please provide both game_id and num_players"}), 400
+    if not game_id:
+        return jsonify({"error": "Please provide game id"}), 400
+    response = update_db(game_id)
+    if response:
+        return jsonify(response), 200
+    return jsonify({"error": "Game not found"}), 404
     
-    #   write a function to update the game info
+    #write a function to update the game info
     # Update the game info in the cache or DB
     # Check if the game exists in the cache or DB
     # If it does, update the game info

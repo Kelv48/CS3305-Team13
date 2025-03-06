@@ -1,10 +1,11 @@
-#For testing run file in main.py
+# /matchmaking/game_server.py
 #TODO: Add locks to actions writing to activeSessions
 import json
 import redis
 import asyncio
 import logging
 import threading
+import requests
 #from game import game_class    #There are import errors in this module need to make stuff a package 
 from string import Template
 from matchmaking.protocol import Protocols
@@ -276,6 +277,10 @@ async def clientLeave(websocket: ServerConnection, userID, sessionID):
             activeSessions[sessionID]['clients'].pop(userID)
             logger.info(f"Current active sessions {activeSessions}")
             if len(activeSessions[sessionID]['clients']) == 0:    #Deletes session if no WebSockets are left
+                    
+                    # Send a request to the flask server to update the db
+                    response = requests.post('http://localhost:5000/update', json={'sessionID': sessionID})
+                    
                     del activeSessions[sessionID]
                     logger.info(f"session {sessionID} is deleted")
                     return
