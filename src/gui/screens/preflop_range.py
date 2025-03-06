@@ -67,7 +67,7 @@ def preflop_range_visualizer(mainMenu):
     textbox_x = (screen_width - textbox_width) // 2
     textbox_y = (screen_height - textbox_height) // 2
     textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
-    pygame.draw.rect(textbox_surface, (0, 0, 0, 100), (0, 0, textbox_width, textbox_height), border_radius=50)
+    pygame.draw.rect(textbox_surface, (0, 0, 0, 150), (0, 0, textbox_width, textbox_height), border_radius=50)
     
     # Header text.
     header_text = "PREFLOP RANGE"

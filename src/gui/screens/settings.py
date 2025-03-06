@@ -51,6 +51,8 @@ class Dropdown:
         self.initial_start_index = 0
 
     def draw(self, screen):
+        # Draw black outline for main dropdown box
+        pygame.draw.rect(screen, pygame.Color("Black"), self.rect.inflate(2, 2))
         # Draw the main dropdown box (always visible)
         pygame.draw.rect(screen, self.main_color, self.rect)
         selected_text = self.font.render(self.options[self.selected_index]["name"], True, self.text_color)
@@ -69,6 +71,8 @@ class Dropdown:
                     self.rect.width,
                     self.rect.height
                 )
+                # Draw black outline for each option
+                pygame.draw.rect(screen, pygame.Color("Black"), option_rect.inflate(2, 2))
                 # Change color on hover
                 if option_rect.collidepoint(pygame.mouse.get_pos()):
                     color = self.hover_color
@@ -134,8 +138,8 @@ class Dropdown:
         return self.options[self.selected_index]
 
 def settings(mainMenu):
-    music_volume = 0.5  # Default music volume
-    sfx_volume = 0.5    # Default sound effects volume
+    music_volume = 0  # Default music volume
+    sfx_volume = 0    # Default sound effects volume
     pygame.mixer.music.set_volume(music_volume)  # Set initial music volume
 
     music_volume_slider = Slider(pos=(0, 0), width=250)
@@ -166,7 +170,7 @@ def settings(mainMenu):
     dropdown_width = 250
     dropdown_height = 40
     # Position it below the sfx slider (adjust as needed)
-    dropdown_x = SCREEN.get_width() // 2 - dropdown_width // 18
+    dropdown_x = SCREEN.get_width() // 2 + dropdown_width // 4
     dropdown_y = SCREEN.get_height() / 2 - 190  
     song_dropdown = Dropdown(
         dropdown_x, dropdown_y, dropdown_width, dropdown_height,
@@ -194,23 +198,23 @@ def settings(mainMenu):
         textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
         pygame.draw.rect(
             textbox_surface, 
-            (0, 0, 0, 100), 
+            (0, 0, 0, 150), 
             (0, 0, textbox_width, textbox_height), 
             border_radius=50
         )
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
         # Center sliders
-        music_volume_slider.rect.x = SOUND_width / 3 - music_volume_slider.rect.width / 2
+        music_volume_slider.rect.x = SOUND_width / 2.8 - music_volume_slider.rect.width / 2
         music_volume_slider.rect.y = SOUND_height / 3.5
-        sfx_volume_slider.rect.x = SOUND_width / 3 - sfx_volume_slider.rect.width / 2
+        sfx_volume_slider.rect.x = SOUND_width / 2.8 - sfx_volume_slider.rect.width / 2
         sfx_volume_slider.rect.y = SOUND_height / 2
 
         # Render slider labels
         music_label = screen_font(30).render("MUSIC VOLUME", True, "White")
-        sfx_label = screen_font(30).render("SOUND EFFECTS VOLUME", True, "White")
-        music_label_rect = music_label.get_rect(center=(SOUND_width / 3, music_volume_slider.rect.y - 20))
-        sfx_label_rect = sfx_label.get_rect(center=(SOUND_width / 3, sfx_volume_slider.rect.y - 20))
+        sfx_label = screen_font(30).render("SFX VOLUME", True, "White")
+        music_label_rect = music_label.get_rect(center=(SOUND_width / 2.8, music_volume_slider.rect.y - 20))
+        sfx_label_rect = sfx_label.get_rect(center=(SOUND_width / 2.8, sfx_volume_slider.rect.y - 20))
         SCREEN.blit(music_label, music_label_rect)
         SCREEN.blit(sfx_label, sfx_label_rect)
 
@@ -219,8 +223,8 @@ def settings(mainMenu):
         sfx_percentage = f"{int(sfx_volume_slider.value * 100)}%"
         music_percentage_label = screen_font(30).render(music_percentage, True, "White")
         sfx_percentage_label = screen_font(30).render(sfx_percentage, True, "White")
-        music_percentage_rect = music_percentage_label.get_rect(center=(SOUND_width / 3, music_volume_slider.rect.y + 40))
-        sfx_percentage_rect = sfx_percentage_label.get_rect(center=(SOUND_width / 3, sfx_volume_slider.rect.y + 40))
+        music_percentage_rect = music_percentage_label.get_rect(center=(SOUND_width / 2.8, music_volume_slider.rect.y + 40))
+        sfx_percentage_rect = sfx_percentage_label.get_rect(center=(SOUND_width / 2.8, sfx_volume_slider.rect.y + 40))
         SCREEN.blit(music_percentage_label, music_percentage_rect)
         SCREEN.blit(sfx_percentage_label, sfx_percentage_rect)
 

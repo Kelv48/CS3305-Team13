@@ -31,10 +31,10 @@ def mainMenu():
         textbox_y = int(screen_height * 0.15)
 
         textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
-        pygame.draw.rect(textbox_surface, (0, 0, 0, 100), (0, 0, textbox_width, textbox_height), border_radius=50)
+        pygame.draw.rect(textbox_surface, (0, 0, 0, 150), (0, 0, textbox_width, textbox_height), border_radius=50)
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
 
-        MAIN_TEXT = screen_font(50).render("Gamblers Den", True, "Gold")
+        MAIN_TEXT = screen_font(50).render("GAMBLERS DEN", True, "Gold")
         MAIN_RECT = MAIN_TEXT.get_rect(center=(screen_width // 2, screen_height // 9))
         SCREEN.blit(MAIN_TEXT, MAIN_RECT)
 

@@ -83,7 +83,7 @@ def run_guide_screen(title, guide_text, main_menu_callback, hand_ranking_callbac
         # Draw a filled rounded rectangle on the textbox_surface.
         pygame.draw.rect(
             textbox_surface, 
-            (0, 0, 0, 100), 
+            (0, 0, 0, 150), 
             (0, 0, textbox_width, textbox_height), 
             border_radius=30
         )

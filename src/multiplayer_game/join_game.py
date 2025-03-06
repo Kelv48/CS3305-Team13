@@ -19,6 +19,7 @@ DUMMY_LOBBIES = [
 def join_game(mainMenu):
     print("JOIN GAME SCREEN")
     c = Client.connect("localhost", 80)
+    selected_lobby = None
 
     while True:
         LOBBY_MOUSE_POS = pygame.mouse.get_pos()
@@ -77,7 +78,12 @@ def join_game(mainMenu):
             
             # Create lobby entry background
             entry_surface = pygame.Surface((textbox_width - 100, lobby_height), pygame.SRCALPHA)
-            pygame.draw.rect(entry_surface, (255, 255, 255, 30), (0, 0, textbox_width - 100, lobby_height), border_radius=10)
+            
+            # Check if this lobby is selected
+            is_selected = selected_lobby == i
+            highlight_color = (0, 255, 0, 50) if is_selected else (255, 255, 255, 30)
+            
+            pygame.draw.rect(entry_surface, highlight_color, (0, 0, textbox_width - 100, lobby_height), border_radius=10)
             SCREEN.blit(entry_surface, (textbox_x + 50, lobby_y))
 
             # Lobby code
@@ -93,9 +99,17 @@ def join_game(mainMenu):
             status_text = lobby_font.render(lobby["status"], True, status_color)
             SCREEN.blit(status_text, (textbox_x + textbox_width - 150, lobby_y + 15))
 
+            # Check if mouse is over this lobby
+            lobby_rect = pygame.Rect(textbox_x + 50, lobby_y, textbox_width - 100, lobby_height)
+            if lobby_rect.collidepoint(LOBBY_MOUSE_POS):
+                pygame.draw.rect(entry_surface, (255, 255, 255, 70), (0, 0, textbox_width - 100, lobby_height), border_radius=10)
+                SCREEN.blit(entry_surface, (textbox_x + 50, lobby_y))
+
         # Define button labels and functions
         buttons = [
-            ("LEAVE LOBBY", mainMenu)]
+            ("LEAVE LOBBY", mainMenu),
+            ("JOIN GAME", lambda: print(f"Joining lobby: {DUMMY_LOBBIES[selected_lobby]['CODE']}") if selected_lobby is not None else None)
+        ]
 
         # Calculate horizontal spacing for buttons
         button_count = len(buttons)
@@ -110,20 +124,29 @@ def join_game(mainMenu):
                 pos=(button_x, fixed_y), 
                 text_input=text, 
                 font=screen_font(30), 
-                base_colour="White", 
-                hovering_colour="Light Green",
+                base_colour="White" if text != "JOIN GAME" or selected_lobby is not None else "Gray", 
+                hovering_colour="Light Green" if text != "JOIN GAME" or selected_lobby is not None else "Gray",
                 image=None)
 
             button.changecolour(LOBBY_MOUSE_POS)
             button.update(SCREEN)
             button_objects.append((button, action))
 
-        # Check for button clicks
+        # Check for button clicks and lobby selection
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
+                # Check for lobby selection
+                for i, lobby in enumerate(DUMMY_LOBBIES):
+                    lobby_y = start_y + (i * (lobby_height + spacing))
+                    lobby_rect = pygame.Rect(textbox_x + 50, lobby_y, textbox_width - 100, lobby_height)
+                    if lobby_rect.collidepoint(LOBBY_MOUSE_POS):
+                        selected_lobby = i
+                        break
+
+                # Check for button clicks
                 for button, action in button_objects:
                     if button.checkForInput(LOBBY_MOUSE_POS):
                         if action == sys.exit:
@@ -131,7 +154,7 @@ def join_game(mainMenu):
                             sys.exit()
                         elif action == "start_game_early":
                             print("Starting game early")
-                        else:
+                        elif action is not None:  # Only execute if action is not None
                             action()
 
         # Draw the scaled cursor image at the mouse position
