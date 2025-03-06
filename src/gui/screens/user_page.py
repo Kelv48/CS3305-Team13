@@ -53,17 +53,14 @@ def user_page(mainMenu):
         scaled_bg = pygame.transform.scale(BG, (screen_width, screen_height))
         SCREEN.blit(scaled_bg, (0, 0))
 
-        # Dynamic Header with Glow Effect (e.g., "Kelvin's Page")
-        header_text = screen_font(50).render(f"{username}'s Page", True, "Gold")
-        header_shadow = screen_font(50).render(f"{username}'s Page", True, (255, 215, 0, 100))
-        header_rect = header_text.get_rect(center=(screen_width / 2, screen_height * 0.15))
-        
-        SCREEN.blit(header_shadow, (header_rect.x + 2, header_rect.y + 2))  # Glow effect
-        SCREEN.blit(header_text, header_rect)
+        USER_TEXT = screen_font(50).render("USER INFO", True, "Gold")
+        USER_RECT = USER_TEXT.get_rect(center=(screen_width / 2, screen_height / 13))
+        SCREEN.blit(USER_TEXT, USER_RECT)
 
+     
         # User info container
-        box_width, box_height = int(screen_width * 0.8), int(screen_height * 0.6)
-        box_x, box_y = (screen_width - box_width) // 2, int(screen_height * 0.25)
+        box_width, box_height = int(screen_width * 0.8), int(screen_height * 0.8)
+        box_x, box_y = (screen_width - box_width) // 2, int(screen_height * 0.1)
         info_surface = pygame.Surface((box_width, box_height), pygame.SRCALPHA)
         pygame.draw.rect(info_surface, (0, 0, 0, 150), (0, 0, box_width, box_height), border_radius=30)
         SCREEN.blit(info_surface, (box_x, box_y))
@@ -93,7 +90,7 @@ def user_page(mainMenu):
 
         # "Back" Button with glowing effect
         USER_BACK = Button(
-            pos=(screen_width / 2, screen_height * 0.9),
+            pos=(screen_width / 2, screen_height * 0.8),
             text_input="HOME",
             font=screen_font(35),
             base_colour="White",

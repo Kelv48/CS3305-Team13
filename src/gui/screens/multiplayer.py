@@ -44,9 +44,9 @@ def multiPlayer(mainMenu):
 
         
         # Calculate positions based on current screen size
-        SINGLE_TEXT = screen_font(50).render("Poker", True, "Gold")
-        SINGLE_RECT = SINGLE_TEXT.get_rect(center=(screen_width / 2, screen_height / 9))
-        SCREEN.blit(SINGLE_TEXT, SINGLE_RECT)
+        MULTI_TEXT = screen_font(50).render("MULTIPLAYER", True, "Gold")
+        MULTI_RECT = MULTI_TEXT.get_rect(center=(screen_width / 2, screen_height / 9))
+        SCREEN.blit(MULTI_TEXT, MULTI_RECT)
 
         # Define button labels and functions
         buttons = [
@@ -57,7 +57,7 @@ def multiPlayer(mainMenu):
 
         # Calculate vertical spacing with closer spacing
         button_count = len(buttons)
-        button_height = screen_height / (button_count + 3) # Change number bigger to make the buttons closer
+        button_height = screen_height / (button_count + 2) # Change number bigger to make the buttons closer
 
         # Create and position buttons
         button_objects = []
