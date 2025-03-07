@@ -16,7 +16,8 @@ class Protocols:
         FORCE_START = 'protocol.forceStart'                        #Used to alert clients of a change in the force start vote
         LOBBY_UPDATE = 'protocol.lobbyUpdate'                      #Used to update client with new info about the amount of players in lobby
         ERROR = 'protocol.error'                                   #Used to tell client that an error has occurred 
-        PLAYER_ID = 'protocol.playerID'                            #Used to assign an id to client to track what player they are i.e. 1 → player 1
+        CLIENT_LIST = 'protocol.client_list'
+        # PLAYER_ID = 'protocol.playerID'                            #Used to assign an id to client to track what player they are i.e. 1 → player 1
 
 
 
@@ -29,8 +30,6 @@ class Protocols:
         CREATE_GAME = 'protocol.request_create_game'                    #Used by client to join a game
         JOIN_GAME = 'protocol.request_join_game'                        #Used by client to create a game 
         START_GAME_EARLY_VOTE = 'protocol.request_start_game_early'
-        # AUTHENTICATION = 'protocol.request_authentication'              #Used to request of auth when client logs in 
         CREATE_ACCOUNT = 'protocol.request_create_account'              #Used to create an account, which is stored in DB 
-        # LOGOUT = 'protocol.request_logout'                              #Used by client to log out
         LIST_OF_GAMES = 'protocol.request_list_of_games'                #Used to request for a list of games
         BAILOUT = 'protocol.request_bailout'                            #Used to request bailout
