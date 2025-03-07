@@ -62,7 +62,7 @@ def poker_round(multiplayer_list, client_param):
     # Use try...finally to ensure roles are rotated exactly once.
     try:
         # Pre-flop auction.
-        auction(None, multiplayer_list)
+        auction(None, multiplayer_list, client)
         if sum(p.live for p in player_list) + sum(p.alin for p in player_list) == 1:
             list_winner = onePlayerWin()
             recap_round(list_winner)
@@ -72,7 +72,7 @@ def poker_round(multiplayer_list, client_param):
         flop = random.sample(deck, 3)
         for card in flop:
             deck.remove(card)
-        auction(flop, multiplayer_list)
+        auction(flop, multiplayer_list, client)
         if sum(p.live for p in player_list) + sum(p.alin for p in player_list) == 1:
             list_winner = onePlayerWin()
             recap_round(list_winner)
@@ -82,7 +82,7 @@ def poker_round(multiplayer_list, client_param):
         turn = random.sample(deck, 1)
         deck.remove(turn[0])
         common_cards = flop + turn
-        auction(common_cards, multiplayer_list)
+        auction(common_cards, multiplayer_list, client)
         if sum(p.live for p in player_list) + sum(p.alin for p in player_list) == 1:
             list_winner = onePlayerWin()
             recap_round(list_winner)
@@ -92,7 +92,7 @@ def poker_round(multiplayer_list, client_param):
         river = random.sample(deck, 1)
         deck.remove(river[0])
         common_cards += river
-        auction(common_cards, multiplayer_list)
+        auction(common_cards, multiplayer_list, client)
         if sum(p.live for p in player_list) + sum(p.alin for p in player_list) == 1:
             list_winner = onePlayerWin()
             recap_round(list_winner)
