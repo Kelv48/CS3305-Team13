@@ -63,11 +63,10 @@ def create_game(mainMenu, c=None):
                 case Protocols.Response.CLIENT_LIST:
                             
                             client.set_main_menu(mainMenu)
-                            client.set_game_screen(lambda: gameMenu(mainMenu, msg['data'], client))
 
                     
                             client.receive()        #redirects client to game_server
-                            stop_thread.is_set()    #Stops the thread from being called again
+                            stop_thread.set()    #Stops the thread from being called again
                             client.run_game(3)      #Move to game screen
                 #             return  #Exit the thread
                 # case Protocols.Response.SESSION_ID:
