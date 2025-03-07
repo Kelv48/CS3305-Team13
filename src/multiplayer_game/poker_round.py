@@ -53,11 +53,15 @@ def poker_round(multiplayer_list, client_param):
         '2D', '3D', '4D', '5D', '6D', '7D', '8D', '9D', 'TD', 'JD', 'QD', 'KD', 'AD'
     ]
 
-    # Deal two cards to each player (screen positions remain unchanged).
-    for player in player_list_chair:
-        player.cards = random.sample(deck, 2)
-        for card in player.cards:
-            deck.remove(card)
+    if client.getSessionID() == multiplayer_list[0]:
+        # Deal two cards to each player (screen positions remain unchanged).
+        for player in player_list_chair:
+            player.cards = random.sample(deck, 2)
+            client.send(None, {'player':player})
+            for card in player.cards:
+                deck.remove(card)
+    else:
+        client.receive()
 
     # Use try...finally to ensure roles are rotated exactly once.
     try:
