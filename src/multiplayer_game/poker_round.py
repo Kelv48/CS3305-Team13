@@ -5,7 +5,7 @@ from src.multiplayer_game.poker_score import players_score
 from src.multiplayer_game.game_gui.utils import recapRound as recap_round, splitPot, onePlayerWin, changePlayersPositions
 from src.gui.utils.constants import SB, BB
 
-def poker_round(multiplayer_list):
+def poker_round(multiplayer_list, client_param):
     """
     Play one round of poker.
     Players remain in the same on-screen (chair) positions.
@@ -20,6 +20,7 @@ def poker_round(multiplayer_list):
     player_list = Player.player_list
     num_players = len(player_list)
     multiplayer_list = multiplayer_list
+    client = client_param
     
     # Retrieve the current dealer index.
     dealer_index = Player.dealer_index  # Initially set in the Player class (e.g., -1)
