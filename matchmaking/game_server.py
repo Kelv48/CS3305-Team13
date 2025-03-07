@@ -1,14 +1,13 @@
-# /matchmaking/game_server.py
+#For testing run file in main.py
 #TODO: Add locks to actions writing to activeSessions
 import json
 import redis
 import asyncio
 import logging
 import threading
-import requests
 #from game import game_class    #There are import errors in this module need to make stuff a package 
 from string import Template
-from matchmaking.protocol import Protocols
+from protocol import Protocols
 from websockets.exceptions import ConnectionClosedError, ConnectionClosed
 from websockets.asyncio.server import serve, ServerConnection
 
@@ -27,8 +26,8 @@ When a client leaves what needs to happen?
 '''
 
 #Server setup
-host = "0.0.0.0"
-port = 8001
+host = "localhost"
+port = 443
 activeSessions = {}                                             #Key:pair Game ID → set of connected clients
 template = Template('{"m_type": "$m_type", "data": "$data"}')   #This is a template for message to be sent to clients
 
@@ -96,28 +95,40 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
                     print(activeSessions)
 
 
-            match message['m_type']:
-                case Protocols.Request.FOLD:
-                    logger.info(f"client is folding")
-                    await foldClient(websocket, message['sessionID'], userID)
+            logger.info("starting to broadcast message")
+            for client_writer in activeSessions[currentSessionID]['clients'].values():
+                if client_writer != websocket:
+                    try:
+                         await client_writer.send(json.dumps(message))
+                    except ConnectionClosedError:
+                        print("client has disconnected during broadcast")
+                        await clientLeave(client_writer, currentSessionID, userID)
+                print("end of function")
 
-                case Protocols.Request.RAISE:
-                    await raiseClient(websocket, message['sessionID'], userID)
 
-                case Protocols.Request.CHECK:
-                    await clientCheck(websocket, message['sessionID'], userID)
 
-                case Protocols.Request.CALL:
-                    await clientCall(websocket, message['sessionID'], userID)
+            # match message['m_type']:
+            #     case Protocols.Request.FOLD:
+            #         logger.info(f"client is folding")
+            #         await foldClient(websocket, message['sessionID'], userID, message)
 
-                case Protocols.Request.BAILOUT:
-                    await clientBailout(websocket,message['sessionID'], userID, message['data'])
+            #     case Protocols.Request.RAISE:
+            #         await raiseClient(websocket, message['sessionID'], userID, message)
 
-                case Protocols.Request.LEAVE:
-                    #TODO:redo this so that message and update is broadcast to all players in the current game
-                    await clientLeave(websocket, message['userID'], message['sessionID'])
-                    print("Client has disconnected: ")
-                    break
+            #     case Protocols.Request.CHECK:
+            #         await clientCheck(websocket, message['sessionID'], userID, message)
+
+            #     case Protocols.Request.CALL:
+            #         await clientCall(websocket, message['sessionID'], userID, message)
+
+            #     case Protocols.Request.BAILOUT:
+            #         await clientBailout(websocket,message['sessionID'], userID, message['data'])
+
+            #     case Protocols.Request.LEAVE:
+            #         #TODO:redo this so that message and update is broadcast to all players in the current game
+            #         await clientLeave(websocket, message['userID'], message['sessionID'])
+            #         print("Client has disconnected: ")
+            #         break
                 
         except ConnectionResetError as e:   #Occurs if client or server closes connection without sending close frame
             print(f"disconnected from {websocket.remote_address}")
@@ -166,18 +177,17 @@ async def clientBailout(websocket, sessionID, userID, data):
     
 
 
-async def foldClient(websocket: ServerConnection, sessionID, userID):
+async def foldClient(websocket: ServerConnection, sessionID, userID, message):
     print("player has folded")
     #GameLogic manipulation 
-    #game = games_dict[sessionID]['gameObj]
-    #game.foldPlayer()
+   
     
     #Broadcast messages to all other players 
     logger.info("starting to broadcast message")
     for client_writer in activeSessions[sessionID]['clients'].values():
         if client_writer != websocket:
             try:
-                await client_writer.send("player has folded".encode())
+                await client_writer.send(json.dumps(message))
 
             except ConnectionClosedError:    #If a player has disconnected 
                 #Broadcast info to the other players and remove data from game and server
@@ -187,7 +197,7 @@ async def foldClient(websocket: ServerConnection, sessionID, userID):
     print("end of function")
 
 
-async def raiseClient(websocket: ServerConnection, sessionID, userID):
+async def raiseClient(websocket: ServerConnection, sessionID, userID, message):
     print("player has raise")
     #GameLogic manipulation 
     #game = games_dict[sessionID]['gameObj]
@@ -196,15 +206,14 @@ async def raiseClient(websocket: ServerConnection, sessionID, userID):
     for client_writer in activeSessions[sessionID]['clients'].values():
         if client_writer != websocket:
             try:
-                await client_writer.send("player has raise the pot by __".encode())
-
+                await client_writer.send(json.dumps(message))
             except ConnectionClosedError:
                 print("client has disconnected during broadcast")
                 await clientLeave(client_writer, sessionID, userID)
     print("end of function")
 
 
-async def clientCheck(websocket: ServerConnection, sessionID, userID):
+async def clientCheck(websocket: ServerConnection, sessionID, userID, message):
     print("player has checked")
     #GameLogic manipulation 
     #game = games_dict[sessionID]['gameObj]
@@ -213,7 +222,7 @@ async def clientCheck(websocket: ServerConnection, sessionID, userID):
     for client_writer in activeSessions[sessionID]['clients'].values():
         if client_writer != websocket:
             try:
-                await client_writer.send("player has checked".encode())
+                 await client_writer.send(json.dumps(message))
         
             except ConnectionClosedError:
                 print("client has disconnected during broadcast")
@@ -221,7 +230,7 @@ async def clientCheck(websocket: ServerConnection, sessionID, userID):
 
     print("end of function")
 
-async def clientCall(websocket: ServerConnection, sessionID, userID):
+async def clientCall(websocket: ServerConnection, sessionID, userID, message):
     logger.info("player has called")
     #GameLogic manipulation 
     #game = games_dict[sessionID]['gameObj]
@@ -230,7 +239,7 @@ async def clientCall(websocket: ServerConnection, sessionID, userID):
     for client_writer in activeSessions[sessionID]['clients'].values():
         if client_writer != websocket:
             try:
-                await client_writer.send("player has called".encode())
+                 await client_writer.send(json.dumps(message))
 
             except ConnectionClosedError:
                 print("client has disconnected during broadcast")
@@ -277,10 +286,6 @@ async def clientLeave(websocket: ServerConnection, userID, sessionID):
             activeSessions[sessionID]['clients'].pop(userID)
             logger.info(f"Current active sessions {activeSessions}")
             if len(activeSessions[sessionID]['clients']) == 0:    #Deletes session if no WebSockets are left
-                    
-                    # Send a request to the flask server to update the db
-                    response = requests.post('http://localhost:5000/update', json={'sessionID': sessionID})
-                    
                     del activeSessions[sessionID]
                     logger.info(f"session {sessionID} is deleted")
                     return
