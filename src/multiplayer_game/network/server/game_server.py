@@ -95,28 +95,40 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
                     print(activeSessions)
 
 
-            match message['m_type']:
-                case Protocols.Request.FOLD:
-                    logger.info(f"client is folding")
-                    await foldClient(websocket, message['sessionID'], userID, message)
+            logger.info("starting to broadcast message")
+            for client_writer in activeSessions[currentSessionID]['clients'].values():
+                if client_writer != websocket:
+                    try:
+                         await client_writer.send(json.dumps(message))
+                    except ConnectionClosedError:
+                        print("client has disconnected during broadcast")
+                        await clientLeave(client_writer, currentSessionID, userID)
+                print("end of function")
 
-                case Protocols.Request.RAISE:
-                    await raiseClient(websocket, message['sessionID'], userID, message)
 
-                case Protocols.Request.CHECK:
-                    await clientCheck(websocket, message['sessionID'], userID, message)
 
-                case Protocols.Request.CALL:
-                    await clientCall(websocket, message['sessionID'], userID, message)
+            # match message['m_type']:
+            #     case Protocols.Request.FOLD:
+            #         logger.info(f"client is folding")
+            #         await foldClient(websocket, message['sessionID'], userID, message)
 
-                case Protocols.Request.BAILOUT:
-                    await clientBailout(websocket,message['sessionID'], userID, message['data'])
+            #     case Protocols.Request.RAISE:
+            #         await raiseClient(websocket, message['sessionID'], userID, message)
 
-                case Protocols.Request.LEAVE:
-                    #TODO:redo this so that message and update is broadcast to all players in the current game
-                    await clientLeave(websocket, message['userID'], message['sessionID'])
-                    print("Client has disconnected: ")
-                    break
+            #     case Protocols.Request.CHECK:
+            #         await clientCheck(websocket, message['sessionID'], userID, message)
+
+            #     case Protocols.Request.CALL:
+            #         await clientCall(websocket, message['sessionID'], userID, message)
+
+            #     case Protocols.Request.BAILOUT:
+            #         await clientBailout(websocket,message['sessionID'], userID, message['data'])
+
+            #     case Protocols.Request.LEAVE:
+            #         #TODO:redo this so that message and update is broadcast to all players in the current game
+            #         await clientLeave(websocket, message['userID'], message['sessionID'])
+            #         print("Client has disconnected: ")
+            #         break
                 
         except ConnectionResetError as e:   #Occurs if client or server closes connection without sending close frame
             print(f"disconnected from {websocket.remote_address}")
