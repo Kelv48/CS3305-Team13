@@ -1,8 +1,8 @@
 import pygame
 
 
-card_width = 69.1
-card_height = 105.6
+card_width = 73
+card_height = 90
 screen_width = 1280
 screen_height = 720
 

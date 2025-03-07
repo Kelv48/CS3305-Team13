@@ -46,7 +46,8 @@ def create_game(mainMenu, c=None):
         try:
             msg = client.receive()
         except ConnectionClosed as e:
-            print("Client connection closed")
+            print("Client connection closed. Leaving thread")
+            stop_thread.is_set()
         if msg:
             data = msg  # Assuming msg is already a dictionary
             match data['m_type']:
@@ -59,19 +60,13 @@ def create_game(mainMenu, c=None):
                             num_players = data.get("data")
                             print(f"Number of players updated: {num_players}")
                 
-                case Protocols.Response.REDIRECT:
-                             #Client is already connected 
-
-                             #Wait to receive list of clients 
-                             client_list = client.receive()
-                             #Set up client to run game_menu.py 
-                             client.set_main_menu(mainMenu)
-                             client.set_game_screen(lambda: gameMenu(mainMenu, client_list['data']))
-                             #pass the client list into game_menu
-                             client.run_game(3)
-
-                             pass
-                #             #Move to game screen
+                case Protocols.Response.CLIENT_LIST:
+                            
+                            client.set_main_menu(mainMenu)
+                            client.set_game_screen(lambda: gameMenu(mainMenu, msg['data'], client))
+                            client.receive()        #redirects client to game_server
+                            stop_thread.set()       #Stops the thread from being called again
+                            client.run_game(3)      #Move to game screen
                 #             return  #Exit the thread
                 # case Protocols.Response.SESSION_ID:
                 #         client.setSessionID(msg['data'])
