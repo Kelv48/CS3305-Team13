@@ -36,7 +36,7 @@ class AI:
         Returns: (p_win, p_tie)
         """
         from src.singleplayer_game.poker_score import players_score as playerScore
-        number_games = 10000
+        number_games = 1000
         n_win = 0
         n_tie = 0
 
