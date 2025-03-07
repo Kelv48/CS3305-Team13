@@ -31,11 +31,11 @@ def gameMenu(mainMenu, playerList, client):
         Player.player_list_chair.clear()
 
         # Show start menu and get user choice
-        start_choice = menuStart(mainMenu)
+        # start_choice = menuStart(mainMenu)
 
-        if start_choice == "HOME":
-            mainMenu()   # Return to home screen if "HOME" is chosen
-            return
+        # if start_choice == "HOME":
+        #     mainMenu()   # Return to home screen if "HOME" is chosen
+        #     return
 
         # Create a human player and then the requested number of bots.
         Player('Player 1', START_STACK, 'human')
