@@ -1,4 +1,4 @@
-template_data = {
+preflop_data = {
         # vs raise (villains: seats before hero)
         # ALL HJ combos
         ("vs raise", "HJ", "LJ"): 

@@ -2,7 +2,7 @@ import sys
 import pygame
 from src.gui.utils.constants import SCREEN, BG, screen_font, scaled_cursor, FPS
 from src.gui.utils.button import Button
-from src.gui.screens.ranges_data import template_data, open_ranges
+from src.gui.screens.ranges_data import preflop_data, open_ranges
 
 # Helper Functions for Valid Positions
 def get_valid_hero_positions(scenario):
@@ -98,7 +98,7 @@ def preflop_range_visualizer(mainMenu):
     for player in open_ranges:
         for opponent in open_opponents:
             strat_data[("Open", player, opponent)] = open_ranges[player]
-    strat_data.update(template_data)
+    strat_data.update(preflop_data)
     
     # Side Panel Setup
     options_data = {
