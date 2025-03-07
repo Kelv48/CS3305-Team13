@@ -9,7 +9,7 @@ screen_width = 1280
 screen_height = 720
 START_STACK = 5000
 
-def gameMenu(mainMenu, playerList):
+def gameMenu(mainMenu, playerList, client):
     """Starts the game loop and keeps it running consistently."""
     pygame.init()
     player_list = playerList
