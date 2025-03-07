@@ -8,6 +8,7 @@ from src.gui.utils.constants import SCREEN, BEIGE, GREEN, RED
 from src.singleplayer_game.game_gui.game_button import x_buttons, y_button, width_button
 from pygame_widgets.slider import Slider
 from pygame_widgets.textbox import TextBox
+from src.gui.utils.button import Button
 
 
 def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=None):
@@ -205,14 +206,18 @@ def arrangeRoom(common_cards=None):
                 cards.add(card)
             cards.draw(SCREEN)
 
-    # Draw Main Menu Button.
-    button_rect = pygame.Rect(10, 10, 150, 50)
-    pygame.draw.rect(SCREEN, (200, 0, 0), button_rect)
-    font = pygame.font.Font(None, 36)
-    text = font.render("Main Menu", True, (255, 255, 255))
-    text_rect = text.get_rect(center=button_rect.center)
-    SCREEN.blit(text, text_rect)
-    return button_rect
+    # Create and draw Main Menu Button using the Button class
+    home_button = Button(
+        pos=(85, 35),  # Centered in the 10,10,150,50 rect
+        text_input="Main Menu",
+        font=pygame.font.Font(None, 36),
+        base_colour=(255, 255, 255),
+        hovering_colour=(200, 200, 200),
+        image=None
+    )
+    home_button.update(SCREEN)
+    
+    return home_button
 
 
 

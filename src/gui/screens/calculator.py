@@ -184,9 +184,9 @@ def run_poker_calculator(mainMenu, num_simulations=1000):
     clock.tick(FPS)
 
     # Dimensions for card images and grid layout.
-    CARD_WIDTH, CARD_HEIGHT = 60, 90
+    CARD_WIDTH, CARD_HEIGHT = 70, 90
     GRID_MARGIN_X, GRID_MARGIN_Y = 5, 5
-    GRID_START_X, GRID_START_Y = 80, 90
+    GRID_START_X, GRID_START_Y = 100, 90
 
     # Load all card images (from files or placeholders)
     card_images = load_card_images(CARD_WIDTH, CARD_HEIGHT)
@@ -292,7 +292,7 @@ def run_poker_calculator(mainMenu, num_simulations=1000):
         textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
         pygame.draw.rect(
             textbox_surface,
-            (0, 0, 0, 100),  # black with alpha=100 (semi-transparent)
+            (0, 0, 0, 150),  # black with alpha=100 (semi-transparent)
             (0, 0, textbox_width, textbox_height),
             border_radius=50
         )
