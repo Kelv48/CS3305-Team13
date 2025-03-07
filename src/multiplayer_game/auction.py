@@ -3,8 +3,6 @@ from src.multiplayer_game.game_gui.game_button import buttons
 
 # Player decisions => fold, call, check, raise, all-in
 from src.multiplayer_game.game_gui.utils import playerDecision, arrangeRoom, drawPlayer
-from src.gui.utils.constants import BB
-
 
 def auction(common_cards=None, multi_list=None):
     """
@@ -54,8 +52,6 @@ def getPlayerOptions(player, player_list):
         min_raise = call_value + (sorted_bets[0] if sorted_bets else 0)
     else:
         min_raise = call_value + sorted_bets[0] - sorted_bets[1]
-    if min_raise < BB:
-        min_raise = BB
 
     max_raise = player.stack
     pot = sum(input_stack_list)
@@ -81,7 +77,6 @@ def getPlayerDecision(player, options, min_raise, max_raise, common_cards, call_
     """
     if player.kind == 'human':
         decision = playerDecision(buttons, options, min_raise, max_raise, common_cards)
-
 
     # decision is expected to be a two-element sequence; extract chips if needed
     chips = int(decision[1]) if decision[0] == 'raise' else None
