@@ -53,7 +53,7 @@ def poker_round(multiplayer_list, client_param):
         '2D', '3D', '4D', '5D', '6D', '7D', '8D', '9D', 'TD', 'JD', 'QD', 'KD', 'AD'
     ]
 
-    if client.getSessionID() == multiplayer_list[0]:
+    if client.getSessionID() == multiplayer_list[0]:    #If user is player one send deck
         # Deal two cards to each player (screen positions remain unchanged).
         for player in player_list_chair:
             player.cards = random.sample(deck, 2)
@@ -61,10 +61,11 @@ def poker_round(multiplayer_list, client_param):
             for card in player.cards:
                 deck.remove(card)
     else:
+        #Blocks the code waiting for the message
         client.receive()
 
     # Use try...finally to ensure roles are rotated exactly once.
-    if client.getSessionID() == multiplayer_list[0]:
+    if client.getSessionID() == multiplayer_list[0]:    #If users is player one then execute game 
         try:
             # Pre-flop auction.
             auction(None, multiplayer_list, client)

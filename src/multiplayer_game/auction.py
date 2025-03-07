@@ -1,5 +1,6 @@
 from src.multiplayer_game.game_gui.player import Player
 from src.multiplayer_game.game_gui.game_button import buttons
+import pickle
 
 # Player decisions => fold, call, check, raise, all-in
 from src.multiplayer_game.game_gui.utils import playerDecision, arrangeRoom, drawPlayer
@@ -18,22 +19,28 @@ def auction(common_cards=None, multi_list=None, c_param=None):
     mutliplayer_list = multi_list
     client = c_param
 
-    while not all(player.decision for player in player_list) and not every_fold:
+
+    while not all(player.decision for player in player_list) and not every_fold:    #Loops till everyone has made decision or has folded 
         for player in player_list:
             if not player.decision and player.live:
                 options, call_value, min_raise, max_raise, pot = getPlayerOptions(player, player_list)
-                decision, chips = getPlayerDecision(player, options, min_raise, max_raise, common_cards, call_value, pot, player_list, number_player)
+                decision, chips = getPlayerDecision(player, options, min_raise, max_raise, common_cards, call_value, pot, player_list, number_player)   #  Creates the buttons ... I think
                 processDecision(decision, chips, player, player_list)
                 updateUI(common_cards)
 
+            #Checks if everyone has folded bare one 
             if checkSinglePlayerRemaining(player_list):
                 every_fold = True
                 break
+            
+            client.send(pickle.dumps(player))
 
+    #Sets next round for remaining players 
     for player in player_list:
         player.nextAuction()
         if player.live:
             player.decision = False
+        client.send(pickle.loads(player))
 
 
 def getPlayerOptions(player, player_list):
