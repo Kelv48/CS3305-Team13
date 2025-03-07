@@ -10,7 +10,7 @@ pygame.init()
 # Constants
 BG_COLOR = pygame.Color('white')
 COLOR_INACTIVE = pygame.Color('white')
-COLOR_ACTIVE = pygame.Color('dodgerblue2')
+COLOR_ACTIVE = pygame.Color('blue')
 TEXT_COLOR = pygame.Color('white')
 FONT = screen_font(28)
 BIG_FONT = screen_font(48)
@@ -99,7 +99,7 @@ def best_hand(cards):
             best = ranking
     return best
 
-def simulate_win_rate(my_cards, board_cards, opp_cards=None, num_simulations=1000):
+def simulate_win_rate(my_cards, board_cards, opp_cards=None, num_simulations=2000):
     wins = 0
     ties = 0
     losses = 0
@@ -164,7 +164,7 @@ def load_card_images(card_width, card_height):
     return card_images
 
 #  Main GUI Loop with Card Selection
-def run_poker_calculator(mainMenu, num_simulations=1000):
+def run_poker_calculator(mainMenu, num_simulations=2000):
     clock = pygame.time.Clock()
     clock.tick(FPS)
 

@@ -65,8 +65,9 @@ def poker_round(multiplayer_list, client_param):
         client.receive()
 
     # Use try...finally to ensure roles are rotated exactly once.
-    if client.getSessionID() == multiplayer_list[0]:    #If users is player one then execute game 
-        try:
+    # if client.getSessionID() == multiplayer_list[0]:
+    try:
+        if client.getSessionID() == multiplayer_list[0]:
             # Pre-flop auction.
             auction(None, multiplayer_list, client)
             if sum(p.live for p in player_list) + sum(p.alin for p in player_list) == 1:
@@ -74,6 +75,7 @@ def poker_round(multiplayer_list, client_param):
                 recap_round(list_winner)
                 return
 
+        if client.getSessionID() == multiplayer_list[0]:
             # Flop.
             flop = random.sample(deck, 3)
             for card in flop:
@@ -84,6 +86,7 @@ def poker_round(multiplayer_list, client_param):
                 recap_round(list_winner)
                 return
 
+        if client.getSessionID() == multiplayer_list[0]:
             # Turn.
             turn = random.sample(deck, 1)
             deck.remove(turn[0])
@@ -93,7 +96,8 @@ def poker_round(multiplayer_list, client_param):
                 list_winner = onePlayerWin()
                 recap_round(list_winner)
                 return
-
+        
+        if client.getSessionID() == multiplayer_list[0]:
             # River.
             river = random.sample(deck, 1)
             deck.remove(river[0])
@@ -104,10 +108,10 @@ def poker_round(multiplayer_list, client_param):
                 recap_round(list_winner)
                 return
 
-            # Final showdown.
-            players_score(player_list_chair, common_cards)
-            list_winner = splitPot()
-            recap_round(list_winner, common_cards)
-        finally:
-            # This call happens exactly once per round (even if we exit early above).
-            changePlayersPositions()
+        # Final showdown.
+        players_score(player_list_chair, common_cards)
+        list_winner = splitPot()
+        recap_round(list_winner, common_cards)
+    finally:
+        # This call happens exactly once per round (even if we exit early above).
+        changePlayersPositions()

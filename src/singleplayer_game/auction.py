@@ -109,7 +109,7 @@ def getPlayerDecision(player, options, min_raise, max_raise, common_cards, call_
             text_pos = (800, 400)  # Position for player 5
         SCREEN.blit(text_surface, text_pos)
         pygame.display.flip()
-        pygame.time.delay(1000)  # Show the decision for 1 second
+        pygame.time.delay(2000)  # Show the decision for 2 second
 
     # decision is expected to be a two-element sequence; extract chips if needed
     chips = int(decision[1]) if decision[0] == 'raise' else None

@@ -36,7 +36,7 @@ class AI:
         Returns: (p_win, p_tie)
         """
         from src.singleplayer_game.poker_score import players_score as playerScore
-        number_games = 500
+        number_games = 10000
         n_win = 0
         n_tie = 0
 
@@ -98,7 +98,7 @@ class AI:
         Enforces that once any bot raises (or goes all-in) in the betting round,
         no subsequent bot is allowed to raise.
         
-        The `betting_round` parameter is an instance of BettingRound (or a similar mutable object)
+        The betting_round parameter is an instance of BettingRound (or a similar mutable object)
         that tracks whether a raise has already occurred in the current round.
         """
         p_win, p_tie = self.probabilityWin()
@@ -189,4 +189,4 @@ class AI:
             return ['raise', min(max_call, self.max_raise)]
         
         decision = 'call' if self.call_value < self.max_raise else 'all-in'
-        return [decision, 0]
+        return [decision, 0] 
