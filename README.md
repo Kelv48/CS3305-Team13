@@ -7,10 +7,10 @@ mode. The multiplayer is run with a backend server handling player connections, 
 communication.
 
 ## Team 13
-- [Kelvin](https://github.com/Kelv48) | Backend Flask-server, Redis and DB
-- [Richard](https://github.com/Richie2030) | Frontend UI and user input
-- [Michael](https://github.com/M-dok) | Networking and GameServer
-- [Yang](https://github.com/YaoYang7) | Game Logic and Functionality
+- [Kelvin](https://github.com/Kelv48) - 122318693 | Backend Flask-server, Redis and DB
+- [Richard](https://github.com/Richie2030) - 122318926 | Frontend UI and user input
+- [Michael](https://github.com/M-dok) - 122383206 | Networking and GameServer
+- [Yang](https://github.com/YaoYang7) - 122460582 | Game Logic and Algorithms
 
 ## Features
 - **Multiplayer Poker Gameplay**: Play poker with multiple users over the network.
