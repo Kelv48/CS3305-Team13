@@ -1,6 +1,7 @@
 import sys
 import pygame
 from src.gui.utils.constants import SCREEN, BG, screen_font, scaled_cursor, FPS
+from src.gui.utils.button import Button
 from src.gui.screens.ranges_data import template_data, open_ranges
 
 # Helper Functions for Valid Positions
@@ -31,25 +32,25 @@ def get_valid_villain_positions(scenario, hero):
 def update_visible_options(options_data):
     scenario_sel = options_data["Scenario"]["selected"]
     valid_heroes = get_valid_hero_positions(scenario_sel)
-    hero_sel = options_data["player"]["selected"]
+    hero_sel = options_data["Player"]["selected"]
     if hero_sel not in valid_heroes:
         hero_sel = valid_heroes[0] if valid_heroes else None
-    options_data["player"]["options"] = valid_heroes
-    options_data["player"]["selected"] = hero_sel
+    options_data["Player"]["options"] = valid_heroes
+    options_data["Player"]["selected"] = hero_sel
 
     valid_villains = []
     if hero_sel:
         valid_villains = get_valid_villain_positions(scenario_sel, hero_sel)
-    opp_sel = options_data["opponent"]["selected"]
+    opp_sel = options_data["Opponent"]["selected"]
     if opp_sel not in valid_villains and valid_villains:
         opp_sel = valid_villains[0]
-    options_data["opponent"]["options"] = valid_villains
-    options_data["opponent"]["selected"] = opp_sel
+    options_data["Opponent"]["options"] = valid_villains
+    options_data["Opponent"]["selected"] = opp_sel
 
 def get_visible_categories(options_data):
-    visible = ["Scenario", "player"]
-    if options_data["opponent"]["options"]:
-        visible.append("opponent")
+    visible = ["Scenario", "Player"]
+    if options_data["Opponent"]["options"]:
+        visible.append("Opponent")
     return visible
 
 # Preflop Range Visualizer Code
@@ -86,9 +87,10 @@ def preflop_range_visualizer(mainMenu):
     # Colors and font.
     RAISE_COLOR = (255, 0, 0)
     CALL_COLOR  = (0, 200, 0)
-    FOLD_COLOR  = (100, 100, 100)
+    FOLD_COLOR  = (200, 200, 200)
     BLACK       = (0, 0, 0)
     font = screen_font(20)
+    home_font = screen_font(34)  # Larger font for home button
     
     # Build the complete strategy data dictionary.
     strat_data = {}
@@ -104,15 +106,38 @@ def preflop_range_visualizer(mainMenu):
             "options": ["Open", "vs raise", "vs 3bet", "vs 4bet", "vs 5bet"],
             "selected": "Open"
         },
-        "player": {
+        "Player": {
             "options": ["LJ", "HJ", "CO", "BTN", "SB"],
             "selected": "LJ"
         },
-        "opponent": {
+        "Opponent": {
             "options": [],
             "selected": ""
         }
     }
+    
+    # Define explanatory text
+    explanation_font = pygame.font.SysFont(None, 28)
+    explanations = [
+        "How to Read the Grid:",
+        "• Red = Raise",
+        "• Green = Call",
+        "• Light Grey = Fold",
+        "",
+        "Scenarios:",
+        "• Open - First to enter pot",
+        "• vs raise - Facing an open",
+        "• vs 3bet - Facing a re-raise",
+        "• vs 4bet/5bet - Facing big raises",
+        "",
+        "Positions:",
+        "• LJ (Lojack) - Early position",
+        "• HJ (Hijack) - Middle position",
+        "• CO (Cutoff) - Late position",
+        "• BTN (Button) - Best position",
+        "• SB (Small Blind) - Forced bet (0.5 of BB)",
+        "• BB (Big Blind) - Forced bet (1 BB)",
+    ]
     
     def draw_radio_buttons(label, x_start, y_start, options_list, selected_option):
         button_rects = []
@@ -138,12 +163,12 @@ def preflop_range_visualizer(mainMenu):
         side_panel_buttons.clear()
         panel_x = container_x + GRID_WIDTH + 50
         panel_y = container_y
-        visible_categories = ["Scenario", "player"]
+        visible_categories = ["Scenario", "Player"]
         if options_data["Scenario"]["selected"] != "Open":
-            visible_categories.append("opponent")
+            visible_categories.append("Opponent")
         offset_y = 0
         for cat in visible_categories:
-            if cat in ["Scenario", "player"]:
+            if cat in ["Scenario", "Player"]:
                 update_visible_options(options_data)
             cat_rects = draw_radio_buttons(
                 cat,
@@ -155,11 +180,25 @@ def preflop_range_visualizer(mainMenu):
             side_panel_buttons.append((cat, cat_rects))
             offset_y += 180
     
+    def draw_explanatory_text():
+        x_position = container_x + GRID_WIDTH + 250
+        y_position = container_y + 30
+        for line in explanations:
+            text_surface = explanation_font.render(line, True, "White")
+            SCREEN.blit(text_surface, (x_position, y_position))
+            y_position += 25
+    
     # Back button setup.
-    back_button_rect = pygame.Rect(20, 20, 80, 30)
-    back_button_color = (180, 180, 180)
-    back_button_text = font.render("HOME", True, BLACK)
-    back_button_text_rect = back_button_text.get_rect(center=back_button_rect.center)
+    back_button = Button(
+        pos=(60, 35),
+        text_input="HOME",
+        font=home_font,  # Using larger font
+        base_colour="White",
+        hovering_colour="Gold",
+        image=pygame.Surface((120, 45), pygame.SRCALPHA)  # Create transparent surface for background
+    )
+    # Add semi-transparent black background to button image
+    pygame.draw.rect(back_button.image, (0, 0, 0, 128), back_button.image.get_rect(), border_radius=10)
     
     # Main Loop
     clock = pygame.time.Clock()
@@ -170,31 +209,33 @@ def preflop_range_visualizer(mainMenu):
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
-                if back_button_rect.collidepoint(mouse_x, mouse_y):
+                if back_button.checkForInput((mouse_x, mouse_y)):
                     mainMenu()
                     running = False
                 for category, rect_list in side_panel_buttons:
                     for (rect, opt) in rect_list:
                         if rect.collidepoint(mouse_x, mouse_y):
                             options_data[category]["selected"] = opt
-                            if category in ["Scenario", "player"]:
+                            if category in ["Scenario", "Player"]:
                                 update_visible_options(options_data)
     
         SCREEN.blit(scaled_bg, (0, 0))
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
         SCREEN.blit(HAND_VISUALIZER_TEXT, header_rect)
-        pygame.draw.rect(SCREEN, back_button_color, back_button_rect, border_radius=5)
-        pygame.draw.rect(SCREEN, BLACK, back_button_rect, 1, border_radius=5)
-        SCREEN.blit(back_button_text, back_button_text_rect)
+        
+        # Update and draw back button
+        back_button.changecolour(pygame.mouse.get_pos())
+        back_button.update(SCREEN)
     
+        draw_explanatory_text()
         draw_side_panel()
     
         scenario_sel = options_data["Scenario"]["selected"]
-        player_sel = options_data["player"]["selected"]
+        player_sel = options_data["Player"]["selected"]
         if scenario_sel == "Open":
             opponent_sel = open_opponents[0]
         else:
-            opponent_sel = options_data["opponent"]["selected"]
+            opponent_sel = options_data["Opponent"]["selected"]
     
         strategy_key = (scenario_sel, player_sel, opponent_sel)
         if strategy_key in strat_data:
@@ -241,11 +282,20 @@ def preflop_range_visualizer(mainMenu):
         call_pct  = 100.0 * call_count / total_combos
         fold_pct  = 100.0 - (raise_pct + call_pct)
         stats_font = pygame.font.SysFont(None, 28)
-        stats_text = stats_font.render(
-            f"Raise ({raise_pct:.1f}%) | Call ({call_pct:.1f}%) | Fold ({fold_pct:.1f}%)",
-            True, (255, 255, 255)
-        )
-        SCREEN.blit(stats_text, (container_x, container_y + GRID_HEIGHT + 15))
+        
+        # Render each action with its own color
+        raise_text = stats_font.render(f"Raise ({raise_pct:.1f}%)", True, (255, 0, 0))  # Red
+        call_text = stats_font.render(f"Call ({call_pct:.1f}%)", True, (0, 255, 0))    # Green
+        fold_text = stats_font.render(f"Fold ({fold_pct:.1f}%)", True, (255, 255, 255)) # White
+        
+        # Calculate positions for each text element
+        x_pos = container_x + 95
+        y_pos = container_y + GRID_HEIGHT + 5
+        
+        # Blit each text element with spacing
+        SCREEN.blit(raise_text, (x_pos, y_pos))
+        SCREEN.blit(call_text, (x_pos + raise_text.get_width() + 10, y_pos))
+        SCREEN.blit(fold_text, (x_pos + raise_text.get_width() + call_text.get_width() + 20, y_pos))
     
         current_mouse_pos = pygame.mouse.get_pos()
         SCREEN.blit(scaled_cursor, current_mouse_pos)
