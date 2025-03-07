@@ -10,7 +10,7 @@ communication.
 - [Kelvin](https://github.com/Kelv48) | Backend Flask-server, Redis and DB
 - [Richard](https://github.com/Richie2030) | Frontend UI and user input
 - [Michael](https://github.com/M-dok) | Networking and GameServer
-- [Yang](https://github.com/YaoYang7) | Game Logic and Functionality
+- [Yang](https://github.com/YaoYang7) | Game Logic and Algorithms
 
 ## Features
 - **Multiplayer Poker Gameplay**: Play poker with multiple users over the network.
