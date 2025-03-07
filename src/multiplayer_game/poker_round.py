@@ -64,48 +64,49 @@ def poker_round(multiplayer_list, client_param):
         client.receive()
 
     # Use try...finally to ensure roles are rotated exactly once.
-    try:
-        # Pre-flop auction.
-        auction(None, multiplayer_list, client)
-        if sum(p.live for p in player_list) + sum(p.alin for p in player_list) == 1:
-            list_winner = onePlayerWin()
-            recap_round(list_winner)
-            return
+    if client.getSessionID() == multiplayer_list[0]:
+        try:
+            # Pre-flop auction.
+            auction(None, multiplayer_list, client)
+            if sum(p.live for p in player_list) + sum(p.alin for p in player_list) == 1:
+                list_winner = onePlayerWin()
+                recap_round(list_winner)
+                return
 
-        # Flop.
-        flop = random.sample(deck, 3)
-        for card in flop:
-            deck.remove(card)
-        auction(flop, multiplayer_list, client)
-        if sum(p.live for p in player_list) + sum(p.alin for p in player_list) == 1:
-            list_winner = onePlayerWin()
-            recap_round(list_winner)
-            return
+            # Flop.
+            flop = random.sample(deck, 3)
+            for card in flop:
+                deck.remove(card)
+            auction(flop, multiplayer_list, client)
+            if sum(p.live for p in player_list) + sum(p.alin for p in player_list) == 1:
+                list_winner = onePlayerWin()
+                recap_round(list_winner)
+                return
 
-        # Turn.
-        turn = random.sample(deck, 1)
-        deck.remove(turn[0])
-        common_cards = flop + turn
-        auction(common_cards, multiplayer_list, client)
-        if sum(p.live for p in player_list) + sum(p.alin for p in player_list) == 1:
-            list_winner = onePlayerWin()
-            recap_round(list_winner)
-            return
+            # Turn.
+            turn = random.sample(deck, 1)
+            deck.remove(turn[0])
+            common_cards = flop + turn
+            auction(common_cards, multiplayer_list, client)
+            if sum(p.live for p in player_list) + sum(p.alin for p in player_list) == 1:
+                list_winner = onePlayerWin()
+                recap_round(list_winner)
+                return
 
-        # River.
-        river = random.sample(deck, 1)
-        deck.remove(river[0])
-        common_cards += river
-        auction(common_cards, multiplayer_list, client)
-        if sum(p.live for p in player_list) + sum(p.alin for p in player_list) == 1:
-            list_winner = onePlayerWin()
-            recap_round(list_winner)
-            return
+            # River.
+            river = random.sample(deck, 1)
+            deck.remove(river[0])
+            common_cards += river
+            auction(common_cards, multiplayer_list, client)
+            if sum(p.live for p in player_list) + sum(p.alin for p in player_list) == 1:
+                list_winner = onePlayerWin()
+                recap_round(list_winner)
+                return
 
-        # Final showdown.
-        players_score(player_list_chair, common_cards)
-        list_winner = splitPot()
-        recap_round(list_winner, common_cards)
-    finally:
-        # This call happens exactly once per round (even if we exit early above).
-        changePlayersPositions()
+            # Final showdown.
+            players_score(player_list_chair, common_cards)
+            list_winner = splitPot()
+            recap_round(list_winner, common_cards)
+        finally:
+            # This call happens exactly once per round (even if we exit early above).
+            changePlayersPositions()
