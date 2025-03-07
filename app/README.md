@@ -1,66 +1,75 @@
 # `app` Directory - User Management API
 
-This directory contains the core logic and structure for the User Management API. 
-The `app` directory is modularized for better organization, separating different concerns like models, 
-routes, caching, and configuration.
+This directory contains the core logic and structure for the **User Management API**.  
+The `app` directory is modularized for better organization, separating different concerns such as models, routes, caching, database migrations, and configuration.
 
-## File Structure
+---
+
+## 📂 File Structure
 
 ### `app/__init__.py`
-- This file initializes the Flask app, the database (using Flask-SQLAlchemy), and any configurations required for the app to run. 
-- It also registers the routes from the `routes.py` file to make sure the API endpoints are accessible.
+- Initializes the **Flask app** and **SQLAlchemy database**.
+- Configures **Flask-Migrate** for handling database migrations.
+- Registers the `routes.py` file to expose API endpoints.
+- Establishes the connection to **Redis** for caching.
 
 ### `app/models.py`
-- Defines the database models used in the application. Currently, this includes the `User` model, `Stats` model (for storing user statistics), and the `Leaderboard` model (for storing leaderboard rankings).
-- This file also defines the relationships between these models using SQLAlchemy.
+- Defines the database models:
+  - **`User`**: Stores user authentication details and wallet balance.
+  - **`Stats`**: Tracks user game statistics (win/loss count and earnings).
+  - **`Leaderboard`**: Ranks users based on earnings and performance.
+- Defines relationships between models using **SQLAlchemy**.
 
 ### `app/routes.py`
-- Contains the routes (API endpoints) for the application.
-    - `/register`: Endpoint to create a new user.
-    - `/login`: Endpoint to fetch user data by name, with caching support using Redis.
-- Each route handles HTTP requests and interacts with the models to perform necessary operations like creating users or fetching their information.
+- Defines the core API endpoints:
+  - **User Authentication**
+    - `/register`: Register a new user.
+    - `/login`: Authenticate and fetch user data (with Redis caching).
+    - `/logout`: Invalidate a user session and remove cache data.
+  - **User Stats & Leaderboard**
+    - `/stats`: Retrieve user statistics.
+    - `/leaderboard`: Fetch the current leaderboard.
+  - **Game Server Integration**
+    - `/update`: Updates the number of players in a game session.
+    - `/terminate`: Removes a game session when completed.
 
 ### `app/cache.py`
-- Contains functions for interacting with Redis, primarily for caching user data.
-- When a user is fetched via `/login`, the data is cached for 5 minutes to reduce database hits.
+- Implements **Redis caching** for improved API performance.
+- Functions include:
+  - `get_user_DBorCache()`: Fetch user data from Redis or fallback to the database.
+  - `get_or_update_leaderboard()`: Retrieve the leaderboard data from cache.
+- Cached data has a **5-minute expiration** to ensure data freshness.
 
 ### `app/config.py`
-- This file holds configuration settings for the Flask app, such as database URI, Redis connection settings, and other configurations required by the app.
-
-  ## How It Works
-
-1. **Creating a New User**: The user provides a `name` and `password`, and this is stored in the SQLite database. The user information is then available for later use in other API calls.
-  
-2. **Fetching a User**: When a user is fetched using their name, the system first checks if the user data is available in the Redis cache. If it's found (a cache hit), it’s returned immediately. Otherwise, it queries the database and stores the result in Redis for future use (a cache miss).
-
-3. **Cache Expiry**: User data in Redis is stored with a 5-minute expiry time to keep it fresh. If a user’s data is not accessed for over 5 minutes, it will be removed from the cache, and a new query to the database will be made the next time the data is needed.
+- Stores configuration settings for:
+  - **Database connection URI** (SQLite by default, configurable for PostgreSQL/MySQL).
+  - **Redis settings** (default: `localhost:6379`).
+  - **Security settings**, such as session timeout durations.
 
 ---
 
-## Configuration
+## ⚙️ How It Works
 
-- **SQLite Database**: The app uses an SQLite database for persistent storage of user data. You may need to modify the database URI in `config.py` if you are using a different database for production.
-  
-- **Redis**: The app uses Redis to cache user data. Make sure Redis is running locally on the default port `6379`. If you want to use a different Redis server or port, update the connection settings in `config.py`.
+1. **User Registration**  
+   - The API hashes passwords securely before storing them in the database.  
+   - A new **Stats** and **Leaderboard** entry is automatically created for the user.
+
+2. **User Authentication & Caching**  
+   - When logging in, the API first checks **Redis** for cached user data.  
+   - If not found, it retrieves the data from the database and caches it for **5 minutes**.  
+   - **Password verification** is done using `werkzeug.security`.
+
+3. **Matchmaking & Game Session Updates**  
+   - The API interacts with the **Matchmaking Server** to manage player sessions.  
+   - `/update`: Updates game session details in the **Game Server**.  
+   - `/terminate`: Clears game session data from **Redis** when the match ends.
 
 ---
 
-## Running the Application
+## 🔧 Configuration
 
-1. **Set up Redis**: Make sure Redis is installed and running locally. You can follow the [Redis installation guide](https://redis.io/docs/getting-started/) to install Redis if it’s not already set up.
-
-2. **Install Dependencies**: 
-    - Navigate to the project root and install the required Python dependencies:
-      ```bash
-      pip install flask flask_sqlalchemy redis requests
-      ```
-
-3. **Run the Flask App**:
-    - To start the server, run:
-      ```bash
-      python run.py
-      ```
-
-4. **Access the API**:
-    - The API will be available at `http://127.0.0.1:5000` if you run it locally.
-    - You can test the API using any API client (Postman, Curl, etc.) or with Python's `requests` library.
+### **Database (SQLite/PostgreSQL/MySQL)**
+- The app **uses SQLite** by default for local development.
+- To switch to **PostgreSQL or MySQL**, update `config.py`:
+  ```python
+  SQLALCHEMY_DATABASE_URI = 'postgresql://username:password@localhost/dbname'
