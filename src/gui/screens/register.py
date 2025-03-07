@@ -4,6 +4,7 @@ import requests
 import json
 from src.gui.utils.button import Button
 from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor, FPS
+from werkzeug.security import generate_password_hash, check_password_hash
 
 BASE_URL = 'http://84.8.144.77:5000'
 LOCAL_FILE = "local.json"
@@ -157,7 +158,7 @@ def registerUser(username, password):
     if response.status_code == 201:
         return f"User {username} registered successfully!"
     else:
-        return f"Failed to register"
+        return f"Failed to register user {username}!"
 
 # Login Functionality
 def login(mainMenu):
@@ -225,12 +226,12 @@ def loginUser(username, password):
 
     if response.status_code == 200:
         userdata = response.json()
-        if userdata["password"] == password:
+        if check_password_hash(userdata["password"], password):
             wallet = userdata["wallet"]
             save_user(username, wallet)
             return f"User {username} logged in successfully!"
         else:
-            return "Incorrect password!"
+            return f"Incorrect credentials"
     else:
         return f"Failed to login"
 
