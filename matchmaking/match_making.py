@@ -88,7 +88,7 @@ async def joinGame(websocket: ServerConnection, sessionID, userID):
             logger.info("Broadcasting to clients in lobby")
             message = template.substitute(m_type=Protocols.Response.LOBBY_UPDATE, data=activeSessions[sessionID]['numPlayer'])
             for serverConnection in  activeSessions[sessionID]['clients']:  #Broadcast info to other clients in lobby
-                if serverConnection != websocket:
+              #  if serverConnection != websocket:
                     await serverConnection.send(message.encode())
         
         #If there isn't any room to join game tell player 
@@ -109,9 +109,6 @@ async def voteStart(websocket: ServerConnection, sessionID):
     try:
         activeSessions[sessionID]['forceStart'].add(websocket)
         logger.info(f"Votes: {len(activeSessions[sessionID]['forceStart'])}")
-        if len(activeSessions[sessionID]['forceStart']) >= activeSessions[sessionID]['numPlayer'] and activeSessions[sessionID]['numPlayer'] > 1:
-            await redirect(sessionID) 
-            return  #Exit function 
         
     
         #Broadcast new info to other clients in lobby 
@@ -121,6 +118,10 @@ async def voteStart(websocket: ServerConnection, sessionID):
             #if serverConnection != websocket:
                 await serverConnection.send(message)
 
+        if len(activeSessions[sessionID]['forceStart']) >= activeSessions[sessionID]['numPlayer'] and activeSessions[sessionID]['numPlayer'] > 1:
+            await redirect(sessionID) 
+            return  #Exit function 
+        
     except KeyError as e:
         error_message = template.substitute(m_type=Protocols.Response.ERROR, data=json.dumps("The game that you are trying to join does not exist"))
         await websocket.send(error_message)
@@ -132,12 +133,16 @@ async def redirect(sessionID):
     #Create game object using or numPlayer  as a constructing parameter 
     gameObj = None
 
+    #Sends list of clients in lobby to clients in session
+    msg = template.substitute(m_type=Protocols.Response.CLIENT_LIST, data=json.dumps(list(activeSessions[sessionID]['clients'].values())))
+    for serverConnection in activeSessions[sessionID]['clients']:   
+        await serverConnection.send(msg)
+
     #Redirect each client in lobby to game server 
-    redirectMessage = json.dumps({"m_type": Protocols.Response.REDIRECT, "data": {"host": "localhost", "port": 443}})
+    redirectMessage = json.dumps({"m_type": Protocols.Response.REDIRECT, "data": {"host": "84.8.144.77", "port": 8001}})
     for serverConnection in activeSessions[sessionID]['clients']:                
         await serverConnection.send(redirectMessage)
-                
-
+    
 
     #Publish relevant info to redis server
     data = {'sessionID':sessionID, 'clients':{}, 'gameObj':gameObj}

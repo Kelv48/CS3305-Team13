@@ -21,6 +21,7 @@ def update_db(game_id):
 def get_user_DBorCache(user_name):
     cache_key = f'user:{user_name}'
     cached_data = redis_client.get(cache_key)
+    
     if cached_data:
         print("Cache hit")
         return json.loads(cached_data)
