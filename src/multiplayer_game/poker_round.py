@@ -5,19 +5,21 @@ from src.multiplayer_game.poker_score import players_score
 from src.multiplayer_game.game_gui.utils import recapRound as recap_round, splitPot, onePlayerWin, changePlayersPositions
 from src.gui.utils.constants import SB, BB
 
-def poker_round():
+def poker_round(multiplayer_list):
     """
     Play one round of poker.
     Players remain in the same on-screen (chair) positions.
     Only the roles (SB and BB) rotate one seat clockwise per round.
     This function guarantees that changePlayersPositions() is called exactly once
     at the end of the round (even for early exits).
+    Multiplayer_list is a list of player usernames, it is then used in auction to determine if a player's turn is theirs or not. 
     """
     # Fixed on-screen positions
     player_list_chair = Player.player_list_chair
     # Logical order (same order as chair) used for role assignment
     player_list = Player.player_list
     num_players = len(player_list)
+    multiplayer_list = multiplayer_list
     
     # Retrieve the current dealer index.
     dealer_index = Player.dealer_index  # Initially set in the Player class (e.g., -1)
@@ -59,7 +61,7 @@ def poker_round():
     # Use try...finally to ensure roles are rotated exactly once.
     try:
         # Pre-flop auction.
-        auction()
+        auction(None, multiplayer_list)
         if sum(p.live for p in player_list) + sum(p.alin for p in player_list) == 1:
             list_winner = onePlayerWin()
             recap_round(list_winner)
@@ -69,7 +71,7 @@ def poker_round():
         flop = random.sample(deck, 3)
         for card in flop:
             deck.remove(card)
-        auction(flop)
+        auction(flop, multiplayer_list)
         if sum(p.live for p in player_list) + sum(p.alin for p in player_list) == 1:
             list_winner = onePlayerWin()
             recap_round(list_winner)
@@ -79,7 +81,7 @@ def poker_round():
         turn = random.sample(deck, 1)
         deck.remove(turn[0])
         common_cards = flop + turn
-        auction(common_cards)
+        auction(common_cards, multiplayer_list)
         if sum(p.live for p in player_list) + sum(p.alin for p in player_list) == 1:
             list_winner = onePlayerWin()
             recap_round(list_winner)
@@ -89,7 +91,7 @@ def poker_round():
         river = random.sample(deck, 1)
         deck.remove(river[0])
         common_cards += river
-        auction(common_cards)
+        auction(common_cards, multiplayer_list)
         if sum(p.live for p in player_list) + sum(p.alin for p in player_list) == 1:
             list_winner = onePlayerWin()
             recap_round(list_winner)

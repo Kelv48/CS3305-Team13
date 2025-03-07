@@ -9,10 +9,11 @@ screen_width = 1280
 screen_height = 720
 START_STACK = 5000
 
-def gameMenu(mainMenu, playerList):
+def gameMenu(mainMenu, playerList, client):
     """Starts the game loop and keeps it running consistently."""
     pygame.init()
-    player_list = playerList
+    multiplayer_list = playerList # list of str
+    # player_1 = player_list[0]
     clock = pygame.time.Clock()
 
     # Define the home button rectangle (assumed same as in arrangeRoom)
@@ -29,10 +30,9 @@ def gameMenu(mainMenu, playerList):
             mainMenu()   # Return to home screen if "HOME" is chosen
             return
 
-        # Create a human player and then the requested number of bots.
-        Player('Player 1', START_STACK, 'human')
-        for i in range(start_choice):
-            Player(f'Bot {i+1}', START_STACK, 'AI')
+        # Create a lobby of players
+        for i in range(len(multiplayer_list)):
+            Player(multiplayer_list[i], START_STACK, 'human', False)
 
         game_running = True
         while game_running and len(Player.player_list_chair) > 1:
@@ -49,7 +49,7 @@ def gameMenu(mainMenu, playerList):
                         return
 
             # Execute a round of poker and update player positions
-            poker_round()
+            poker_round(multiplayer_list) # takes in multiplayer_list to check if it is the player's turn
             for player in Player.player_list_chair:
                 player.nextRound()
 
@@ -105,11 +105,11 @@ def menuStart(mainMenu):
 
         # Buttons definition
         buttons = [
-            ("1 Bot", 1),
-            ("2 Bots", 2),
-            ("3 Bots", 3),
-            ("4 Bots", 4),
-            ("5 Bots", 5),
+            ("2 Players", 2),
+            ("3 Players", 3),
+            ("4 Players", 4),
+            ("5 Players", 5),
+            ("6 Players", 6),
             ("HOME", mainMenu)
         ]
         button_objects = []

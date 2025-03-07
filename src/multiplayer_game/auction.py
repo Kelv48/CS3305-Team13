@@ -1,10 +1,12 @@
 from src.multiplayer_game.game_gui.player import Player
 from src.multiplayer_game.game_gui.game_button import buttons
+
+# Player decisions => fold, call, check, raise, all-in
 from src.multiplayer_game.game_gui.utils import playerDecision, arrangeRoom, drawPlayer
 from src.gui.utils.constants import BB
 
 
-def auction(common_cards=None):
+def auction(common_cards=None, multi_list=None):
     """
     Displays each player's available options for the auction round.
     Once a player selects an option, their attributes are updated.
@@ -15,14 +17,13 @@ def auction(common_cards=None):
     player_list = [player for player in Player.player_list if player.live] 
     number_player = len(player_list)
     every_fold = False
+    mutliplayer_list = multi_list
 
     while not all(player.decision for player in player_list) and not every_fold:
         for player in player_list:
             if not player.decision and player.live:
                 options, call_value, min_raise, max_raise, pot = getPlayerOptions(player, player_list)
-                decision, chips = getPlayerDecision(
-                    player, options, min_raise, max_raise, common_cards, call_value, pot, player_list, number_player
-                )
+                decision, chips = getPlayerDecision(player, options, min_raise, max_raise, common_cards, call_value, pot, player_list, number_player)
                 processDecision(decision, chips, player, player_list)
                 updateUI(common_cards)
 
