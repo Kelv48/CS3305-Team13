@@ -1,4 +1,5 @@
 import json
+import pickle
 from websockets.sync.client import connect
 from websockets.exceptions import ConnectionClosed, InvalidURI
 from src.multiplayer_game.network.server.protocol import Protocols
@@ -15,6 +16,7 @@ class Client:
         self.loading_screen = None
 
         self.game_screen = None
+        self.in_game = False    
 
     def set_loading_screen(self, action):
         self.loading_screen = action
@@ -80,13 +82,18 @@ class Client:
             print(f"{self.id} is waiting for a message")
             message = self.client.recv(timeout=10)
             print(f"{self.id} received message: {message}")
-            der = json.loads(message)
-            match der['m_type']:
-                case Protocols.Response.REDIRECT:
-                        self.redirect(der['data']['host'], der['data']['port'])
-                case Protocols.Response.SESSION_ID:
-                        self.setSessionID(der['data'])
-            return der
+            if self.in_game:
+                der = pickle.loads(message)
+                return der
+            else:
+                der = json.loads(message)
+                match der['m_type']:
+                    case Protocols.Response.REDIRECT:
+                            self.redirect(der['data']['host'], der['data']['port'])
+                            self.in_game = True
+                    case Protocols.Response.SESSION_ID:
+                            self.setSessionID(der['data'])
+                return der
         #If no message is received within time-limit
         except TimeoutError as e:
             print("AAAAAA I'M FUCKING OFF RECEIVING THE MESSAGE ")
