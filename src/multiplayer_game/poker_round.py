@@ -56,9 +56,9 @@ def poker_round(multiplayer_list, client_param):
     # Deal two cards to each player (screen positions remain unchanged).
     for player in player_list_chair:
         player.cards = random.sample(deck, 2)
+        client.send(None, {'player':player})
         for card in player.cards:
             deck.remove(card)
-
     # Use try...finally to ensure roles are rotated exactly once.
     try:
         # Pre-flop auction.
