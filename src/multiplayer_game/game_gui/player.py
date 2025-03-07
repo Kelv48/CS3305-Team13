@@ -26,10 +26,13 @@ class Player(object):
         self.input_stack = 0
         self.bet_auction = 0
         self.win_chips = 0
-        self.decision = False
+        self.decision = False   
         self.turn = turn 
         self.action_history = []
         Player._position += 1
+
+    def set_turn(self, state):
+        self.turn = state
 
     def allin(self):
         self.live = False

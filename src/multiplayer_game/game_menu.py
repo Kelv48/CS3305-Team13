@@ -12,9 +12,8 @@ START_STACK = 5000
 def gameMenu(mainMenu, playerList, client):
     """Starts the game loop and keeps it running consistently."""
     pygame.init()
-    player_list = playerList # list of str
-    player_1 = player_list[0]
-    turn_idx = 0
+    multiplayer_list = playerList # list of str
+    # player_1 = player_list[0]
     clock = pygame.time.Clock()
 
     # # Show start menu and get user choice
@@ -31,10 +30,17 @@ def gameMenu(mainMenu, playerList, client):
         # Reset players for a new game
         Player.player_list_chair.clear()
 
+        # Show start menu and get user choice
+        start_choice = menuStart(mainMenu)
 
-        # Create a lobby of players
-        for i in range(len(player_list)):
-            Player(player_list[i], START_STACK, 'human', False)
+        if start_choice == "HOME":
+            mainMenu()   # Return to home screen if "HOME" is chosen
+            return
+
+        # Create a human player and then the requested number of bots.
+        Player('Player 1', START_STACK, 'human')
+        for i in range(start_choice):
+            Player(f'Bot {i+1}', START_STACK, 'AI')
 
         game_running = True
         while game_running and len(Player.player_list_chair) > 1:
@@ -51,7 +57,7 @@ def gameMenu(mainMenu, playerList, client):
                         return
 
             # Execute a round of poker and update player positions
-            poker_round()
+            poker_round(multiplayer_list) # takes in multiplayer_list to check if it is the player's turn
             for player in Player.player_list_chair:
                 player.nextRound()
 
