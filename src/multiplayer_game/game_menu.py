@@ -24,11 +24,11 @@ def gameMenu(mainMenu, playerList, client):
         Player.player_list_chair.clear()
 
         # Show start menu and get user choice
-        start_choice = menuStart(mainMenu)
+        # start_choice = menuStart(mainMenu)
 
-        if start_choice == "HOME":
-            mainMenu()   # Return to home screen if "HOME" is chosen
-            return
+        # if start_choice == "HOME":
+        #     mainMenu()   # Return to home screen if "HOME" is chosen
+        #     return
 
         # Create a lobby of players
         for i in range(len(multiplayer_list)):
