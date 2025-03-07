@@ -22,7 +22,7 @@ screen_height = 720
 pygame.display.set_caption("GAMBLERS DEN")
 
 # SCREEN = pygame.display.set_mode((1280, 720), pygame.FULLSCREEN)    # Fullscreen
-SCREEN = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)    # Resizable
+SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)    # Resizable
 
 
 # Load and scale the cursor image to 32x32

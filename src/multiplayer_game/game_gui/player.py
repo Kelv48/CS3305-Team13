@@ -11,7 +11,7 @@ class Player(object):
     _position = 0
     dealer_index = -1  # For role assignment; see explanation below.
 
-    def __init__(self, name, stack, kind='human'):
+    def __init__(self, name, stack, kind='human', turn=False):
         self.__class__.player_list.append(self)
         self.__class__.player_list_chair.append(self)
         self.name = name
@@ -27,6 +27,7 @@ class Player(object):
         self.bet_auction = 0
         self.win_chips = 0
         self.decision = False
+        self.turn = turn 
         self.action_history = []
         Player._position += 1
 

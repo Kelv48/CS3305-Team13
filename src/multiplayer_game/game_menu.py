@@ -9,9 +9,10 @@ screen_width = 1280
 screen_height = 720
 START_STACK = 5000
 
-def gameMenu(mainMenu):
+def gameMenu(mainMenu, playerList):
     """Starts the game loop and keeps it running consistently."""
     pygame.init()
+    player_list = playerList
     clock = pygame.time.Clock()
 
     # Define the home button rectangle (assumed same as in arrangeRoom)
