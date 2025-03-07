@@ -1,5 +1,6 @@
 # app/routes.py
 from flask import Blueprint, request, jsonify, g
+from werkzeug.security import generate_password_hash, check_password_hash
 from .models import User, Stats, Leaderboard
 from .cache import get_user_DBorCache, get_or_update_leaderboard, update_db 
 from . import db
@@ -25,7 +26,12 @@ def get_user():
     # Fetch user data from cache or DB
     user = get_user_DBorCache(username)
     if user:
-        return jsonify(user), 200
+        user_object = User.query.filter_by(name=username).first()
+        if user_object and check_password_hash(user['password'], password):
+            return jsonify(user), 200
+        else:
+            return jsonify({'error': 'Invalid username or password'}), 401
+        
     return jsonify({'error': 'User not found'}), 404
 
 # Route for user registration
@@ -45,7 +51,9 @@ def create_user():
         return jsonify({'error': 'User already exists'}), 400
     try:
         # Create new user and save to the database
-        new_user = User(name=data['username'], password=data['password'])
+        hashed_password = generate_password_hash(data['password'], method='sha256')
+
+        new_user = User(name=data['username'], password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
 
