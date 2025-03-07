@@ -49,7 +49,7 @@ def gameMenu(mainMenu, playerList, client):
                         return
 
             # Execute a round of poker and update player positions
-            poker_round(multiplayer_list) # takes in multiplayer_list to check if it is the player's turn
+            poker_round(multiplayer_list, client) # takes in multiplayer_list to check if it is the player's turn
             for player in Player.player_list_chair:
                 player.nextRound()
 
