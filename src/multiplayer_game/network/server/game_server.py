@@ -98,16 +98,16 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
             match message['m_type']:
                 case Protocols.Request.FOLD:
                     logger.info(f"client is folding")
-                    await foldClient(websocket, message['sessionID'], userID)
+                    await foldClient(websocket, message['sessionID'], userID, message)
 
                 case Protocols.Request.RAISE:
-                    await raiseClient(websocket, message['sessionID'], userID)
+                    await raiseClient(websocket, message['sessionID'], userID, message)
 
                 case Protocols.Request.CHECK:
-                    await clientCheck(websocket, message['sessionID'], userID)
+                    await clientCheck(websocket, message['sessionID'], userID, message)
 
                 case Protocols.Request.CALL:
-                    await clientCall(websocket, message['sessionID'], userID)
+                    await clientCall(websocket, message['sessionID'], userID, message)
 
                 case Protocols.Request.BAILOUT:
                     await clientBailout(websocket,message['sessionID'], userID, message['data'])
@@ -165,18 +165,17 @@ async def clientBailout(websocket, sessionID, userID, data):
     
 
 
-async def foldClient(websocket: ServerConnection, sessionID, userID):
+async def foldClient(websocket: ServerConnection, sessionID, userID, message):
     print("player has folded")
     #GameLogic manipulation 
-    #game = games_dict[sessionID]['gameObj]
-    #game.foldPlayer()
+   
     
     #Broadcast messages to all other players 
     logger.info("starting to broadcast message")
     for client_writer in activeSessions[sessionID]['clients'].values():
         if client_writer != websocket:
             try:
-                await client_writer.send("player has folded".encode())
+                await client_writer.send(json.dumps(message))
 
             except ConnectionClosedError:    #If a player has disconnected 
                 #Broadcast info to the other players and remove data from game and server
@@ -186,7 +185,7 @@ async def foldClient(websocket: ServerConnection, sessionID, userID):
     print("end of function")
 
 
-async def raiseClient(websocket: ServerConnection, sessionID, userID):
+async def raiseClient(websocket: ServerConnection, sessionID, userID, message):
     print("player has raise")
     #GameLogic manipulation 
     #game = games_dict[sessionID]['gameObj]
@@ -195,15 +194,14 @@ async def raiseClient(websocket: ServerConnection, sessionID, userID):
     for client_writer in activeSessions[sessionID]['clients'].values():
         if client_writer != websocket:
             try:
-                await client_writer.send("player has raise the pot by __".encode())
-
+                await client_writer.send(json.dumps(message))
             except ConnectionClosedError:
                 print("client has disconnected during broadcast")
                 await clientLeave(client_writer, sessionID, userID)
     print("end of function")
 
 
-async def clientCheck(websocket: ServerConnection, sessionID, userID):
+async def clientCheck(websocket: ServerConnection, sessionID, userID, message):
     print("player has checked")
     #GameLogic manipulation 
     #game = games_dict[sessionID]['gameObj]
@@ -212,7 +210,7 @@ async def clientCheck(websocket: ServerConnection, sessionID, userID):
     for client_writer in activeSessions[sessionID]['clients'].values():
         if client_writer != websocket:
             try:
-                await client_writer.send("player has checked".encode())
+                 await client_writer.send(json.dumps(message))
         
             except ConnectionClosedError:
                 print("client has disconnected during broadcast")
@@ -220,7 +218,7 @@ async def clientCheck(websocket: ServerConnection, sessionID, userID):
 
     print("end of function")
 
-async def clientCall(websocket: ServerConnection, sessionID, userID):
+async def clientCall(websocket: ServerConnection, sessionID, userID, message):
     logger.info("player has called")
     #GameLogic manipulation 
     #game = games_dict[sessionID]['gameObj]
@@ -229,7 +227,7 @@ async def clientCall(websocket: ServerConnection, sessionID, userID):
     for client_writer in activeSessions[sessionID]['clients'].values():
         if client_writer != websocket:
             try:
-                await client_writer.send("player has called".encode())
+                 await client_writer.send(json.dumps(message))
 
             except ConnectionClosedError:
                 print("client has disconnected during broadcast")
