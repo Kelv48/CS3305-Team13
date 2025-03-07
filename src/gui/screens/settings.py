@@ -12,7 +12,7 @@ class Slider:
         pygame.draw.rect(screen, "White", self.rect)
         pygame.draw.rect(
             screen, 
-            "Light Green", 
+            "Gold", 
             (self.rect.x + self.value * self.rect.width - 5, self.rect.y - 5, 10, 20)
         )
 
@@ -174,7 +174,7 @@ def settings(mainMenu):
     dropdown_y = SCREEN.get_height() / 2 - 190  
     song_dropdown = Dropdown(
         dropdown_x, dropdown_y, dropdown_width, dropdown_height,
-        playlist, dropdown_font, pygame.Color("White"), pygame.Color("LightGreen"), pygame.Color("Black"),
+        playlist, dropdown_font, pygame.Color("White"), pygame.Color("Gold"), pygame.Color("Black"),
         visible_options=5  # Adjust this to how many options you want visible at once
     )
 
@@ -239,7 +239,7 @@ def settings(mainMenu):
             text_input="HOME", 
             font=screen_font(30), 
             base_colour="White", 
-            hovering_colour="Light Green",
+            hovering_colour="Gold",
             image=None
         )
         SOUND_BACK.changecolour(SOUND_MOUSE_POS)

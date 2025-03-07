@@ -94,7 +94,7 @@ def user_page(mainMenu):
             text_input="HOME",
             font=screen_font(35),
             base_colour="White",
-            hovering_colour="Light Green",
+            hovering_colour="Gold",
             image=None,
         )
 

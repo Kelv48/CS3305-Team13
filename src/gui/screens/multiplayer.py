@@ -68,7 +68,7 @@ def multiPlayer(mainMenu):
                 text_input=text, 
                 font=screen_font(30), 
                 base_colour="White", 
-                hovering_colour="Light Green",
+                hovering_colour="Gold",
                 image=None)
             
             button.changecolour(MULTI_MOUSE_POS)

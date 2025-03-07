@@ -73,7 +73,7 @@ def leaderboard(mainMenu):
             text_input="HOME",
             font=screen_font(30),
             base_colour="White",
-            hovering_colour="Light Green",
+            hovering_colour="Gold",
             image=None
         )
         home_button.changecolour(MOUSE_POS)

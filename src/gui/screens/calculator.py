@@ -12,7 +12,7 @@ BG_COLOR = pygame.Color('white')
 COLOR_INACTIVE = pygame.Color('white')
 COLOR_ACTIVE = pygame.Color('dodgerblue2')
 TEXT_COLOR = pygame.Color('white')
-FONT = screen_font(30)
+FONT = screen_font(28)
 BIG_FONT = screen_font(48)
 ACTIVE_BG_COLOR = (255, 0, 0, 128)  # Semi-transparent red
 
@@ -217,7 +217,7 @@ def run_poker_calculator(mainMenu, num_simulations=1000):
         text_input="Calculate",
         font=FONT,
         base_colour=TEXT_COLOR,
-        hovering_colour="green"
+        hovering_colour="Gold"
     )
     
     # Back button
@@ -226,7 +226,7 @@ def run_poker_calculator(mainMenu, num_simulations=1000):
         text_input="HOME",
         font=FONT,
         base_colour=TEXT_COLOR,
-        hovering_colour="green"
+        hovering_colour="Gold"
     )
     
     # Dictionary to hold card assignments
@@ -319,6 +319,13 @@ def run_poker_calculator(mainMenu, num_simulations=1000):
         header_y = 30
         CALCULATOR_RECT = CALCULATOR_TEXT.get_rect(center=(textbox_x + textbox_width // 2, header_y))
         SCREEN.blit(CALCULATOR_TEXT, CALCULATOR_RECT)
+        
+        # Draw back button with background
+        back_bg = pygame.Surface((back_button.rect.width + 40, back_button.rect.height + 20), pygame.SRCALPHA)
+        pygame.draw.rect(back_bg, (0, 0, 0, 150), back_bg.get_rect(), border_radius=10)
+        back_bg_x = back_button.rect.centerx - back_bg.get_width() // 2
+        back_bg_y = back_button.rect.centery - back_bg.get_height() // 2
+        SCREEN.blit(back_bg, (back_bg_x, back_bg_y))
         
         # Update and draw buttons
         mouse_pos = pygame.mouse.get_pos()
