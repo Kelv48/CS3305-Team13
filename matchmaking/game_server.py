@@ -26,8 +26,8 @@ When a client leaves what needs to happen?
 '''
 
 #Server setup
-host = "localhost"
-port = 443
+host = "0.0.0.0"
+port = 8001
 activeSessions = {}                                             #Key:pair Game ID → set of connected clients
 template = Template('{"m_type": "$m_type", "data": "$data"}')   #This is a template for message to be sent to clients
 
@@ -48,7 +48,7 @@ def addActiveSession(message):
             data = json.loads(message['data'])
             sessionID = data.get('sessionID')
             with lock:
-                activeSessions[sessionID] = {'clients':data['clients'], 'gameObj': data['gameObj']}
+                activeSessions[sessionID] = {'clients':data['clients'], 'player_list':data['player_list']}
                 print(activeSessions)
 
 thread = pubsub.subscribe(**{channel: addActiveSession})

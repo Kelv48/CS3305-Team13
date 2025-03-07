@@ -145,7 +145,7 @@ async def redirect(sessionID):
     
 
     #Publish relevant info to redis server
-    data = {'sessionID':sessionID, 'clients':{}, 'gameObj':gameObj}
+    data = {'sessionID':sessionID, 'clients':{}, 'player_list':list(activeSessions[sessionID]['clients'].values())}
     r.publish(channel, json.dumps(data))
 
 async def leaveGame(websocket: ServerConnection, sessionID, redirect=False):
