@@ -87,7 +87,7 @@ def render_screen(title, username, password, active_input, button_actions, messa
             text_input=text, 
             font=screen_font(30), 
             base_colour="White", 
-            hovering_colour="Light Green",
+            hovering_colour="Gold",
             image=None
         )
         

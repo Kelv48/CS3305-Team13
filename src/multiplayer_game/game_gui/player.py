@@ -147,6 +147,19 @@ class Player(object):
         # Adjust offset as needed (here, 10 pixels padding to the left)
         text_offset_x = x - role_text.get_width() - 10  
         text_offset_y = y + (height // 2 - role_text.get_height() // 2)
+
+
+        # Create a semi-transparent background surface
+        padding = 5  # Padding around the text
+        bg_width = role_text.get_width() + (padding * 2)
+        bg_height = role_text.get_height() + (padding * 2)
+        bg_surface = pygame.Surface((bg_width, bg_height), pygame.SRCALPHA)
+        pygame.draw.rect(bg_surface, (255, 255, 255, 128), (0, 0, bg_width, bg_height))
+        
+        # Draw the background and text
+        win.blit(bg_surface, (text_offset_x - padding, text_offset_y - padding))
+
+
         win.blit(role_text, (text_offset_x, text_offset_y))
         # ------------------------
         

@@ -1,6 +1,7 @@
 import sys
 import pygame
-from src.gui.utils.constants import SCREEN, BG, screen_font, scaled_cursor, FPS
+from src.gui.utils.constants import SCREEN, BG, screen_font, scaled_cursor, FPS, WHITE
+from src.gui.utils.button import Button
 
 def hand_equity_visualizer(mainMenu):
     pygame.init()
@@ -135,7 +136,7 @@ def hand_equity_visualizer(mainMenu):
     textbox_surface = pygame.Surface((textbox_width, textbox_height), pygame.SRCALPHA)
     pygame.draw.rect(
         textbox_surface,
-        (0, 0, 0, 150),  # black semi-transparent background
+        (0, 0, 0, 180),  # black semi-transparent background
         (0, 0, textbox_width, textbox_height),
         border_radius=50
     )
@@ -165,7 +166,7 @@ def hand_equity_visualizer(mainMenu):
 
     # colours
     BLACK = (0, 0, 0)
-    GREEN = (0, 200, 0)
+    GREEN = (50, 164, 49)
     LIGHT_GREY = (220, 220, 220)
     VERY_LIGHT_GREY = (240, 240, 240)
     PAIR_GREY = (200, 200, 200)
@@ -175,8 +176,9 @@ def hand_equity_visualizer(mainMenu):
     # Ranks (index 0 = A, 1 = K, ..., 12 = 2)
     ranks = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"]
 
-    font = pygame.font.SysFont(None, 20)
-    slider_font = pygame.font.SysFont(None, 24)
+    font = pygame.font.SysFont(None, 24)
+    home_font = pygame.font.SysFont(None, 34)
+    slider_font = pygame.font.SysFont(None, 34)
 
     # Data structure to hold which cells are selected
     selected = [[False for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
@@ -193,7 +195,7 @@ def hand_equity_visualizer(mainMenu):
 
     # Slider geometry
     slider_x = 700
-    slider_y = 500
+    slider_y = 600
     slider_width = 200 - 2 * MARGIN
     slider_height = SLIDER_AREA_HEIGHT - 2 * MARGIN
     track_height = 4
@@ -203,7 +205,7 @@ def hand_equity_visualizer(mainMenu):
     # Add Text Input Box for Percentage Entry
     #
     input_box_rect = pygame.Rect(slider_x + slider_width + 20, slider_y, 100, 30)
-    input_text = str(round(slider_value))
+    input_text = str(round(slider_value)) + "%"
     input_active = False
 
     # Define colours for the text box (inactive/active)
@@ -249,11 +251,54 @@ def hand_equity_visualizer(mainMenu):
     # Initialize selection at 100%
     update_range_from_slider()
 
-    # Define a back button rectangle (e.g., top-left corner)
-    back_button_rect = pygame.Rect(20, 20, 80, 30)
-    back_button_color = (180, 180, 180)
-    back_button_text = font.render("HOME", True, "White")
-    back_button_text_rect = back_button_text.get_rect(center=back_button_rect.center)
+    # Create a transparent black background surface for the back button
+    button_bg_width = 100
+    button_bg_height = 40
+    button_bg = pygame.Surface((button_bg_width, button_bg_height), pygame.SRCALPHA)
+    pygame.draw.rect(
+        button_bg,
+        (0, 0, 0, 180),  # black with 180 alpha (semi-transparent)
+        (0, 0, button_bg_width, button_bg_height),
+        border_radius=10
+    )
+
+    # Define a back button using the Button class
+    back_button = Button(
+        pos=(60, 35),
+        text_input="HOME",
+        font=home_font,
+        base_colour="White",
+        hovering_colour="Gold",
+        image=button_bg
+    )
+
+    # Define explanatory text
+    explanation_font = pygame.font.SysFont(None, 28)
+    explanations = [
+        "How to Read the Grid:",
+        "• Each cell represents your two starting cards",
+        "• 's' means suited (same suit)",
+        "• 'o' means offsuit (different suits)",
+        "• Pairs are when both cards are the same",
+        "Examples:",
+        "• AKs = Ace-King suited",
+        "• JTo = Jack-Ten offsuit",
+        "• QQ = Queen-Queen pair",
+        "",
+        # "Understanding Equity:",
+        # "• Numbers show winning chances vs random hands",
+        # "• Higher % = stronger starting hand",
+        # "• Pairs (AA=85%) are strongest",
+        # "• Suited hands are stronger than offsuit",
+        # "• Connected cards (next to each other) are strong",
+        # "",
+        "Using Hand Ranges:",
+        "• The slider selects hands by strength",
+        "• 20% = top 20% strongest hands",
+        "• Selected hands shown in green",
+        "• Tighter range = stronger hands only",
+        "• Connected cards (next to each other) are strong"
+    ]
 
     clock = pygame.time.Clock()
     running = True
@@ -269,8 +314,8 @@ def hand_equity_visualizer(mainMenu):
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
 
-                # Check if the back button was clicked.
-                if back_button_rect.collidepoint(mouse_x, mouse_y):
+                # Check if the back button was clicked using the Button class
+                if back_button.checkForInput(event.pos):
                     mainMenu()
                     running = False
 
@@ -311,29 +356,31 @@ def hand_equity_visualizer(mainMenu):
                     if event.key == pygame.K_RETURN:
                         # Validate and update the slider_value from the text input.
                         try:
-                            new_val = float(input_text)
+                            # Remove the % symbol before converting to float
+                            new_val = float(input_text.rstrip('%'))
                         except ValueError:
                             new_val = slider_value
                         new_val = max(0, min(new_val, 100))  # Clamp between 0 and 100.
                         slider_value = new_val
                         update_range_from_slider()
-                        input_text = str(round(slider_value))
+                        input_text = str(round(slider_value)) + "%"
                         input_active = False  # Exit text input mode.
                     elif event.key == pygame.K_BACKSPACE:
-                        input_text = input_text[:-1]
+                        if len(input_text) > 1:  # Keep at least 1 character + %
+                            input_text = input_text[:-2] + "%"
                     else:
-                        # Only allow digits for percentage entry.
-                        if event.unicode.isdigit():
-                            input_text += event.unicode
+                        # Only allow digits for percentage entry
+                        if event.unicode.isdigit() and len(input_text.rstrip('%')) < 3:  # Limit to 3 digits
+                            input_text = input_text.rstrip('%') + event.unicode + "%"
 
         # Redraw background, textbox, and header text.
         SCREEN.blit(scaled_bg, (0, 0))
         SCREEN.blit(textbox_surface, (textbox_x, textbox_y))
         SCREEN.blit(HAND_VISUALIZER_TEXT, HAND_VISUALIZER_RECT)
 
-        # Draw the back button.
-        pygame.draw.rect(SCREEN, back_button_color, back_button_rect)
-        SCREEN.blit(back_button_text, back_button_text_rect)
+        # Update and draw the back button
+        back_button.changecolour(pygame.mouse.get_pos())
+        back_button.update(SCREEN)
 
         # Draw the 13x13 grid.
         for row in range(GRID_SIZE):
@@ -371,19 +418,26 @@ def hand_equity_visualizer(mainMenu):
             (int(slider_x + (slider_value / 100.0) * slider_width), int(slider_y + slider_height // 2)),
             knob_radius
         )
-        slider_text = slider_font.render(f"Hand Range: {slider_value:.0f}%", True, BLACK)
-        SCREEN.blit(slider_text, (slider_x, slider_y - 25))
+        slider_text = slider_font.render(f"Hand Range: {slider_value:.0f}%", True, WHITE)
+        SCREEN.blit(slider_text, (slider_x, slider_y - 10))
 
         # Draw the text input box next to the slider.
         if not input_active:
-            input_text = str(round(slider_value))
+            input_text = str(round(slider_value)) + "%"
         box_colour = TEXT_BOX_ACTIVE_colour if input_active else TEXT_BOX_colour
         pygame.draw.rect(SCREEN, box_colour, input_box_rect)
         pygame.draw.rect(SCREEN, BLACK, input_box_rect, 2)  # Border
         input_surface = slider_font.render(input_text, True, BLACK)
         SCREEN.blit(input_surface, (input_box_rect.x + 5, input_box_rect.y + 5))
 
-        # *** Draw the custom cursor last so it’s always on top ***
+        # Draw explanatory text
+        y_offset = container_y
+        for line in explanations:
+            text_surface = explanation_font.render(line, True, "White")
+            SCREEN.blit(text_surface, (container_x + GRID_WIDTH + 50, y_offset))
+            y_offset += 30
+
+        # *** Draw the custom cursor last so it's always on top ***
         current_mouse_pos = pygame.mouse.get_pos()
         SCREEN.blit(scaled_cursor, current_mouse_pos)
 
