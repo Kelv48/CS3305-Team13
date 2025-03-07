@@ -3,8 +3,11 @@ from src.multiplayer_game.game_gui.game_button import buttons
 
 # Player decisions => fold, call, check, raise, all-in
 from src.multiplayer_game.game_gui.utils import playerDecision, arrangeRoom, drawPlayer
+from src.gui.utils.constants import BB, RED, SCREEN, game_font
+import pygame
 
-def auction(common_cards=None, multi_list=None, c_param=None):
+
+def auction(common_cards=None, multi_list=None):
     """
     Displays each player's available options for the auction round.
     Once a player selects an option, their attributes are updated.
@@ -16,7 +19,6 @@ def auction(common_cards=None, multi_list=None, c_param=None):
     number_player = len(player_list)
     every_fold = False
     mutliplayer_list = multi_list
-    client = c_param
 
     while not all(player.decision for player in player_list) and not every_fold:
         for player in player_list:
@@ -53,6 +55,8 @@ def getPlayerOptions(player, player_list):
         min_raise = call_value + (sorted_bets[0] if sorted_bets else 0)
     else:
         min_raise = call_value + sorted_bets[0] - sorted_bets[1]
+    if min_raise < BB:
+        min_raise = BB
 
     max_raise = player.stack
     pot = sum(input_stack_list)
@@ -78,6 +82,30 @@ def getPlayerDecision(player, options, min_raise, max_raise, common_cards, call_
     """
     if player.kind == 'human':
         decision = playerDecision(buttons, options, min_raise, max_raise, common_cards)
+    else:
+        # ... existing AI decision code ...
+        
+        # Display AI decision on screen
+        decision_text = f"{player.name} {decision[0]}"
+        if decision[0] == 'raise':
+            decision_text += f" ${decision[1]}"
+        text_surface = game_font(20).render(decision_text, True, RED)
+        
+        # Position the text based on player position
+        text_positions = {
+            0: (580, 450),
+            1: (360, 400),
+            2: (380, 300),
+            3: (580, 280),
+            4: (780, 300),
+            5: (800, 400)
+        }
+        player_index = player_list.index(player)
+        text_pos = text_positions.get(player_index, (580, 450))
+        
+        SCREEN.blit(text_surface, text_pos)
+        pygame.display.flip()
+        pygame.time.delay(1000)  # Show the decision for 1 second
 
     # decision is expected to be a two-element sequence; extract chips if needed
     chips = int(decision[1]) if decision[0] == 'raise' else None
