@@ -16,24 +16,27 @@ def auction(common_cards=None, multi_list=None, c_param=None):
     player_list = [player for player in Player.player_list if player.live] 
     number_player = len(player_list)
     every_fold = False
-    mutliplayer_list = multi_list
+    multiplayer_list = multi_list
     client = c_param
-
+    user_turn = client.getID()
 
     while not all(player.decision for player in player_list) and not every_fold:    #Loops till everyone has made decision or has folded 
         for player in player_list:
-            if not player.decision and player.live:
-                options, call_value, min_raise, max_raise, pot = getPlayerOptions(player, player_list)
-                decision, chips = getPlayerDecision(player, options, min_raise, max_raise, common_cards, call_value, pot, player_list, number_player)   #  Creates the buttons ... I think
-                processDecision(decision, chips, player, player_list)
-                updateUI(common_cards)
+            if player.name == user_turn:
+                if not player.decision and player.live:
+                    options, call_value, min_raise, max_raise, pot = getPlayerOptions(player, player_list)
+                    decision, chips = getPlayerDecision(player, options, min_raise, max_raise, common_cards, call_value, pot, player_list, number_player)   #  Creates the buttons ... I think
+                    processDecision(decision, chips, player, player_list)
+                    updateUI(common_cards)
 
-            #Checks if everyone has folded bare one 
-            if checkSinglePlayerRemaining(player_list):
-                every_fold = True
-                break
-            
-            client.send(pickle.dumps(player))
+                #Checks if everyone has folded bare one 
+                if checkSinglePlayerRemaining(player_list):
+                    every_fold = True
+                    break
+                
+                client.send(pickle.dumps(player))
+            else:
+                print("Not your turn")
 
     #Sets next round for remaining players 
     for player in player_list:
