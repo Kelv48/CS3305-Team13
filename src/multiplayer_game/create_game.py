@@ -10,9 +10,11 @@ from websockets.exceptions import ConnectionClosed
 
 def create_game(mainMenu, c=None):
     print("CREATE GAME SCREEN")
-    global vote_start_count, num_players, listening
+    global vote_start_count, num_players, playing
     vote_start_count = 0  # Default value
     num_players = 1       #Default value 
+    playing = False
+
 
     #Thread config 
     stop_thread = threading.Event() #Used to stop thread from calling itself
@@ -34,7 +36,7 @@ def create_game(mainMenu, c=None):
          client = c
     
     def listener_thread():
-        global vote_start_count, num_players
+        global vote_start_count, num_players, playing
         
         #If it is set the escape the threaded method
         if stop_thread.is_set():
@@ -47,7 +49,7 @@ def create_game(mainMenu, c=None):
             msg = client.receive()
         except ConnectionClosed as e:
             print("Client connection closed. Leaving thread")
-            stop_thread.is_set()
+            stop_thread.set()
         if msg:
             data = msg  # Assuming msg is already a dictionary
             match data['m_type']:
@@ -61,16 +63,15 @@ def create_game(mainMenu, c=None):
                             print(f"Number of players updated: {num_players}")
                 
                 case Protocols.Response.CLIENT_LIST:
-                            
+                        if not playing:
+                            playing = True
                             client.set_main_menu(mainMenu)
                             client.set_game_screen(lambda: gameMenu(mainMenu, msg['data'], client))
                             client.receive()        #redirects client to game_server
                             stop_thread.set()       #Stops the thread from being called again
-                            client.run_game(3)      #Move to game screen
-                #             return  #Exit the thread
-                # case Protocols.Response.SESSION_ID:
-                #         client.setSessionID(msg['data'])
+                            pygame.event.post(pygame.event.Event(pygame.USEREVENT, {"start_game": True}))  # Signal main thread
 
+                            return
       
         # Schedule the function to run again in 1 second
         threading.Timer(5, listener_thread).start()
@@ -170,6 +171,10 @@ def create_game(mainMenu, c=None):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            
+            if event.type == pygame.USEREVENT and "start_game" in event.dict:
+                client.run_game(3)  # Now runs safely in the main thread
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for button, action in button_objects:
                     if button.checkForInput(LOBBY_MOUSE_POS):
