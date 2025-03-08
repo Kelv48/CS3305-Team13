@@ -8,7 +8,7 @@ communication.
 
 ## Team 13
 - [Kelvin](https://github.com/Kelv48) - 122318693 | Backend Flask-server, Redis and DB
-- [Richard](https://github.com/Richie2030) - 122318926 | Frontend UI and user input
+- [Richard](https://github.com/Richie2030) - 122318926 | Frontend UI, User Input and Tools.
 - [Michael](https://github.com/M-dok) - 122383206 | Networking and GameServer
 - [Yang](https://github.com/YaoYang7) - 122460582 | Game Logic and Algorithms
 
@@ -18,8 +18,10 @@ communication.
 - **Graphical User Interface**: Custom UI designed using Pygame.
 - **Async Networking**: Leverage asyncio to handle multiple connections concurrently.
 - **Music and Sound Effects**: Enhance the gaming experience with audio.
-- **Poker guide: for new players**: to learn how to play.
-- **Poker equity calculator**: For calculating the values of hands.
+- **Poker Guide: for new players**: to learn how to play.
+- **Poker Hand Ranges**: For visualizing all starting hand combinations.
+- **Poker Preflop Ranges**: For visualizing all preflop scenarios.
+- **Poker Equity Calculator**: For calculating the values of hands.
 
 ## Instalation
 
