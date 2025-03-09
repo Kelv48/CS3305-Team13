@@ -38,6 +38,30 @@ def execute_betting_round(community_cards, multiplayer_list, client):
     auction(community_cards, multiplayer_list, client)
     return sum(p.live for p in Player.player_list) + sum(p.alin for p in Player.player_list) > 1
 
+def deal_flop(deck):
+    """Deals the flop (three community cards)."""
+    flop = random.sample(deck, 3)
+    for card in flop:
+        deck.remove(card)
+    return flop
+
+def deal_turn(deck, flop):
+    """Deals the turn (one community card)."""
+    turn = random.sample(deck, 1)
+    deck.remove(turn[0])
+    return flop + turn
+
+def deal_river(deck, common_cards):
+    """Deals the river (one community card)."""
+    river = random.sample(deck, 1)
+    deck.remove(river[0])
+    return common_cards + river
+
+def showdown(player_list, common_cards):
+    """Handles the final showdown and determines the winner."""
+    players_score(player_list, common_cards)
+    recap_round(splitPot(), common_cards)
+
 def poker_round(multiplayer_list, client):
     """Manages a single round of poker without UI handling."""
     player_list = Player.player_list
@@ -61,35 +85,29 @@ def poker_round(multiplayer_list, client):
             return
         
         # Flop
-        flop = random.sample(deck, 3)
-        for card in flop:
-            deck.remove(card)
+        flop = deal_flop(deck)
         if not execute_betting_round(flop, multiplayer_list, client):
             recap_round(onePlayerWin())
             return
         
         # Turn
-        turn = random.sample(deck, 1)
-        deck.remove(turn[0])
-        common_cards = flop + turn
+        common_cards = deal_turn(deck, flop)
         if not execute_betting_round(common_cards, multiplayer_list, client):
             recap_round(onePlayerWin())
             return
         
         # River
-        river = random.sample(deck, 1)
-        deck.remove(river[0])
-        common_cards += river
+        common_cards = deal_river(deck, common_cards)
         if not execute_betting_round(common_cards, multiplayer_list, client):
             recap_round(onePlayerWin())
             return
         
         # Final showdown
-        players_score(player_list, common_cards)
-        recap_round(splitPot(), common_cards)
+        showdown(player_list, common_cards)
     
     finally:
         changePlayersPositions()
+
 
 
 # def poker_round(multiplayer_list, client_param):
