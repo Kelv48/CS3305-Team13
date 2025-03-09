@@ -292,12 +292,17 @@ def giveCard(type_card, cards):
     sub_cards = pygame.sprite.Group()
     list_cards = dict_cards[type_card]
 
-    for i in range(len(list_cards)):
-        card_object = cards_object[cards[i]]
-        card_object.type_card = list_cards[i]
-        card_object.putInPlace()
-        sub_cards.add(card_object)
+    for i, card in enumerate(cards[:len(list_cards)]):  # Ensure we don't exceed list_cards length
+        card_object = cards_object.get(card)  # Use .get() to avoid KeyErrors
+        if card_object:
+            card_object.type_card = list_cards[i]
+            card_object.putInPlace()
+            sub_cards.add(card_object)
+        else:
+            print(f"Warning: Card '{card}' not found in cards_object. Index: {i}, Type: {type(card)}")
+
     return sub_cards
+
 
 def coverUpCards(player_list):
     """
