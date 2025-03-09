@@ -48,6 +48,14 @@ def gameMenu(mainMenu, playerList, client):
                         mainMenu()  # Go to home screen if the Home button is pressed
                         return
 
+            client.send('cards')    #request for cards
+            cards = client.receive()    #receiving cards
+            print("AAAAAAA MY CARDS", cards)
+            for p in Player.player_list:
+                if p.name == cards['userID']:
+                    p.cards = cards['cards']
+                    break
+            
             # Execute a round of poker and update player positions
             poker_round(multiplayer_list, client) # takes in multiplayer_list to check if it is the player's turn
             for player in Player.player_list_chair:

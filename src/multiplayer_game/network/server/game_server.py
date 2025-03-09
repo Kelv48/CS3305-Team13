@@ -8,7 +8,7 @@ import threading
 #from game import game_class    #There are import errors in this module need to make stuff a package 
 from string import Template
 from protocol import Protocols
-from src.multiplayer_game.poker_round import poker_round
+from src.multiplayer_game.poker_round import poker_round, initialize_deck, deal_two_cards
 from src.multiplayer_game.auction import processDecision
 from websockets.exceptions import ConnectionClosedError, ConnectionClosed
 from websockets.asyncio.server import serve, ServerConnection
@@ -50,7 +50,7 @@ def addActiveSession(message):
             data = json.loads(message['data'])
             sessionID = data.get('sessionID')
             with lock:
-                activeSessions[sessionID] = {'clients':data['clients'], 'client_list': data['client_list'], 'c_player':0}
+                activeSessions[sessionID] = {'clients':data['clients'], 'client_list': data['client_list'], 'c_player':0, 'deck':initialize_deck()}
                 print(activeSessions)
 
 thread = pubsub.subscribe(**{channel: addActiveSession})
@@ -129,6 +129,9 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
                 case 'call':
                     await clientCall(websocket, message['sessionID'], userID, message)
 
+                case 'cards':
+                    await clientCards(websocket, message['sessionID', userID, message])
+
             #     case Protocols.Request.BAILOUT:
             #         await clientBailout(websocket,message['sessionID'], userID, message['data'])
 
@@ -154,7 +157,18 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
 
         except UnboundLocalError as e:  #Can occur if connection  is closed with no close frame received or sent
             break
-        
+
+
+async def clientCards(websocket, sessionID, userID, data):
+    dealtCards = deal_two_cards(activeSessions[sessionID]['deck'])
+    try:
+        await websocket.send(json.dumps({'cards':dealtCards, 'userID':userID}))
+    except ConnectionClosedError:    #If a player has disconnected 
+        #Broadcast info to the other players and remove data from game and server
+        print("client has disconnected during broadcast")
+        await clientLeave(websocket, sessionID, userID)
+    
+
 #TODO: Look over this code cuz this might be shite
 async def clientBailout(websocket, sessionID, userID, data):
     '''
