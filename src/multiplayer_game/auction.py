@@ -20,13 +20,13 @@ def auction(common_cards=None, multi_list=None, c_param=None):
                 options, call_value, min_raise, max_raise, pot = getPlayerOptions(player, player_list)
                 decision, chips = getPlayerDecision(player, options, min_raise, max_raise, common_cards, call_value, pot, player_list)
                 processDecision(decision, chips, player, player_list)
-                updateUI(common_cards)
+                #updateUI(common_cards)
                 
                 if checkSinglePlayerRemaining(player_list):
                     every_fold = True
                     break
                 
-                client.send(None, {'decision':decision, 'pot':pot})
+                client.send(None, {'decision':decision})
             else:
                 print("Not your turn")
 
