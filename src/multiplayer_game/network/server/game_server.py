@@ -8,6 +8,7 @@ import threading
 #from game import game_class    #There are import errors in this module need to make stuff a package 
 from string import Template
 from protocol import Protocols
+from src.multiplayer_game.poker_round import poker_round
 from websockets.exceptions import ConnectionClosedError, ConnectionClosed
 from websockets.asyncio.server import serve, ServerConnection
 
@@ -100,8 +101,8 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
             if activeSessions[currentSessionID]['c_player'] >= len(activeSessions[currentSessionID]['clients']):
                 activeSessions[currentSessionID]['c_player'] = 0
 
-            #CALL poker_round()
-            msg = {'decision': message['decision'], 'nextPlayer':activeSessions[currentSessionID]['clients'][activeSessions[currentSessionID]['c_player']]}
+            poker_round(activeSessions[currentSessionID]['client_list'], websocket)
+            msg = {'decision': message['data'], 'nextPlayer':activeSessions[currentSessionID]['clients'][activeSessions[currentSessionID]['c_player']]}
             logger.info("starting to broadcast message")
             for client_writer in activeSessions[currentSessionID]['clients'].values():
                 if client_writer != websocket:
@@ -110,7 +111,6 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
                     except ConnectionClosedError:
                         print("client has disconnected during broadcast")
                         await clientLeave(client_writer, currentSessionID, userID)
-                print("end of function")
 
 
 
