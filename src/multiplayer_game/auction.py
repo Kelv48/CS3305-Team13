@@ -1,6 +1,6 @@
 from src.multiplayer_game.game_gui.player import Player
 from src.multiplayer_game.game_gui.game_button import buttons
-import pickle
+# import pickle
 
 from src.multiplayer_game.game_gui.utils import playerDecision, arrangeRoom, drawPlayer
 import time
@@ -26,7 +26,7 @@ def auction(common_cards=None, multi_list=None, c_param=None):
                     every_fold = True
                     break
                 
-                client.send(pickle.dumps(player))
+                client.send(None, {'decision':decision, 'pot':pot})
             else:
                 print("Not your turn")
 
@@ -34,7 +34,7 @@ def auction(common_cards=None, multi_list=None, c_param=None):
         player.nextAuction()
         if player.live:
             player.decision = False
-        client.send(pickle.dumps(player))
+        # client.send(pickle.dumps(player))
 
 def getPlayerOptions(player, player_list):
     """
