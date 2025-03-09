@@ -9,6 +9,7 @@ import threading
 from string import Template
 from protocol import Protocols
 from src.multiplayer_game.poker_round import poker_round
+from src.multiplayer_game.auction import processDecision
 from websockets.exceptions import ConnectionClosedError, ConnectionClosed
 from websockets.asyncio.server import serve, ServerConnection
 
@@ -101,32 +102,32 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
             if activeSessions[currentSessionID]['c_player'] >= len(activeSessions[currentSessionID]['clients']):
                 activeSessions[currentSessionID]['c_player'] = 0
 
-            poker_round(activeSessions[currentSessionID]['client_list'], websocket)
-            msg = {'decision': message['data'], 'nextPlayer':activeSessions[currentSessionID]['clients'][activeSessions[currentSessionID]['c_player']]}
-            logger.info("starting to broadcast message")
-            for client_writer in activeSessions[currentSessionID]['clients'].values():
-                if client_writer != websocket:
-                    try:
-                         await client_writer.send(json.dumps(msg))  #Server is sending prev player decision and pot to all other clients 
-                    except ConnectionClosedError:
-                        print("client has disconnected during broadcast")
-                        await clientLeave(client_writer, currentSessionID, userID)
+            # poker_round(activeSessions[currentSessionID]['client_list'], websocket) #Poker round runs game 
+            # msg = {'decision': message['data'], 'nextPlayer':activeSessions[currentSessionID]['clients'][activeSessions[currentSessionID]['c_player']]}
+            # logger.info("starting to broadcast message")
+            # for client_writer in activeSessions[currentSessionID]['clients'].values():
+            #     if client_writer != websocket:
+            #         try:
+            #              await client_writer.send(json.dumps(msg))  #Server is sending prev player decision and pot to all other clients 
+            #         except ConnectionClosedError:
+            #             print("client has disconnected during broadcast")
+            #             await clientLeave(client_writer, currentSessionID, userID)
 
 
 
-            # match message['m_type']:
-            #     case Protocols.Request.FOLD:
-            #         logger.info(f"client is folding")
-            #         await foldClient(websocket, message['sessionID'], userID, message)
+            match message['m_type']:
+                case 'fold':
+                    logger.info(f"client is folding")
+                    await foldClient(websocket, message['sessionID'], userID, message)
 
-            #     case Protocols.Request.RAISE:
-            #         await raiseClient(websocket, message['sessionID'], userID, message)
+                case 'raise':
+                    await raiseClient(websocket, message['sessionID'], userID, message)
 
-            #     case Protocols.Request.CHECK:
-            #         await clientCheck(websocket, message['sessionID'], userID, message)
+                case 'check':
+                    await clientCheck(websocket, message['sessionID'], userID, message)
 
-            #     case Protocols.Request.CALL:
-            #         await clientCall(websocket, message['sessionID'], userID, message)
+                case 'call':
+                    await clientCall(websocket, message['sessionID'], userID, message)
 
             #     case Protocols.Request.BAILOUT:
             #         await clientBailout(websocket,message['sessionID'], userID, message['data'])
@@ -187,14 +188,13 @@ async def clientBailout(websocket, sessionID, userID, data):
 async def foldClient(websocket: ServerConnection, sessionID, userID, message):
     print("player has folded")
     #GameLogic manipulation 
-   
-    
-    #Broadcast messages to all other players 
+    processDecision(message['data'], userID, activeSessions[sessionID]['client_list'])
+    msg = {'decision': message['data'], 'nextPlayer':activeSessions[sessionID]['clients'][activeSessions[sessionID]['c_player']]}
     logger.info("starting to broadcast message")
     for client_writer in activeSessions[sessionID]['clients'].values():
         if client_writer != websocket:
-            try:
-                await client_writer.send(json.dumps(message))
+            try:                         
+                await client_writer.send(json.dumps(msg)) 
 
             except ConnectionClosedError:    #If a player has disconnected 
                 #Broadcast info to the other players and remove data from game and server
@@ -206,14 +206,13 @@ async def foldClient(websocket: ServerConnection, sessionID, userID, message):
 
 async def raiseClient(websocket: ServerConnection, sessionID, userID, message):
     print("player has raise")
-    #GameLogic manipulation 
-    #game = games_dict[sessionID]['gameObj]
-
+    msg = {'decision': message['data'], 'nextPlayer':activeSessions[sessionID]['clients'][activeSessions[sessionID]['c_player']]}
     logger.info("starting to broadcast message")
     for client_writer in activeSessions[sessionID]['clients'].values():
         if client_writer != websocket:
-            try:
-                await client_writer.send(json.dumps(message))
+            try:                         
+                await client_writer.send(json.dumps(msg)) 
+
             except ConnectionClosedError:
                 print("client has disconnected during broadcast")
                 await clientLeave(client_writer, sessionID, userID)
@@ -225,12 +224,14 @@ async def clientCheck(websocket: ServerConnection, sessionID, userID, message):
     #GameLogic manipulation 
     #game = games_dict[sessionID]['gameObj]
 
+    
+    msg = {'decision': message['data'], 'nextPlayer':activeSessions[sessionID]['clients'][activeSessions[sessionID]['c_player']]}
     logger.info("starting to broadcast message")
     for client_writer in activeSessions[sessionID]['clients'].values():
         if client_writer != websocket:
-            try:
-                 await client_writer.send(json.dumps(message))
-        
+            try:                         
+                await client_writer.send(json.dumps(msg)) 
+
             except ConnectionClosedError:
                 print("client has disconnected during broadcast")
                 await clientLeave(client_writer, sessionID, userID)
@@ -239,14 +240,14 @@ async def clientCheck(websocket: ServerConnection, sessionID, userID, message):
 
 async def clientCall(websocket: ServerConnection, sessionID, userID, message):
     logger.info("player has called")
-    #GameLogic manipulation 
-    #game = games_dict[sessionID]['gameObj]
 
+    msg = {'decision': message['data'], 'nextPlayer':activeSessions[sessionID]['clients'][activeSessions[sessionID]['c_player']]}
     logger.info("starting to broadcast message")
     for client_writer in activeSessions[sessionID]['clients'].values():
         if client_writer != websocket:
-            try:
-                 await client_writer.send(json.dumps(message))
+            try:                         
+                await client_writer.send(json.dumps(msg)) 
+
 
             except ConnectionClosedError:
                 print("client has disconnected during broadcast")

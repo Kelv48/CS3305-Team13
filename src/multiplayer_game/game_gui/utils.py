@@ -62,7 +62,7 @@ def playerDecision(buttons, dict_options, min_raise, max_raise, client, common_c
                         else:
                             decision = [button.name]      
                         pause_action = False
-                        client.send(None, decision)
+                        client.send(button.name, decision)
                         break
 
             if event.type == pygame.MOUSEMOTION:
