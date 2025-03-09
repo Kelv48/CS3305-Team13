@@ -5,6 +5,10 @@ from src.multiplayer_game.poker_score import players_score
 from src.multiplayer_game.game_gui.utils import recapRound as recap_round, splitPot, onePlayerWin, changePlayersPositions
 from src.gui.utils.constants import SB, BB
 
+def initialize_deck():
+    """Creates and returns a shuffled deck of cards."""
+    return [f'{rank}{suit}' for suit in 'CSHD' for rank in '23456789TJQKA']
+
 def deal_cards(deck, player_list):
     """Distributes two cards to each player."""
     for player in player_list:
@@ -38,24 +42,35 @@ def execute_betting_round(community_cards, multiplayer_list, client):
     auction(community_cards, multiplayer_list, client)
     return sum(p.live for p in Player.player_list) + sum(p.alin for p in Player.player_list) > 1
 
-def deal_flop(deck):
-    """Deals the flop (three community cards)."""
-    flop = random.sample(deck, 3)
-    for card in flop:
+def flop(deck, multiplayer_list, client):
+    """Handles the flop round."""
+    flop_cards = random.sample(deck, 3)
+    for card in flop_cards:
         deck.remove(card)
-    return flop
+    if not execute_betting_round(flop_cards, multiplayer_list, client):
+        recap_round(onePlayerWin())
+        return None
+    return flop_cards
 
-def deal_turn(deck, flop):
-    """Deals the turn (one community card)."""
-    turn = random.sample(deck, 1)
-    deck.remove(turn[0])
-    return flop + turn
+def turn(deck, common_cards, multiplayer_list, client):
+    """Handles the turn round."""
+    turn_card = random.sample(deck, 1)
+    deck.remove(turn_card[0])
+    common_cards += turn_card
+    if not execute_betting_round(common_cards, multiplayer_list, client):
+        recap_round(onePlayerWin())
+        return None
+    return common_cards
 
-def deal_river(deck, common_cards):
-    """Deals the river (one community card)."""
-    river = random.sample(deck, 1)
-    deck.remove(river[0])
-    return common_cards + river
+def river(deck, common_cards, multiplayer_list, client):
+    """Handles the river round."""
+    river_card = random.sample(deck, 1)
+    deck.remove(river_card[0])
+    common_cards += river_card
+    if not execute_betting_round(common_cards, multiplayer_list, client):
+        recap_round(onePlayerWin())
+        return None
+    return common_cards
 
 def showdown(player_list, common_cards):
     """Handles the final showdown and determines the winner."""
@@ -65,16 +80,13 @@ def showdown(player_list, common_cards):
 def poker_round(multiplayer_list, client):
     """Manages a single round of poker without UI handling."""
     player_list = Player.player_list
-    num_players = len(player_list)
     dealer_index = Player.dealer_index
     
     # Assign blinds
     assign_blinds(player_list, dealer_index)
     
     # Initialize deck
-    deck = [
-        f'{rank}{suit}' for suit in 'CSHD' for rank in '23456789TJQKA'
-    ]
+    deck = initialize_deck()
     
     # Deal cards
     deal_cards(deck, player_list)
@@ -85,21 +97,18 @@ def poker_round(multiplayer_list, client):
             return
         
         # Flop
-        flop = deal_flop(deck)
-        if not execute_betting_round(flop, multiplayer_list, client):
-            recap_round(onePlayerWin())
+        common_cards = flop(deck, multiplayer_list, client)
+        if common_cards is None:
             return
         
         # Turn
-        common_cards = deal_turn(deck, flop)
-        if not execute_betting_round(common_cards, multiplayer_list, client):
-            recap_round(onePlayerWin())
+        common_cards = turn(deck, common_cards, multiplayer_list, client)
+        if common_cards is None:
             return
         
         # River
-        common_cards = deal_river(deck, common_cards)
-        if not execute_betting_round(common_cards, multiplayer_list, client):
-            recap_round(onePlayerWin())
+        common_cards = river(deck, common_cards, multiplayer_list, client)
+        if common_cards is None:
             return
         
         # Final showdown
@@ -107,6 +116,7 @@ def poker_round(multiplayer_list, client):
     
     finally:
         changePlayersPositions()
+
 
 
 
