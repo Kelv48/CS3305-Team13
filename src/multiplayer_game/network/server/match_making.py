@@ -123,8 +123,6 @@ async def voteStart(websocket: ServerConnection, sessionID):
         print("Error occurred trying to send message to client")
       
 async def redirect(sessionID):
-    #Create game object using or numPlayer  as a constructing parameter 
-    gameObj = None
 
     #Redirect each client in lobby to game server 
     redirectMessage = json.dumps({"m_type": Protocols.Response.REDIRECT, "data": {"host": "localhost", "port": 443}})
@@ -134,7 +132,7 @@ async def redirect(sessionID):
 
 
     #Publish relevant info to redis server
-    data = {'sessionID':sessionID, 'clients':{}, 'gameObj':gameObj}
+    data = {'sessionID':sessionID, 'clients':{}, 'client_list':list(activeSessions[sessionID]['clients'].values())}
     r.publish(channel, json.dumps(data))
 
 async def leaveGame(websocket: ServerConnection, sessionID, redirect=False):

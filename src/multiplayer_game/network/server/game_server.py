@@ -48,7 +48,7 @@ def addActiveSession(message):
             data = json.loads(message['data'])
             sessionID = data.get('sessionID')
             with lock:
-                activeSessions[sessionID] = {'clients':data['clients'], 'gameObj': data['gameObj']}
+                activeSessions[sessionID] = {'clients':data['clients'], 'client_list': data['client_list'], 'c_player':0}
                 print(activeSessions)
 
 thread = pubsub.subscribe(**{channel: addActiveSession})
@@ -94,12 +94,18 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
                     activeSessions[message['sessionID']]['clients'][userID] = websocket     #Adds serverConnection to the appropriate session
                     print(activeSessions)
 
+            activeSessions[currentSessionID]['c_player'] += 1   #Moves pointer to the next player 
 
+            #Prevents IndexError
+            if activeSessions[currentSessionID]['c_player'] >= len(activeSessions[currentSessionID]['clients']):
+                activeSessions[currentSessionID]['c_player'] = 0
+
+            msg = {'decision': message['decision'], 'pot':message['pot'], 'nextPlayer':activeSessions[currentSessionID]['clients'][activeSessions[currentSessionID]['c_player']]}
             logger.info("starting to broadcast message")
             for client_writer in activeSessions[currentSessionID]['clients'].values():
                 if client_writer != websocket:
                     try:
-                         await client_writer.send(json.dumps(message))
+                         await client_writer.send(json.dumps(msg))
                     except ConnectionClosedError:
                         print("client has disconnected during broadcast")
                         await clientLeave(client_writer, currentSessionID, userID)
