@@ -82,18 +82,14 @@ class Client:
             print(f"{self.id} is waiting for a message")
             message = self.client.recv(timeout=10)
             print(f"{self.id} received message: {message}")
-            if self.in_game:
-                der = pickle.loads(message)
-                return der
-            else:
-                der = json.loads(message)
-                match der['m_type']:
-                    case Protocols.Response.REDIRECT:
+        
+            der = json.loads(message)
+            match der['m_type']:
+                case Protocols.Response.REDIRECT:
                             self.redirect(der['data']['host'], der['data']['port'])
-                            self.in_game = True
-                    case Protocols.Response.SESSION_ID:
+                case Protocols.Response.SESSION_ID:
                             self.setSessionID(der['data'])
-                return der
+            return der
         #If no message is received within time-limit
         except TimeoutError as e:
             print("AAAAAA I'M FUCKING OFF RECEIVING THE MESSAGE ")
