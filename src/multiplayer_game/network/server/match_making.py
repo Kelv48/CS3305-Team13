@@ -23,7 +23,7 @@ from websockets.exceptions import ConnectionClosed, ConnectionClosedError, Conne
 from  websockets.asyncio.server import serve, ServerConnection
 
 # Server attributes
-host ="localhost"
+host ="0.0.0.0"
 port = 80
 template = Template('{"m_type": "$m_type", "data": $data}')   #This is a template for message to be sent to clients
 activeSessions = {}  
@@ -125,7 +125,7 @@ async def voteStart(websocket: ServerConnection, sessionID):
 async def redirect(sessionID):
 
     #Redirect each client in lobby to game server 
-    redirectMessage = json.dumps({"m_type": Protocols.Response.REDIRECT, "data": {"host": "localhost", "port": 443}})
+    redirectMessage = json.dumps({"m_type": Protocols.Response.REDIRECT, "data": {"host": "127.20.0.1","port":443}})
     for serverConnection in activeSessions[sessionID]['clients']:                
         await serverConnection.send(redirectMessage)
                 

@@ -28,8 +28,8 @@ def create_game(mainMenu, c=None):
 
     # Connect to the server
     if not c:
-        client =  Client.connect("84.8.144.77", 8000)
-        #client = Client.connect('localhost', 80)
+        #client=  Client.connect("84.8.144.77", 8000)
+        client =  Client.connect("127.20.0.1", 80)
         client.setID(username)  #sets clients username 
         client.send(Protocols.Request.CREATE_GAME, 6)
     else:

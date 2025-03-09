@@ -23,8 +23,8 @@ def join_game(mainMenu):
         username = data['username']
 
     #Establish connection    
-    c =  Client.connect("84.8.144.77", 8000)
-    #c = Client.connect("localhost", 80)
+    #c = Client.connect("84.8.144.77", 8000)
+    c =  Client.connect("127.20.0.1", 80)
     c.setID(username)
 
     # #Thread config 
