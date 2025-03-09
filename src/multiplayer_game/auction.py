@@ -79,21 +79,20 @@ def getPlayerDecision(player, options, min_raise, max_raise, common_cards, call_
     chips = int(decision[1]) if decision[0] == 'raise' else None
     return decision[0], chips
 
-def processDecision(decision, player, player_list, chips=0):
+def processDecision(decision, chips, player, player_list):
     """
     Update the player's state based on their decision.
     """
-    actions = {
-        'call': processCall,
-        'fold': player.fold,
-        'check': lambda: setattr(player, 'decision', True),
-        'all-in': processAllIn,
-        'raise': lambda: processRaise(player, chips, player_list),
-    }
-    
-    action = actions.get(decision)
-    if action:
-        action(player, player_list)
+    if decision == 'call':
+        processCall(player, player_list)
+    elif decision == 'fold':
+        player.fold()
+    elif decision == 'check':
+        player.decision = True
+    elif decision == 'all-in':
+        processAllIn(player, player_list)
+    elif decision == 'raise':
+        processRaise(player, chips, player_list)
 
 def processCall(player, player_list):
     required = max(p.input_stack for p in player_list) - player.input_stack

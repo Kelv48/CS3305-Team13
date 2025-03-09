@@ -11,16 +11,7 @@ from src.multiplayer_game.network.client.client import Client
 
 # Dummy lobby data
 DUMMY_LOBBIES = [
-    {"CODE": "ABC123", "players": 2, "max_players": 6, "status": "Waiting"},
-    {"CODE": "DEF456", "players": 3, "max_players": 6, "status": "Waiting"},
-    {"CODE": "GHI789", "players": 1, "max_players": 6, "status": "Waiting"},
-    {"CODE": "JKL012", "players": 6, "max_players": 6, "status": "Full"},
-    {"CODE": "MNO345", "players": 4, "max_players": 6, "status": "Waiting"},
-    {"CODE": "PQR678", "players": 2, "max_players": 6, "status": "Waiting"},
-    {"CODE": "STU901", "players": 5, "max_players": 6, "status": "Waiting"},
-    {"CODE": "VWX234", "players": 1, "max_players": 6, "status": "Waiting"},
-    {"CODE": "YZA567", "players": 3, "max_players": 6, "status": "Waiting"},
-    {"CODE": "BCD890", "players": 4, "max_players": 6, "status": "Waiting"}
+    {"CODE": "DON'T CLICK", "players": 0, "max_players": 6, "status": "TESTING"}
 ]
 
 def join_game(mainMenu):
