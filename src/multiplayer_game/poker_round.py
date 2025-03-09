@@ -9,12 +9,25 @@ def initialize_deck():
     """Creates and returns a shuffled deck of cards."""
     return [f'{rank}{suit}' for suit in 'CSHD' for rank in '23456789TJQKA']
 
-def deal_cards(deck, player_list):
-    """Distributes two cards to each player."""
-    for player in player_list:
-        player.cards = random.sample(deck, 2)
-        for card in player.cards:
-            deck.remove(card)
+# def deal_cards(deck, player_list):
+#     """Distributes two cards to each player."""
+#     for player in player_list:
+#         player.cards = random.sample(deck, 2)
+#         for card in player.cards:
+#             deck.remove(card)
+
+def deal_cards(deck, player):
+    """Distributes two cards to a single player."""
+    player.cards = random.sample(deck, 2)
+    for card in player.cards:
+        deck.remove(card)
+
+def deal_two_cards(deck):
+    """Removes two cards from the deck and returns them."""
+    dealt_cards = random.sample(deck, 2)
+    for card in dealt_cards:
+        deck.remove(card)
+    return dealt_cards
 
 def assign_blinds(player_list, dealer_index):
     """Assigns small and big blinds."""
@@ -89,7 +102,7 @@ def poker_round(multiplayer_list, client):
     deck = initialize_deck()
     
     # Deal cards
-    deal_cards(deck, player_list)
+    # deal_cards(deck, player_list)
     
     try:
         if not execute_betting_round(None, multiplayer_list, client):
