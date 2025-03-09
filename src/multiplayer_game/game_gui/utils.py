@@ -10,7 +10,7 @@ from pygame_widgets.slider import Slider
 from pygame_widgets.textbox import TextBox
 
 
-def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=None):
+def playerDecision(buttons, dict_options, min_raise, max_raise, client, common_cards=None):
     """
     Displays the GUI for a player's decision and returns their action.
     If no action is received within a set time, auto-fold is returned.
@@ -60,8 +60,9 @@ def playerDecision(buttons, dict_options, min_raise, max_raise, common_cards=Non
                         if button.name == 'raise':
                             decision = [button.name, slider.getValue() + min_raise]
                         else:
-                            decision = [button.name]
+                            decision = [button.name]      
                         pause_action = False
+                        client.send(None, decision)
                         break
 
             if event.type == pygame.MOUSEMOTION:

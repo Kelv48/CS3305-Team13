@@ -17,7 +17,7 @@ def auction(common_cards=None, multi_list=None, c_param=None):
         for player in player_list:
             if player.name == user_turn and not player.decision and player.live:
                 options, call_value, min_raise, max_raise, pot = getPlayerOptions(player, player_list)
-                decision, chips = getPlayerDecision(player, options, min_raise, max_raise, common_cards, call_value, pot, player_list)
+                decision, chips = getPlayerDecision(player, options, min_raise, max_raise, common_cards, call_value, pot, player_list, client)
                 processDecision(decision, chips, player, player_list)
                 #updateUI(common_cards)
                 
@@ -58,7 +58,7 @@ def getPlayerOptions(player, player_list):
     
     return options, call_value, min_raise, max_raise, pot
 
-def getPlayerDecision(player, options, min_raise, max_raise, common_cards, call_value, pot, player_list):
+def getPlayerDecision(player, options, min_raise, max_raise, common_cards, call_value, pot, player_list, client):
     """
     Get the player's decision with a timeout mechanism.
     """
@@ -68,7 +68,7 @@ def getPlayerDecision(player, options, min_raise, max_raise, common_cards, call_
     
     while time.time() - start_time < timeout:
         if player.kind == 'human':
-            decision = playerDecision(buttons, options, min_raise, max_raise, common_cards)
+            decision = playerDecision(buttons, options, min_raise, max_raise, client, common_cards)
             if decision:
                 break
 

@@ -100,12 +100,13 @@ async def handleClient(websocket: ServerConnection): #ConnectionClosedError mayb
             if activeSessions[currentSessionID]['c_player'] >= len(activeSessions[currentSessionID]['clients']):
                 activeSessions[currentSessionID]['c_player'] = 0
 
-            msg = {'decision': message['decision'], 'pot':message['pot'], 'nextPlayer':activeSessions[currentSessionID]['clients'][activeSessions[currentSessionID]['c_player']]}
+            #CALL poker_round()
+            msg = {'decision': message['decision'], 'nextPlayer':activeSessions[currentSessionID]['clients'][activeSessions[currentSessionID]['c_player']]}
             logger.info("starting to broadcast message")
             for client_writer in activeSessions[currentSessionID]['clients'].values():
                 if client_writer != websocket:
                     try:
-                         await client_writer.send(json.dumps(msg))
+                         await client_writer.send(json.dumps(msg))  #Server is sending prev player decision and pot to all other clients 
                     except ConnectionClosedError:
                         print("client has disconnected during broadcast")
                         await clientLeave(client_writer, currentSessionID, userID)
