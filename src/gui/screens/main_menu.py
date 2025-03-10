@@ -5,7 +5,7 @@ from src.gui.utils.constants import BG, screen_font, SCREEN, scaled_cursor, FPS
 from src.gui.screens.singleplayer import singlePlayer
 from src.gui.screens.settings import settings
 from src.gui.screens.multiplayer import multiPlayer
-from src.gui.screens.guide import how_to_play_poker
+from src.gui.screens.hand_rankings import hand_rankings
 from src.gui.screens.leaderboard import leaderboard
 from src.gui.screens.register import register, logout, load_user
 from src.gui.screens.user_page import user_page
@@ -41,9 +41,8 @@ def mainMenu():
         # Define button labels and functions
         buttons = [
             ("SINGLEPLAYER", singlePlayer),
-            ("GUIDE", how_to_play_poker),
+            ("HAND RANKINGS", hand_rankings),
             ("TOOLS", tools),
-            ("LEADERBOARD", leaderboard),
             ("SETTINGS", settings),
             ("QUIT", sys.exit)
         ]
@@ -52,6 +51,7 @@ def mainMenu():
             buttons.insert(0, ("LOGOUT", logout))  # Logout button
             buttons.insert(1, ("USER", user_page))
             buttons.insert(3, ("MULTIPLAYER", multiPlayer))
+            buttons.insert(4, ("LEADERBOARD", leaderboard))
         else:
             buttons.insert(0, ("REGISTER & LOGIN", register))
 
