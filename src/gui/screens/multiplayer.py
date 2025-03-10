@@ -6,7 +6,6 @@ import asyncio
 
 from src.multiplayer_game.create_game import create_game
 from src.multiplayer_game.join_game import join_game
-from src.multiplayer_game.loading_screen import loading_screen
 
 from src.multiplayer_game.network.client.client import Client
 
@@ -52,7 +51,6 @@ def multiPlayer(mainMenu):
         buttons = [
             ("CREATE GAME", create_game),
             ("JOIN GAME", join_game),
-            ("LOADING SCREEN", loading_screen),
             ("HOME", mainMenu)]
 
         # Calculate vertical spacing with closer spacing
@@ -98,12 +96,6 @@ def multiPlayer(mainMenu):
                             c.set_join_game_screen(lambda: join_game(mainMenu))
                             print("MULTIPLAYER ACTION = JOIN GAME")
                             c.run_game(1)
-                        if action == loading_screen:
-                            c = Client()
-                            c.set_main_menu(mainMenu)
-                            c.set_loading_screen(lambda: loading_screen(mainMenu))
-                            print("MULTIPLAYER ACTION = LOADING SCREEN")
-                            c.run_game(2)
                         if action == mainMenu:
                             action()
 

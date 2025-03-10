@@ -206,19 +206,6 @@ def arrangeRoom(common_cards=None):
                 cards.add(card)
             cards.draw(SCREEN)
 
-    # Create and draw Main Menu Button using the Button class
-    home_button = Button(
-        pos=(85, 35),  # Centered in the 10,10,150,50 rect
-        text_input="Main Menu",
-        font=pygame.font.Font(None, 36),
-        base_colour=(255, 255, 255),
-        hovering_colour=(200, 200, 200),
-        image=None
-    )
-    home_button.update(SCREEN)
-    
-    return home_button
-
 
 
 

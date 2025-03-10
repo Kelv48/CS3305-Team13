@@ -15,9 +15,6 @@ GREEN = (94, 151, 82)
 FPS = 60
 WIDTH = 1280
 HEIGHT = 720
-START_STACK = 5000
-screen_width = 1280
-screen_height = 720
 
 pygame.display.set_caption("GAMBLERS DEN")
 
@@ -26,7 +23,7 @@ SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)    # Resizab
 
 
 # Load and scale the cursor image to 32x32
-cursor_image = pygame.image.load("assets/images/pointer_c.png").convert_alpha()
+cursor_image = pygame.image.load("assets/images/Cursor.png").convert_alpha()
 scaled_cursor = pygame.transform.smoothscale(cursor_image, (32, 32))
 
 # Hide the default cursor
@@ -51,11 +48,8 @@ bb_icon = pygame.transform.scale(bb_icon, (70, 70))
 
 
 
-
-
-
 # Background
-BG = pygame.image.load("assets/images/BE.jpeg").convert_alpha()
+BG = pygame.image.load("assets/images/Background.jpeg").convert_alpha()
 BG.set_colorkey(WHITE)
 
 
@@ -71,9 +65,6 @@ label_player_image.set_colorkey(WHITE)
 # Game Background
 GAME_BG = pygame.image.load("assets/images/GameBackground.jpg").convert_alpha()
 GAME_BG.set_colorkey(WHITE)
-
-
-
 
 
 # Sound effect

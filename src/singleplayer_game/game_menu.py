@@ -7,7 +7,7 @@ from src.singleplayer_game.poker_round import poker_round
 
 screen_width = 1280
 screen_height = 720
-START_STACK = 5000
+START_STACK = 10000
 
 def gameMenu(mainMenu):
     """Starts the game loop and keeps it running consistently."""
